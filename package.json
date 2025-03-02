@@ -12,7 +12,7 @@
     "axios": "^1.8.1",
     "next": "15.2.0",
     "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^4.8.69",
+    "pdfjs-dist": "^3.4.120",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-toastify": "^11.0.5"

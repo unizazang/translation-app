@@ -1,29 +1,36 @@
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
-import dynamic from "next/dynamic";
 
-// pdfjs-dist의 Web Worker를 동적으로 로드
-const pdfjsLib = dynamic(() => import("pdfjs-dist/build/pdf"), { ssr: false });
+// ✅ Web Worker 경로를 고정된 버전으로 직접 설정
+GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js`;
 
+/**
+ * PDF 파일을 로드하는 함수
+ */
 export async function loadPdf(file: File) {
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await getDocument({ data: arrayBuffer }).promise;
-  return pdf;
+  const reader = new FileReader();
+  return new Promise<ArrayBuffer>((resolve, reject) => {
+    reader.onload = () => resolve(reader.result as ArrayBuffer);
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
 }
 
 /**
- * PDF 문서에서 텍스트를 추출하는 함수
- * @param pdfBuffer PDF 파일의 ArrayBuffer
- * @returns 각 페이지별 텍스트 배열
+ * PDF에서 텍스트를 추출하는 함수
  */
 export async function extractTextFromPdf(pdfBuffer: ArrayBuffer) {
   const pdf = await getDocument({ data: pdfBuffer }).promise;
-  const extractedText: string[][] = [];
+  console.log("✅ PDF 문서 열기 완료, 총 페이지 수:", pdf.numPages);
+  const extractedText: { text: string; x: number; y: number }[][] = [];
 
   for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
     const page = await pdf.getPage(pageNum);
     const textContent = await page.getTextContent();
 
-    // 텍스트를 x 좌표 기준으로 정렬하여 컬럼을 분리
+    if (textContent.items.length === 0) {
+      console.warn(`⚠️ 페이지 ${pageNum}에서 추출된 텍스트가 없습니다.`);
+    }
+
     const lines = textContent.items.map((item: any) => ({
       text: item.str,
       x: item.transform[4], // x 좌표
@@ -37,17 +44,13 @@ export async function extractTextFromPdf(pdfBuffer: ArrayBuffer) {
 }
 
 /**
- * 텍스트를 x 좌표 기준으로 컬럼을 분리하는 함수
- * @param textData 각 페이지별 텍스트 데이터 (x, y 좌표 포함)
- * @param columnThreshold 컬럼을 나누는 x 좌표 기준값 (예: 300px)
- * @returns 컬럼별 텍스트 배열
+ * x 좌표 기준으로 컬럼을 자동 분리하는 함수
  */
 export function splitTextByColumns(
   textData: { text: string; x: number; y: number }[][],
   columnThreshold = 300
 ) {
   return textData.map((page) => {
-    // 왼쪽 컬럼과 오른쪽 컬럼을 구분
     const leftColumn: string[] = [];
     const rightColumn: string[] = [];
 
@@ -60,8 +63,28 @@ export function splitTextByColumns(
     });
 
     return {
-      leftColumn: leftColumn.join(" "), // 왼쪽 컬럼 텍스트 합치기
-      rightColumn: rightColumn.join(" "), // 오른쪽 컬럼 텍스트 합치기
+      leftColumn: leftColumn.join(" "),
+      rightColumn: rightColumn.join(" "),
     };
   });
+}
+
+/**
+ * 텍스트를 문장 단위로 나누는 함수
+ */
+export function splitTextIntoSentences(text: string): string[] {
+  return text.replace(/\n+/g, " ").match(/[^.!?]+[.!?]+|.+$/g) || [];
+}
+
+/**
+ * 컬럼별 문장을 나누는 함수
+ */
+export function splitColumnsIntoSentences(columnText: {
+  leftColumn: string;
+  rightColumn: string;
+}) {
+  return {
+    leftSentences: splitTextIntoSentences(columnText.leftColumn),
+    rightSentences: splitTextIntoSentences(columnText.rightColumn),
+  };
 }
