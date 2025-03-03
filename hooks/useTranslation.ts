@@ -22,17 +22,21 @@ export function useTranslation() {
    * 입력된 텍스트를 번역하는 함수
    */
   const translateText = async (text: string, sourceLang: string) => {
-    const [google, papago, deepL] = await Promise.all([
-      translateWithGoogle(text, sourceLang),
-      translateWithPapago(text, sourceLang),
-      translateWithDeepL(text, sourceLang),
-    ]);
+    try {
+      const [google, papago, deepL] = await Promise.all([
+        translateWithGoogle(text, sourceLang),
+        translateWithPapago(text, sourceLang),
+        translateWithDeepL(text, sourceLang),
+      ]);
 
-    setTranslations({
-      google: google || "",
-      papago: papago || "",
-      deepL: deepL || "",
-    });
+      setTranslations({
+        google: google || "번역 실패",
+        papago: papago || "번역 실패",
+        deepL: deepL || "번역 실패",
+      });
+    } catch (error) {
+      console.error("Translation Error:", error);
+    }
   };
 
   return { translations, translateText };
