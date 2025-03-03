@@ -1,24 +1,14 @@
 "use client";
 
-import React from "react";
-import { useTextProcessing } from "@/hooks/useTextProcessing";
-import TranslationCard from "@/components/TranslationCard";
+interface TranslationResultProps {
+  text: string;
+}
 
-const TranslationResult: React.FC<{ text: string }> = ({ text }) => {
-  const { groupedSentences, processText } = useTextProcessing();
-
-  // PDF 텍스트를 받아서 문장 분리 후 그룹화 실행
-  React.useEffect(() => {
-    if (text) processText(text);
-  }, [text]);
-
+export default function TranslationResult({ text }: TranslationResultProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-      {groupedSentences.map((group, index) => (
-        <TranslationCard key={index} textGroup={group} />
-      ))}
+    <div className="w-full max-w-2xl border p-4 rounded-lg">
+      <h2 className="text-xl font-semibold mb-2">추출된 문장</h2>
+      <pre className="whitespace-pre-wrap">{text}</pre>
     </div>
   );
-};
-
-export default TranslationResult;
+}

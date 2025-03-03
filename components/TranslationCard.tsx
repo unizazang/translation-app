@@ -1,19 +1,35 @@
-import React from "react";
+"use client";
 
 interface TranslationCardProps {
-  textGroup: string[];
+  originalText: string;
+  translations: { google: string; papago: string; deepL: string };
 }
 
-const TranslationCard: React.FC<TranslationCardProps> = ({ textGroup }) => {
+export default function TranslationCard({
+  originalText,
+  translations,
+}: TranslationCardProps) {
   return (
-    <div className="border rounded-lg p-4 shadow-md bg-white">
-      {textGroup.map((sentence, index) => (
-        <p key={index} className="text-lg leading-relaxed mb-2">
-          {sentence}
-        </p>
-      ))}
+    <div
+      style={{
+        border: "1px solid gray",
+        padding: "10px",
+        marginBottom: "10px",
+      }}
+    >
+      <h3>원본 문장</h3>
+      <p>{originalText}</p>
+
+      <h3>번역 결과</h3>
+      <p>
+        <strong>Google:</strong> {translations.google}
+      </p>
+      <p>
+        <strong>Papago:</strong> {translations.papago}
+      </p>
+      <p>
+        <strong>DeepL:</strong> {translations.deepL}
+      </p>
     </div>
   );
-};
-
-export default TranslationCard;
+}
