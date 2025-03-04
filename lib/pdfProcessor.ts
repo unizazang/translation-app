@@ -15,6 +15,19 @@ export async function loadPdf(file: File) {
   });
 }
 
+/*
+ * 이상한 공백이랑 특수문자 치환하는 함수
+ */
+
+export function cleanExtractedText(text: string): string {
+  return text
+    .replace(/\s{2,}/g, " ") // 연속된 공백을 하나로 줄임
+    .replace(/-\s+/g, "") // 하이픈 뒤에 공백이 있으면 붙여서 연결
+    .replace(/([a-zA-Z])\s+([a-zA-Z])/g, "$1$2") // 중간에 들어간 공백 제거 (단어 사이)
+    .replace(/’/g, "'") // 이상한 특수문자 치환
+    .trim();
+}
+
 /**
  * PDF에서 텍스트를 추출하는 함수
  */

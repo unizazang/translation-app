@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   translateWithGoogle,
   translateWithPapago,
@@ -29,6 +29,10 @@ export function useTranslation() {
     deepL: "",
   });
 
+  useEffect(() => {
+    console.log("📌 최신 고유명사 목록:", properNouns);
+  }, [properNouns]);
+
   /**
    * 입력된 텍스트를 번역하는 함수
    */
@@ -40,7 +44,7 @@ export function useTranslation() {
         properNouns
       );
 
-      console.log("🔹 변환된 텍스트:", transformedText); // ✅ 변환 확인
+      console.log("🔹 변환된 텍스트:", transformedText); // 디버깅 추가
 
       // ✅ 변환된 텍스트로 번역 실행 (수정된 부분)
       const [google, papago, deepL] = await Promise.all([
@@ -49,11 +53,28 @@ export function useTranslation() {
         translateWithDeepL(transformedText, sourceLang),
       ]);
 
+      console.log("✅ 번역 결과 (Google):", google);
+      console.log("✅ 번역 결과 (Papago):", papago);
+      console.log("✅ 번역 결과 (DeepL):", deepL);
+
       setTranslations({
         google: restoreProperNounsFromTokens(google || "", tokenMap),
         papago: restoreProperNounsFromTokens(papago || "", tokenMap),
         deepL: restoreProperNounsFromTokens(deepL || "", tokenMap),
       });
+
+      console.log(
+        "🔄 복원된 번역 (Google):",
+        restoreProperNounsFromTokens(google || "", tokenMap)
+      );
+      console.log(
+        "🔄 복원된 번역 (Papago):",
+        restoreProperNounsFromTokens(papago || "", tokenMap)
+      );
+      console.log(
+        "🔄 복원된 번역 (DeepL):",
+        restoreProperNounsFromTokens(deepL || "", tokenMap)
+      );
     } catch (error) {
       console.error("Translation Error:", error);
     }

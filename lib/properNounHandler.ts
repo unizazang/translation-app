@@ -6,13 +6,19 @@ export function replaceProperNounsWithTokens(
   properNouns: string[]
 ): { transformedText: string; tokenMap: Record<string, string> } {
   let transformedText = text;
-  const tokenMap: Record<string, string> = {}; // 토큰과 원래 단어 매핑 저장
+  const tokenMap: Record<string, string> = {};
 
   properNouns.forEach((noun, index) => {
-    const token = `__PN${index}__`; // 고유 토큰 생성
-    tokenMap[token] = noun; // 원래 단어 저장
-    const regex = new RegExp(`\\b${noun}\\b`, "gi"); // 단어 단위로 정확히 매칭
-    transformedText = transformedText.replace(regex, token); // 변환 적용
+    const token = `__PN${index}__`;
+    tokenMap[token] = noun;
+
+    // ✅ 모든 경우를 포괄하는 정규식 (대소문자 구분 없음)
+    const regex = new RegExp(
+      `\\b${noun.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")}\\b`,
+      "gi"
+    );
+
+    transformedText = transformedText.replace(regex, token);
   });
 
   return { transformedText, tokenMap };
@@ -28,8 +34,8 @@ export function restoreProperNounsFromTokens(
   let restoredText = translatedText;
 
   Object.entries(tokenMap).forEach(([token, original]) => {
-    const regex = new RegExp(token, "g");
-    restoredText = restoredText.replace(regex, original); // 토큰을 원래 단어로 변경
+    const regex = new RegExp(`\\b${token}\\b`, "g"); // ✅ 단어 경계를 포함해 안전한 변환
+    restoredText = restoredText.replace(regex, original);
   });
 
   return restoredText;
