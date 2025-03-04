@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PdfUploader from "@/components/PdfUploader";
 import TranslationResult from "@/components/TranslationResult";
 import LanguageSelector from "@/components/LanguageSelector";
@@ -12,6 +12,7 @@ export default function Home() {
   const [pdfText, setPdfText] = useState<string>(""); // 원본 텍스트
   const [selectedLanguage, setSelectedLanguage] = useState<string>("en"); // 기본값: 영어
   const [currentIndex, setCurrentIndex] = useState<number>(0); // 현재 번역할 문장 그룹의 인덱스
+  const [isTranslating, setIsTranslating] = useState<boolean>(false); // 번역 중 여부
 
   const { groupedSentences, processText } = useTextProcessing(); // 문장 그룹화 훅
   const { translations, translateText } = useTranslation(); // 번역 훅
@@ -24,17 +25,28 @@ export default function Home() {
   };
 
   // 번역 실행 함수
-  const handleTranslate = () => {
+  const handleTranslate = async () => {
     if (groupedSentences[currentIndex]) {
-      translateText(groupedSentences[currentIndex].join(" "), selectedLanguage);
+      setIsTranslating(true); // 🔹 번역 시작 시 상태 변경
+      await translateText(
+        groupedSentences[currentIndex].join(" "),
+        selectedLanguage
+      );
+      setIsTranslating(false); // 🔹 번역 완료 후 상태 변경
     }
   };
 
-  // 다음 문장으로 이동
+  // ✅ currentIndex가 변경될 때 자동으로 번역 실행
+  useEffect(() => {
+    if (groupedSentences.length > 0) {
+      handleTranslate();
+    }
+  }, [currentIndex]); // 🔹 currentIndex가 변경될 때 실행
+
+  // 다음 문장으로 이동 (currentIndex 변경 → useEffect에서 번역 실행)
   const handleNext = () => {
     if (currentIndex < groupedSentences.length - 1) {
       setCurrentIndex((prevIndex) => prevIndex + 1);
-      handleTranslate(); // 다음 문장 자동 번역
     }
   };
 
@@ -48,12 +60,13 @@ export default function Home() {
       {/* PDF 업로드 */}
       <PdfUploader onTextExtracted={handleTextExtracted} />
 
-      {/* 번역 실행 버튼 */}
+      {/* 번역 실행 버튼 (최초 번역 실행) */}
       <button
         onClick={handleTranslate}
         className="px-4 py-2 bg-blue-500 text-white rounded"
+        disabled={isTranslating} // 🔹 번역 중이면 버튼 비활성화
       >
-        번역하기
+        {isTranslating ? "번역 중..." : "번역하기"}
       </button>
 
       {/* 현재 번역 중인 문장 그룹 표시 */}
@@ -71,8 +84,9 @@ export default function Home() {
         <button
           onClick={handleNext}
           className="px-4 py-2 bg-gray-500 text-white rounded mt-4"
+          disabled={isTranslating} // 🔹 번역 중이면 버튼 비활성화
         >
-          다음 문장
+          {isTranslating ? "번역 중..." : "다음 문장"}
         </button>
       )}
     </div>
