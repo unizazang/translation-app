@@ -25,7 +25,7 @@ export function replaceProperNounsWithTokens(
 }
 
 /**
- * ✅ 번역 후 토큰을 원래 고유명사로 되돌리는 함수
+ * ✅ 번역 후 토큰을 원래 고유명사로 되돌리는 함수 (문장부호 처리 추가)
  */
 export function restoreProperNounsFromTokens(
   translatedText: string,
@@ -34,8 +34,12 @@ export function restoreProperNounsFromTokens(
   let restoredText = translatedText;
 
   Object.entries(tokenMap).forEach(([token, original]) => {
-    const regex = new RegExp(`\\b${token}\\b`, "g"); // ✅ 단어 경계를 포함해 안전한 변환
-    restoredText = restoredText.replace(regex, original);
+    // ✅ 단어 경계 + 문장부호도 포함하여 변환
+    const regex = new RegExp(`${token}([.,!?]*)`, "g");
+    restoredText = restoredText.replace(
+      regex,
+      (_, punctuation) => original + (punctuation || "")
+    );
   });
 
   return restoredText;

@@ -2,7 +2,6 @@ import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 
 // ✅ Web Worker 경로를 고정된 버전으로 직접 설정
 GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js`;
-
 /**
  * PDF 파일을 로드하는 함수
  */
@@ -14,11 +13,9 @@ export async function loadPdf(file: File) {
     reader.readAsArrayBuffer(file);
   });
 }
-
-/*
- * 이상한 공백이랑 특수문자 치환하는 함수
+/**
+ * ✅ 이상한 공백이랑 특수문자 치환하는 함수
  */
-
 export function cleanExtractedText(text: string): string {
   return text
     .replace(/\s{2,}/g, " ") // 연속된 공백을 하나로 줄임
@@ -29,13 +26,13 @@ export function cleanExtractedText(text: string): string {
 }
 
 /**
- * PDF에서 텍스트를 추출하는 함수
+ * ✅ PDF에서 텍스트를 추출하는 함수 (cleanExtractedText 적용)
  */
 export async function extractTextFromPdf(pdfBuffer: ArrayBuffer) {
   const pdf = await getDocument({ data: pdfBuffer }).promise;
   console.log("✅ PDF 문서 열기 완료, 총 페이지 수:", pdf.numPages);
 
-  let extractedText: string = "";
+  const extractedText: { text: string; x: number; y: number }[][] = []; // ✅ 좌표 정보 유지
 
   for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
     const page = await pdf.getPage(pageNum);
@@ -45,19 +42,22 @@ export async function extractTextFromPdf(pdfBuffer: ArrayBuffer) {
       console.warn(`⚠️ 페이지 ${pageNum}에서 추출된 텍스트가 없습니다.`);
     }
 
-    const pageText = textContent.items.map((item: any) => item.str).join(" "); // 텍스트를 하나의 문자열로 합치기
+    // ✅ 텍스트 정제 적용 (cleanExtractedText 추가)
+    const lines = textContent.items.map((item: any) => ({
+      text: cleanExtractedText(item.str), // ✅ 여기서 정제
+      x: item.transform[4], // x 좌표
+      y: item.transform[5], // y 좌표
+    }));
 
-    extractedText += " " + pageText; // 페이지별 텍스트를 하나로 결합
+    extractedText.push(lines);
   }
 
-  extractedText = cleanExtractedText(extractedText); // ✅ 불필요한 공백 및 특수문자 제거
   console.log("📝 정제된 PDF 텍스트:", extractedText);
-
   return extractedText;
 }
 
 /**
- * x 좌표 기준으로 컬럼을 자동 분리하는 함수
+ * ✅ x 좌표 기준으로 컬럼을 자동 분리하는 함수 (정제된 텍스트 적용)
  */
 export function splitTextByColumns(
   textData: { text: string; x: number; y: number }[][],
@@ -68,10 +68,11 @@ export function splitTextByColumns(
     const rightColumn: string[] = [];
 
     page.forEach(({ text, x }) => {
+      const cleanedText = cleanExtractedText(text); // ✅ 컬럼별 텍스트 정제 적용
       if (x < columnThreshold) {
-        leftColumn.push(text);
+        leftColumn.push(cleanedText);
       } else {
-        rightColumn.push(text);
+        rightColumn.push(cleanedText);
       }
     });
 
@@ -80,24 +81,4 @@ export function splitTextByColumns(
       rightColumn: rightColumn.join(" "),
     };
   });
-}
-
-/**
- * 텍스트를 문장 단위로 나누는 함수
- */
-export function splitTextIntoSentences(text: string): string[] {
-  return text.replace(/\n+/g, " ").match(/[^.!?]+[.!?]+|.+$/g) || [];
-}
-
-/**
- * 컬럼별 문장을 나누는 함수
- */
-export function splitColumnsIntoSentences(columnText: {
-  leftColumn: string;
-  rightColumn: string;
-}) {
-  return {
-    leftSentences: splitTextIntoSentences(columnText.leftColumn),
-    rightSentences: splitTextIntoSentences(columnText.rightColumn),
-  };
 }
