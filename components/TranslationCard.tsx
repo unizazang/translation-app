@@ -1,5 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { highlightDifferences } from "@/lib/textComparison";
+
 interface TranslationCardProps {
   originalText: string;
   translations: { google: string; papago: string; deepL: string };
@@ -9,31 +12,43 @@ export default function TranslationCard({
   originalText,
   translations,
 }: TranslationCardProps) {
+  const [highlightedResults, setHighlightedResults] = useState<string[]>([]);
+
+  // ✅ 번역 결과 변경 시 하이라이트 업데이트
+  useEffect(() => {
+    setHighlightedResults(
+      highlightDifferences(originalText, [
+        translations.google,
+        translations.papago,
+        translations.deepL,
+      ])
+    );
+  }, [originalText, translations]);
+
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 space-y-4">
-      {/* 원본 문장 */}
-      <div className="bg-gray-100 p-4 rounded-lg text-lg font-semibold text-center">
-        {originalText}
-      </div>
+    <div className="w-full border p-4 rounded-lg">
+      <h3 className="text-lg font-semibold">원본 문장</h3>
+      <p>{originalText}</p>
 
-      {/* 번역 결과 (3열 그리드) */}
+      <h3 className="text-lg font-semibold">번역 결과</h3>
       <div className="grid grid-cols-3 gap-4">
-        {/* Google 번역 */}
-        <div className="border p-4 rounded-lg shadow-md bg-white">
-          <h3 className="font-bold text-blue-600">Google 번역</h3>
-          <p>{translations.google}</p>
+        <div className="border p-2">
+          <strong>Google:</strong>
+          <p
+            dangerouslySetInnerHTML={{ __html: highlightedResults[0] || "" }}
+          />
         </div>
-
-        {/* Papago 번역 */}
-        <div className="border p-4 rounded-lg shadow-md bg-white">
-          <h3 className="font-bold text-green-600">Papago 번역</h3>
-          <p>{translations.papago}</p>
+        <div className="border p-2">
+          <strong>Papago:</strong>
+          <p
+            dangerouslySetInnerHTML={{ __html: highlightedResults[1] || "" }}
+          />
         </div>
-
-        {/* DeepL 번역 */}
-        <div className="border p-4 rounded-lg shadow-md bg-white">
-          <h3 className="font-bold text-purple-600">DeepL 번역</h3>
-          <p>{translations.deepL}</p>
+        <div className="border p-2">
+          <strong>DeepL:</strong>
+          <p
+            dangerouslySetInnerHTML={{ __html: highlightedResults[2] || "" }}
+          />
         </div>
       </div>
     </div>
