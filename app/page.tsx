@@ -8,6 +8,9 @@ import TranslationCard from "@/components/TranslationCard";
 import { useTextProcessing } from "@/hooks/useTextProcessing";
 import { useTranslation } from "@/hooks/useTranslation";
 
+import ProperNounManager from "@/components/ProperNounManager"; // ✅ 추가
+import { useProperNoun } from "@/hooks/useProperNoun"; // ✅ 추가
+
 export default function Home() {
   const [pdfText, setPdfText] = useState<string>(""); // 원본 텍스트
   const [selectedLanguage, setSelectedLanguage] = useState<string>("en"); // 기본값: 영어
@@ -16,6 +19,8 @@ export default function Home() {
 
   const { groupedSentences, processText } = useTextProcessing(); // 문장 그룹화 훅
   const { translations, translateText } = useTranslation(); // 번역 훅
+
+  const { properNouns } = useProperNoun(); // ✅ 고유명사 목록 가져오기
 
   // PDF에서 텍스트 추출 시 문장 그룹화 실행
   const handleTextExtracted = (extractedText: string) => {
@@ -53,6 +58,9 @@ export default function Home() {
   return (
     <div className="grid grid-rows-[auto_1fr_auto] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <h1 className="text-2xl font-bold">PDF 번역기</h1>
+
+      {/* 🔹 고유명사 관리 UI 추가 */}
+      <ProperNounManager />
 
       {/* 원본 언어 선택 */}
       <LanguageSelector onSelectLanguage={setSelectedLanguage} />
