@@ -7,6 +7,11 @@ import {
   translateWithDeepL,
 } from "@/lib/translationApi";
 
+const normalizeLanguageForPapago = (lang: string) => {
+  if (lang === "zh") return "zh-TW"; // Papago는 "zh"를 지원하지 않으므로 "zh-TW"로 변환
+  return lang;
+};
+
 export function useTranslation() {
   const [translations, setTranslations] = useState<{
     google: string;
@@ -23,9 +28,11 @@ export function useTranslation() {
    */
   const translateText = async (text: string, sourceLang: string) => {
     try {
+      const papagoLang = normalizeLanguageForPapago(sourceLang);
+
       const [google, papago, deepL] = await Promise.all([
         translateWithGoogle(text, sourceLang),
-        translateWithPapago(text, sourceLang),
+        translateWithPapago(text, papagoLang),
         translateWithDeepL(text, sourceLang),
       ]);
 
