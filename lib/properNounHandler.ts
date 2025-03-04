@@ -25,7 +25,7 @@ export function replaceProperNounsWithTokens(
 }
 
 /**
- * ✅ 번역 후 토큰을 원래 고유명사로 되돌리는 함수 (문장부호 처리 추가)
+ * ✅ 번역 후 토큰을 원래 고유명사로 되돌리는 함수
  */
 export function restoreProperNounsFromTokens(
   translatedText: string,
