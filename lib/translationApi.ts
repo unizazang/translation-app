@@ -27,7 +27,6 @@ export async function translateWithGoogle(
       }
     );
 
-    console.log("✅ Google API 응답:", response.data); // ✅ 응답 로그 추가
     return response.data.data.translations[0].translatedText;
   } catch (error) {
     console.error("🚨 Google Translate Error:", error.response?.data || error);
@@ -46,7 +45,6 @@ export async function translateWithPapago(text: string, sourceLang: string) {
       provider: "papago",
     });
 
-    console.log("Papago 응답:", response.data);
     return response.data.translatedText;
   } catch (error) {
     console.error("Papago Translate Error:", error.response?.data || error);
@@ -62,7 +60,6 @@ export async function translateWithDeepL(text: string, sourceLang: string) {
       provider: "deepl",
     });
 
-    console.log("DeepL 응답:", response.data);
     return response.data.translatedText;
   } catch (error) {
     console.error("DeepL Translate Error:", error.response?.data || error);

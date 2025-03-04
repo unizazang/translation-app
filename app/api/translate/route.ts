@@ -26,13 +26,10 @@ export async function POST(req: NextRequest) {
         }
       );
 
-      console.log("✅ Papago API 응답:", response.data);
       translatedText = response.data.message.result.translatedText;
     }
 
     if (provider === "deepl") {
-      console.log("🔹 DeepL API 요청 시작:", text);
-
       const response = await axios.post(
         "https://api-free.deepl.com/v2/translate",
         new URLSearchParams({
@@ -45,7 +42,6 @@ export async function POST(req: NextRequest) {
         }
       );
 
-      console.log("✅ DeepL API 응답:", response.data);
       translatedText = response.data.translations[0].text;
     }
 
