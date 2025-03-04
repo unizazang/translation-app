@@ -11,6 +11,7 @@ import {
   restoreProperNounsFromTokens,
 } from "@/lib/properNounHandler";
 import { useProperNoun } from "@/hooks/useProperNoun"; // ✅ 고유명사 목록 가져오기
+import { cleanExtractedText } from "@/lib/pdfProcessor"; // ✅ 추가
 
 const normalizeLanguageForPapago = (lang: string) => {
   if (lang === "zh") return "zh-TW"; // Papago는 "zh"를 지원하지 않으므로 "zh-TW"로 변환
@@ -39,12 +40,13 @@ export function useTranslation() {
   const translateText = async (text: string, sourceLang: string) => {
     try {
       const papagoLang = normalizeLanguageForPapago(sourceLang);
+      const cleanedText = cleanExtractedText(text); // ✅ 번역 전에 텍스트 정제
       const { transformedText, tokenMap } = replaceProperNounsWithTokens(
         text,
         properNouns
       );
 
-      console.log("🔹 변환된 텍스트:", transformedText); // 디버깅 추가
+      console.log("🔹 번역 전 정제된 텍스트:", transformedText);
 
       // ✅ 변환된 텍스트로 번역 실행 (수정된 부분)
       const [google, papago, deepL] = await Promise.all([

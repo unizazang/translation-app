@@ -34,7 +34,8 @@ export function cleanExtractedText(text: string): string {
 export async function extractTextFromPdf(pdfBuffer: ArrayBuffer) {
   const pdf = await getDocument({ data: pdfBuffer }).promise;
   console.log("✅ PDF 문서 열기 완료, 총 페이지 수:", pdf.numPages);
-  const extractedText: { text: string; x: number; y: number }[][] = [];
+
+  let extractedText: string = "";
 
   for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
     const page = await pdf.getPage(pageNum);
@@ -44,14 +45,13 @@ export async function extractTextFromPdf(pdfBuffer: ArrayBuffer) {
       console.warn(`⚠️ 페이지 ${pageNum}에서 추출된 텍스트가 없습니다.`);
     }
 
-    const lines = textContent.items.map((item: any) => ({
-      text: item.str,
-      x: item.transform[4], // x 좌표
-      y: item.transform[5], // y 좌표
-    }));
+    const pageText = textContent.items.map((item: any) => item.str).join(" "); // 텍스트를 하나의 문자열로 합치기
 
-    extractedText.push(lines);
+    extractedText += " " + pageText; // 페이지별 텍스트를 하나로 결합
   }
+
+  extractedText = cleanExtractedText(extractedText); // ✅ 불필요한 공백 및 특수문자 제거
+  console.log("📝 정제된 PDF 텍스트:", extractedText);
 
   return extractedText;
 }

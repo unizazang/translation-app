@@ -10,6 +10,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 
 import ProperNounManager from "@/components/ProperNounManager"; // ✅ 추가
 import { useProperNoun } from "@/hooks/useProperNoun"; // ✅ 추가
+import { cleanExtractedText } from "@/lib/pdfProcessor";
 
 export default function Home() {
   const [pdfText, setPdfText] = useState<string>(""); // 원본 텍스트
@@ -24,8 +25,9 @@ export default function Home() {
 
   // PDF에서 텍스트 추출 시 문장 그룹화 실행
   const handleTextExtracted = (extractedText: string) => {
-    setPdfText(extractedText);
-    processText(extractedText); // 문장 그룹화 실행
+    const cleanedText = cleanExtractedText(extractedText); // ✅ 텍스트 정제
+    setPdfText(cleanedText);
+    processText(cleanedText); // ✅ 정제된 텍스트로 문장 그룹화 실행
     setCurrentIndex(0); // 첫 번째 문장 그룹부터 시작
   };
 
