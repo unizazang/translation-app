@@ -44,3 +44,17 @@ export function restoreProperNounsFromTokens(
 
   return restoredText;
 }
+
+/**
+ * ✅ Zero Width Non-Joiner (\u200C) 삽입 함수
+ */
+export function addInvisibleCharacters(text: string): string {
+  return text.split("").join("\u200C"); // 각 문자 사이에 ZWNJ 추가
+}
+
+/**
+ * ✅ Zero Width Non-Joiner (\u200C) 제거 함수 (복구)
+ */
+export function removeInvisibleCharacters(text: string): string {
+  return text.replace(/\u200C/g, ""); // 모든 ZWNJ 제거
+}

@@ -8,7 +8,6 @@ const DEEPL_API_KEY = process.env.NEXT_PUBLIC_DEEPL_API_KEY;
 /**
  * Google 번역 API 호출
  */
-
 export async function translateWithGoogle(
   text: string,
   sourceLang: string,
@@ -52,6 +51,9 @@ export async function translateWithPapago(text: string, sourceLang: string) {
   }
 }
 
+/**
+ * DeepL 번역 API 호출
+ */
 export async function translateWithDeepL(text: string, sourceLang: string) {
   try {
     const response = await axios.post("/api/translate", {
@@ -65,4 +67,37 @@ export async function translateWithDeepL(text: string, sourceLang: string) {
     console.error("DeepL Translate Error:", error.response?.data || error);
     return null;
   }
+}
+
+/**
+ * ✅ Google 번역 API 테스트 함수 추가
+ */
+export async function testGoogleTranslate(
+  inputText: string,
+  sourceLang: string = "en",
+  targetLang: string = "ko"
+) {
+  return await translateWithGoogle(inputText, sourceLang, targetLang);
+}
+
+/**
+ * ✅ Papago 번역 API 테스트 함수 추가
+ */
+export async function testPapagoTranslate(
+  inputText: string,
+  sourceLang: string = "en",
+  targetLang: string = "ko"
+) {
+  return await translateWithPapago(inputText, sourceLang);
+}
+
+/**
+ * ✅ DeepL 번역 API 테스트 함수 추가
+ */
+export async function testDeepLTranslate(
+  inputText: string,
+  sourceLang: string = "EN",
+  targetLang: string = "KO"
+) {
+  return await translateWithDeepL(inputText, sourceLang);
 }
