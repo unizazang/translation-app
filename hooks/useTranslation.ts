@@ -30,8 +30,9 @@ export function useTranslation() {
     deepL: "",
   });
 
-  // ✅ 저장된 번역 목록을 관리하는 상태 추가
-  const [savedTranslations, setSavedTranslations] = useState<string[]>([]);
+  // ✅ 페이지 단위로 저장된 번역 목록을 관리하는 상태 추가
+  const [savedTranslations, setSavedTranslations] = useState<string[][]>([[]]);
+  const [currentPage, setCurrentPage] = useState(0);
 
   useEffect(() => {
     console.log("📌 최신 고유명사 목록:", properNouns);
@@ -77,25 +78,36 @@ export function useTranslation() {
   };
 
   /**
-   * ✅ 번역 결과 저장 함수
+   * ✅ 번역 결과 저장 함수 (페이지 단위)
    */
   const saveTranslation = (translation: string) => {
     setSavedTranslations((prev) => {
-      const updatedList = [...prev, translation];
+      const updatedList = [...prev];
+      updatedList[currentPage] = [...updatedList[currentPage], translation];
       localStorage.setItem("savedTranslations", JSON.stringify(updatedList));
       return updatedList;
     });
   };
 
   /**
-   * ✅ 번역 결과 삭제 함수
+   * ✅ 번역 결과 삭제 함수 (페이지 단위)
    */
   const removeTranslation = (translation: string) => {
     setSavedTranslations((prev) => {
-      const updatedList = prev.filter((item) => item !== translation);
+      const updatedList = [...prev];
+      updatedList[currentPage] = updatedList[currentPage].filter(
+        (item) => item !== translation
+      );
       localStorage.setItem("savedTranslations", JSON.stringify(updatedList));
       return updatedList;
     });
+  };
+
+  /**
+   * ✅ 페이지 변경 함수
+   */
+  const changePage = (page: number) => {
+    setCurrentPage(page);
   };
 
   return {
@@ -104,5 +116,7 @@ export function useTranslation() {
     saveTranslation,
     removeTranslation,
     savedTranslations,
+    currentPage,
+    changePage,
   };
 }
