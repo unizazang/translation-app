@@ -20,7 +20,7 @@ export default function TranslationCard({
   return (
     <div className="w-full border-gray-500 p-10 rounded-lg bg-white text-center">
       <h3 className="text-lg font-semibold mb-5 ">원본 문장</h3>
-      <p>{originalText}</p>
+      <p className="">{originalText}</p>
 
       <h3 className="text-lg font-semibold mt-10 border-t border-gray-300 pt-10 pb-10">
         번역 결과
