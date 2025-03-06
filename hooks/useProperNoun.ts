@@ -2,11 +2,16 @@
 
 import { useState, useEffect } from "react";
 
+interface ProperNoun {
+  original: string;
+  translation: string;
+}
+
 /**
  * ✅ 고유명사 관리 커스텀 훅
  */
 export function useProperNoun() {
-  const [properNouns, setProperNouns] = useState<string[]>([]);
+  const [properNouns, setProperNouns] = useState<ProperNoun[]>([]);
 
   // ✅ 고유명사 목록을 LocalStorage에 저장하고 불러오기
   useEffect(() => {
@@ -23,16 +28,20 @@ export function useProperNoun() {
   /**
    * ✅ 고유명사 추가 함수
    */
-  const addProperNoun = (noun: string) => {
-    if (!noun.trim() || properNouns.includes(noun)) return; // 중복 방지
-    setProperNouns([...properNouns, noun]);
+  const addProperNoun = (original: string, translation: string) => {
+    if (
+      !original.trim() ||
+      properNouns.some((noun) => noun.original === original)
+    )
+      return; // 중복 방지
+    setProperNouns([...properNouns, { original, translation }]);
   };
 
   /**
    * ✅ 고유명사 삭제 함수
    */
-  const removeProperNoun = (noun: string) => {
-    setProperNouns(properNouns.filter((item) => item !== noun));
+  const removeProperNoun = (original: string) => {
+    setProperNouns(properNouns.filter((noun) => noun.original !== original));
   };
 
   return { properNouns, addProperNoun, removeProperNoun };

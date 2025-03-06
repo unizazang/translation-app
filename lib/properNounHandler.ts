@@ -1,49 +1,44 @@
+interface ProperNoun {
+  original: string;
+  translation: string;
+}
+
 /**
- * ✅ 고유명사를 토큰(__PN0__)으로 변환하는 함수
+ * 고유명사를 토큰으로 대체하는 함수
  */
-export function replaceProperNounsWithTokens(
+export const replaceProperNounsWithTokens = (
   text: string,
-  properNouns: string[]
-): { transformedText: string; tokenMap: Record<string, string> } {
+  properNouns: ProperNoun[]
+) => {
+  let tokenMap: { [key: string]: string } = {};
   let transformedText = text;
-  const tokenMap: Record<string, string> = {};
 
   properNouns.forEach((noun, index) => {
-    const token = `__PN${index}__`;
-    tokenMap[token] = noun;
-
-    // ✅ 모든 경우를 포괄하는 정규식 (대소문자 구분 없음)
-    const regex = new RegExp(
-      `\\b${noun.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")}\\b`,
-      "gi"
-    );
-
+    const token = `__PROPER_NOUN_${index}__`;
+    const regex = new RegExp(`\\b${noun.original}\\b`, "g");
     transformedText = transformedText.replace(regex, token);
+    tokenMap[token] = noun.translation;
   });
 
   return { transformedText, tokenMap };
-}
+};
 
 /**
- * ✅ 번역 후 토큰을 원래 고유명사로 되돌리는 함수
+ * 토큰을 원래의 고유명사로 복원하는 함수
  */
-export function restoreProperNounsFromTokens(
-  translatedText: string,
-  tokenMap: Record<string, string>
-): string {
-  let restoredText = translatedText;
+export const restoreProperNounsFromTokens = (
+  text: string,
+  tokenMap: { [key: string]: string }
+) => {
+  let restoredText = text;
 
-  Object.entries(tokenMap).forEach(([token, original]) => {
-    // ✅ 단어 경계 + 문장부호도 포함하여 변환
-    const regex = new RegExp(`${token}([.,!?]*)`, "g");
-    restoredText = restoredText.replace(
-      regex,
-      (_, punctuation) => original + (punctuation || "")
-    );
+  Object.keys(tokenMap).forEach((token) => {
+    const regex = new RegExp(token, "g");
+    restoredText = restoredText.replace(regex, tokenMap[token]);
   });
 
   return restoredText;
-}
+};
 
 /**
  * ✅ Zero Width Non-Joiner (\u200C) 삽입 함수
