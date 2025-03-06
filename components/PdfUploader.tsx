@@ -34,10 +34,21 @@ export default function PdfUploader({ onTextExtracted }: PdfUploaderProps) {
   };
 
   return (
-    <div>
-      <h1>PDF 업로드 및 텍스트 추출</h1>
-      <input type="file" accept="application/pdf" onChange={handleFileUpload} />
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <div className="max-w-md mx-auto p-6 border rounded-lg shadow-lg bg-white text-center">
+      <h1 className="text-xl font-semibold text-gray-800 mb-4">
+        📄 PDF 업로드
+      </h1>
+      <label className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition inline-block">
+        파일 선택
+        <input
+          type="file"
+          accept="application/pdf"
+          onChange={handleFileUpload}
+          className="hidden"
+        />
+      </label>
+
+      {error && <p className="text-red-500 mt-2">{error}</p>}
     </div>
   );
 }
