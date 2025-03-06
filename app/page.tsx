@@ -11,6 +11,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import ProperNounManager from "@/components/ProperNounManager"; // ✅ 추가
 import { useProperNoun } from "@/hooks/useProperNoun"; // ✅ 추가
 import SavedTranslations from "@/components/SavedTranslations";
+import TranslationPagination from "@/components/TranslationPagination";
 
 export default function Home() {
   const [pdfText, setPdfText] = useState<string>("");
@@ -25,6 +26,8 @@ export default function Home() {
     saveTranslation,
     savedTranslations,
     copyAllTranslations,
+    currentPage,
+    changePage,
   } = useTranslation();
 
   const { properNouns } = useProperNoun();
@@ -99,6 +102,12 @@ export default function Home() {
       <SavedTranslations
         savedTranslations={savedTranslations}
         onCopyAll={copyAllTranslations}
+      />
+
+      <TranslationPagination
+        currentPage={currentPage}
+        totalPages={savedTranslations.length}
+        onPageChange={changePage}
       />
     </div>
   );
