@@ -12,6 +12,7 @@ export default function ProperNounManager() {
     addProperNoun(original, translation);
     setOriginal("");
     setTranslation("");
+    console.log("📌 추가된 고유명사:", { original, translation });
   };
 
   return (

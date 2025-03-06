@@ -14,11 +14,14 @@ export const replaceProperNounsWithTokens = (
   let transformedText = text;
 
   properNouns.forEach((noun, index) => {
-    const token = `__PROPER_NOUN_${index}__`;
+    const token = `PROPER_NOUN_${index}`;
     const regex = new RegExp(`\\b${noun.original}\\b`, "g");
     transformedText = transformedText.replace(regex, token);
     tokenMap[token] = noun.translation;
   });
+
+  console.log("📌 토큰으로 대체된 텍스트:", transformedText);
+  console.log("📌 토큰 맵:", tokenMap);
 
   return { transformedText, tokenMap };
 };
@@ -36,6 +39,8 @@ export const restoreProperNounsFromTokens = (
     const regex = new RegExp(token, "g");
     restoredText = restoredText.replace(regex, tokenMap[token]);
   });
+
+  console.log("📌 토큰이 복원된 텍스트:", restoredText);
 
   return restoredText;
 };

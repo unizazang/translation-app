@@ -38,12 +38,13 @@ export default function Home() {
     setCurrentIndex(0);
   };
 
-  const handleTranslate = async () => {
-    if (groupedSentences[currentIndex]) {
+  const handleTranslate = async (index: number) => {
+    if (groupedSentences[index]) {
       setIsTranslating(true);
       await translateText(
-        groupedSentences[currentIndex].join(" "),
-        selectedLanguage
+        groupedSentences[index].join(" "),
+        selectedLanguage,
+        index
       );
       setIsTranslating(false);
     }
@@ -51,13 +52,19 @@ export default function Home() {
 
   useEffect(() => {
     if (groupedSentences.length > 0) {
-      handleTranslate();
+      handleTranslate(currentIndex);
     }
   }, [currentIndex]);
 
   const handleNext = () => {
     if (currentIndex < groupedSentences.length - 1) {
       setCurrentIndex((prevIndex) => prevIndex + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex((prevIndex) => prevIndex - 1);
     }
   };
 
@@ -72,7 +79,7 @@ export default function Home() {
       <PdfUploader onTextExtracted={handleTextExtracted} />
 
       <button
-        onClick={handleTranslate}
+        onClick={() => handleTranslate(currentIndex)}
         className="px-4 py-2 bg-blue-500 text-white rounded"
         disabled={isTranslating}
       >
@@ -89,15 +96,26 @@ export default function Home() {
         )}
       </div>
 
-      {currentIndex < groupedSentences.length - 1 && (
-        <button
-          onClick={handleNext}
-          className="px-4 py-2 bg-gray-500 text-white rounded mt-4"
-          disabled={isTranslating}
-        >
-          {isTranslating ? "번역 중..." : "다음 문장"}
-        </button>
-      )}
+      <div className="flex gap-4 mt-4">
+        {currentIndex > 0 && (
+          <button
+            onClick={handlePrevious}
+            className="px-4 py-2 bg-gray-500 text-white rounded"
+            disabled={isTranslating}
+          >
+            {isTranslating ? "번역 중..." : "이전 문장"}
+          </button>
+        )}
+        {currentIndex < groupedSentences.length - 1 && (
+          <button
+            onClick={handleNext}
+            className="px-4 py-2 bg-gray-500 text-white rounded"
+            disabled={isTranslating}
+          >
+            {isTranslating ? "번역 중..." : "다음 문장"}
+          </button>
+        )}
+      </div>
 
       <SavedTranslations
         savedTranslations={savedTranslations}

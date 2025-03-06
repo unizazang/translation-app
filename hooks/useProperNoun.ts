@@ -11,18 +11,15 @@ interface ProperNoun {
  * ✅ 고유명사 관리 커스텀 훅
  */
 export function useProperNoun() {
-  const [properNouns, setProperNouns] = useState<ProperNoun[]>([]);
+  const [properNouns, setProperNouns] = useState<ProperNoun[]>(() => {
+    const storedNouns = localStorage.getItem("properNouns");
+    return storedNouns ? JSON.parse(storedNouns) : [];
+  });
 
   // ✅ 고유명사 목록을 LocalStorage에 저장하고 불러오기
   useEffect(() => {
-    const storedNouns = localStorage.getItem("properNouns");
-    if (storedNouns) {
-      setProperNouns(JSON.parse(storedNouns));
-    }
-  }, []);
-
-  useEffect(() => {
     localStorage.setItem("properNouns", JSON.stringify(properNouns));
+    console.log("📌 저장된 고유명사 목록:", properNouns);
   }, [properNouns]);
 
   /**
@@ -35,6 +32,7 @@ export function useProperNoun() {
     )
       return; // 중복 방지
     setProperNouns([...properNouns, { original, translation }]);
+    console.log("📌 추가된 고유명사:", { original, translation });
   };
 
   /**
