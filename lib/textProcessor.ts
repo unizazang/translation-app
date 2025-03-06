@@ -1,20 +1,27 @@
-/**
- * 텍스트를 2~3문장씩 그룹화하는 함수
- */
 export function groupSentences(text: string): string[][] {
-  const sentences = text.match(/[^.!?]+[.!?]/g) || []; // 문장 단위로 분리
-  const groupedSentences: string[][] = [];
+  console.log("🚀 groupSentences 함수 실행됨! 원본 텍스트:", text);
 
+  const sentences =
+    text.match(
+      /(?<!\b(?:p|pp|Dr|Mr|Ms|vs|etc))\s*[^.!?]+(?:\.\s*\d+|[.!?])/g
+    ) || [];
+
+  console.log("🔸 분리된 문장 리스트:", sentences);
+
+  const groupedSentences: string[][] = [];
   let tempGroup: string[] = [];
+
   for (let i = 0; i < sentences.length; i++) {
     tempGroup.push(sentences[i].trim());
 
-    // 2~3문장씩 그룹화 (길이가 너무 길면 조절 가능)
+    console.log(`🔹 현재 그룹 (${tempGroup.length}개):`, tempGroup);
+
     if (tempGroup.length === 3 || i === sentences.length - 1) {
       groupedSentences.push(tempGroup);
       tempGroup = [];
     }
   }
 
+  console.log("✅ 최종 그룹화된 문장 리스트:", groupedSentences);
   return groupedSentences;
 }
