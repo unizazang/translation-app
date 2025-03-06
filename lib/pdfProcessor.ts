@@ -18,9 +18,10 @@ export async function loadPdf(file: File) {
  */
 export function cleanExtractedText(text: string): string {
   return text
+    .replace(/[\x00-\x1F\x7F-\x9F]/g, "") // ✅ 제어 문자 및 비표준 문자 제거
     .replace(/\s{2,}/g, " ") // 연속된 공백을 하나로 줄임
     .replace(/-\s+/g, "") // 하이픈 뒤에 공백이 있으면 붙여서 연결
-    .replace(/([a-zA-Z])\s+([a-zA-Z])/g, "$1$2") // 중간에 들어간 공백 제거 (단어 사이)
+    .replace(/([a-zA-Z]) (?=[a-zA-Z])/g, "$1 ") // ✅ 단어 사이 띄어쓰기 유지
     .replace(/’/g, "'") // 이상한 특수문자 치환
     .trim();
 }

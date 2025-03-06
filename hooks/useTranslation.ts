@@ -61,11 +61,16 @@ export function useTranslation() {
       console.log("✅ 번역 결과 (Papago):", papago);
       console.log("✅ 번역 결과 (DeepL):", deepL);
 
+      console.log(
+        "🔄 최종 번역 상태 업데이트 (DeepL):",
+        restoreProperNounsFromTokens(deepL || "", tokenMap)
+      );
       setTranslations({
         google: restoreProperNounsFromTokens(google || "", tokenMap),
         papago: restoreProperNounsFromTokens(papago || "", tokenMap),
         deepL: restoreProperNounsFromTokens(deepL || "", tokenMap),
       });
+      console.log("📌 업데이트된 translations 상태:", translations);
     } catch (error) {
       console.error("Translation Error:", error);
     }
