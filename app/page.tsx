@@ -69,8 +69,8 @@ export default function Home() {
   };
 
   return (
-    <div className="grid grid-rows-[auto_1fr_auto] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <h1 className="text-2xl font-bold">PDF 번역기</h1>
+    <div className="grid grid-rows-[auto_1fr_auto] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 bg-gray-100">
+      <h1 className="text-3xl font-bold text-gray-800">PDF 번역기</h1>
 
       <ProperNounManager />
 
@@ -80,7 +80,7 @@ export default function Home() {
 
       <button
         onClick={() => handleTranslate(currentIndex)}
-        className="px-4 py-2 bg-blue-500 text-white rounded"
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
         disabled={isTranslating}
       >
         {isTranslating ? "번역 중..." : "번역하기"}
@@ -100,7 +100,7 @@ export default function Home() {
         {currentIndex > 0 && (
           <button
             onClick={handlePrevious}
-            className="px-4 py-2 bg-gray-500 text-white rounded"
+            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
             disabled={isTranslating}
           >
             {isTranslating ? "번역 중..." : "이전 문장"}
@@ -109,7 +109,7 @@ export default function Home() {
         {currentIndex < groupedSentences.length - 1 && (
           <button
             onClick={handleNext}
-            className="px-4 py-2 bg-gray-500 text-white rounded"
+            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
             disabled={isTranslating}
           >
             {isTranslating ? "번역 중..." : "다음 문장"}
