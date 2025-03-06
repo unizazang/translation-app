@@ -45,27 +45,20 @@ export default function TranslationCard({
 
       <h3 className="text-lg font-semibold">번역 결과</h3>
       <div className="grid grid-cols-3 gap-4">
-        {["Google", "Papago", "DeepL"].map((provider, index) => (
+        {["google", "papago", "deepL"].map((provider) => (
           <div key={provider} className="border p-2">
-            <strong>{provider}:</strong>
+            <strong>
+              {provider.charAt(0).toUpperCase() + provider.slice(1)}:
+            </strong>
             <p className="p-2">
-              {/* {highlightedTexts[index]} */}
-              {
-                translations[
-                  provider.toLowerCase() as keyof typeof translations
-                ]
-              }
+              {translations[provider as keyof typeof translations]}
             </p>
             <button
               className="mt-2 px-2 py-1 bg-green-500 text-white rounded"
               onClick={() =>
                 onSave(
                   originalText,
-                  provider === "DeepL"
-                    ? translations["deepL"]
-                    : translations[
-                        provider.toLowerCase() as keyof typeof translations
-                      ]
+                  translations[provider as keyof typeof translations]
                 )
               }
             >
