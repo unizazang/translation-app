@@ -10,15 +10,16 @@ import {
   replaceProperNounsWithTokens,
   restoreProperNounsFromTokens,
 } from "@/lib/properNounHandler";
-import { useProperNoun } from "@/hooks/useProperNoun"; // ✅ 고유명사 목록 가져오기
+import { useProperNoun } from "@/hooks/useProperNoun";
+import { cleanExtractedText } from "@/lib/pdfProcessor";
 
 const normalizeLanguageForPapago = (lang: string) => {
-  if (lang === "zh") return "zh-TW"; // Papago는 "zh"를 지원하지 않으므로 "zh-TW"로 변환
+  if (lang === "zh") return "zh-TW";
   return lang;
 };
 
 export function useTranslation() {
-  const { properNouns } = useProperNoun(); // ✅ 사용자 정의 고유명사 목록 가져오기
+  const { properNouns } = useProperNoun();
   const [translations, setTranslations] = useState<{
     google: string;
     papago: string;
@@ -28,6 +29,9 @@ export function useTranslation() {
     papago: "",
     deepL: "",
   });
+
+  // ✅ 저장된 번역 목록을 관리하는 상태 추가
+  const [savedTranslations, setSavedTranslations] = useState<string[]>([]);
 
   useEffect(() => {
     console.log("📌 최신 고유명사 목록:", properNouns);
@@ -39,17 +43,17 @@ export function useTranslation() {
   const translateText = async (text: string, sourceLang: string) => {
     try {
       const papagoLang = normalizeLanguageForPapago(sourceLang);
+      const cleanedText = cleanExtractedText(text);
       const { transformedText, tokenMap } = replaceProperNounsWithTokens(
         text,
         properNouns
       );
 
-      console.log("🔹 변환된 텍스트:", transformedText); // 디버깅 추가
+      console.log("🔹 번역 전 정제된 텍스트:", transformedText);
 
-      // ✅ 변환된 텍스트로 번역 실행 (수정된 부분)
       const [google, papago, deepL] = await Promise.all([
         translateWithGoogle(transformedText, sourceLang),
-        translateWithPapago(transformedText, papagoLang), //파파고는 중국어 표기가 달라서 바꿈
+        translateWithPapago(transformedText, papagoLang),
         translateWithDeepL(transformedText, sourceLang),
       ]);
 
@@ -62,23 +66,38 @@ export function useTranslation() {
         papago: restoreProperNounsFromTokens(papago || "", tokenMap),
         deepL: restoreProperNounsFromTokens(deepL || "", tokenMap),
       });
-
-      console.log(
-        "🔄 복원된 번역 (Google):",
-        restoreProperNounsFromTokens(google || "", tokenMap)
-      );
-      console.log(
-        "🔄 복원된 번역 (Papago):",
-        restoreProperNounsFromTokens(papago || "", tokenMap)
-      );
-      console.log(
-        "🔄 복원된 번역 (DeepL):",
-        restoreProperNounsFromTokens(deepL || "", tokenMap)
-      );
     } catch (error) {
       console.error("Translation Error:", error);
     }
   };
 
-  return { translations, translateText };
+  /**
+   * ✅ 번역 결과 저장 함수
+   */
+  const saveTranslation = (translation: string) => {
+    setSavedTranslations((prev) => {
+      const updatedList = [...prev, translation];
+      localStorage.setItem("savedTranslations", JSON.stringify(updatedList));
+      return updatedList;
+    });
+  };
+
+  /**
+   * ✅ 번역 결과 삭제 함수
+   */
+  const removeTranslation = (translation: string) => {
+    setSavedTranslations((prev) => {
+      const updatedList = prev.filter((item) => item !== translation);
+      localStorage.setItem("savedTranslations", JSON.stringify(updatedList));
+      return updatedList;
+    });
+  };
+
+  return {
+    translations,
+    translateText,
+    saveTranslation,
+    removeTranslation,
+    savedTranslations,
+  };
 }
