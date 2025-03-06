@@ -14,7 +14,9 @@ export const replaceProperNounsWithTokens = (
   let transformedText = text;
 
   properNouns.forEach((noun, index) => {
-    const token = `PROPER_NOUN_${index}`;
+    // 토큰 형식을 변경하여 단어로 인식되지 않도록 함
+    // Proper _ Noun _ index
+    const token = `**P_N_${index}**`;
     const regex = new RegExp(`\\b${noun.original}\\b`, "g");
     transformedText = transformedText.replace(regex, token);
     tokenMap[token] = noun.translation;
