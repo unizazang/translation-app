@@ -5,7 +5,14 @@ import { useProperNoun } from "@/hooks/useProperNoun";
 
 export default function ProperNounManager() {
   const { properNouns, addProperNoun, removeProperNoun } = useProperNoun();
-  const [inputValue, setInputValue] = useState("");
+  const [original, setOriginal] = useState("");
+  const [translation, setTranslation] = useState("");
+
+  const handleAdd = () => {
+    addProperNoun(original, translation);
+    setOriginal("");
+    setTranslation("");
+  };
 
   return (
     <div className="p-4 border rounded-lg">
@@ -13,16 +20,20 @@ export default function ProperNounManager() {
       <div className="flex gap-2 mt-2">
         <input
           type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder="고유명사 입력"
+          placeholder="원본"
+          value={original}
+          onChange={(e) => setOriginal(e.target.value)}
+          className="border p-2 rounded"
+        />
+        <input
+          type="text"
+          placeholder="번역"
+          value={translation}
+          onChange={(e) => setTranslation(e.target.value)}
           className="border p-2 rounded"
         />
         <button
-          onClick={() => {
-            addProperNoun(inputValue);
-            setInputValue(""); // 입력 후 초기화
-          }}
+          onClick={handleAdd}
           className="px-4 py-2 bg-blue-500 text-white rounded"
         >
           추가
@@ -30,14 +41,16 @@ export default function ProperNounManager() {
       </div>
 
       <ul className="mt-3 space-y-1">
-        {properNouns.map((noun, index) => (
+        {properNouns.map((noun) => (
           <li
-            key={index}
+            key={noun.original}
             className="flex justify-between items-center p-2 border rounded"
           >
-            <span>{noun}</span>
+            <span>
+              {noun.original} -> {noun.translation}
+            </span>
             <button
-              onClick={() => removeProperNoun(noun)}
+              onClick={() => removeProperNoun(noun.original)}
               className="text-red-500"
             >
               ❌ 삭제
