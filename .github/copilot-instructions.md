@@ -95,4 +95,6 @@ export default ExamplePage;
 - Do not change variable names, function names, or file names arbitrarily.
 - Do not alter existing logic unless it is necessary to fix an error.
 - When adding parameters, ensure that type errors do not occur in functions that use them. If necessary, request the relevant code from the user.
+- If there is existing code implementing a requested feature, modify it instead of creating new code from scratch.
+- When asked to review a file, only read the file and do not make any modifications unless explicitly requested to do so.
 <!-- 코드 작성 시 지켜야 할 선호 사항과 지침을 설명합니다. -->
