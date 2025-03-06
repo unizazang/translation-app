@@ -24,18 +24,18 @@ export default function ProperNounManager() {
           placeholder="원본"
           value={original}
           onChange={(e) => setOriginal(e.target.value)}
-          className="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border p-2 flex-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <input
           type="text"
           placeholder="번역"
           value={translation}
           onChange={(e) => setTranslation(e.target.value)}
-          className="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border p-2  flex-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={handleAdd}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+          className="px-4 py-2  bg-blue-500 text-white rounded hover:bg-blue-600 transition"
         >
           추가
         </button>
@@ -45,9 +45,9 @@ export default function ProperNounManager() {
         {properNouns.map((noun) => (
           <li
             key={noun.original}
-            className="flex justify-between items-center p-2 border rounded bg-gray-50"
+            className="flex justify-between items-center p-2 border border-gray-300"
           >
-            <span className="text-gray-700">
+            <span className="text-gray-700 italic">
               {noun.original} -> {noun.translation}
             </span>
             <button
