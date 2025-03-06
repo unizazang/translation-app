@@ -21,7 +21,7 @@ export default function SavedTranslations({
       <ul className="mt-4 space-y-2">
         {savedTranslations.map((entry, index) => (
           <li key={index} className="border p-2 rounded bg-gray-100">
-            <pre className="whitespace-pre-wrap">{entry}</pre>
+            <pre className="whitespace-pre-wrap">&nbsp; {entry}</pre>
           </li>
         ))}
       </ul>
