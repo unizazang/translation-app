@@ -87,3 +87,12 @@ export default ExamplePage;
 - Write clear and concise commit messages.
 - Submit a pull request with a detailed description of your changes.
 <!-- 기여 방법과 지침을 설명합니다. -->
+
+## Preferences and Prompts
+
+- Do not arbitrarily modify existing code. Only add what is necessary.
+- Do not delete existing code. If deletion is necessary, clearly comment on the changes.
+- Do not change variable names, function names, or file names arbitrarily.
+- Do not alter existing logic unless it is necessary to fix an error.
+- When adding parameters, ensure that type errors do not occur in functions that use them. If necessary, request the relevant code from the user.
+<!-- 코드 작성 시 지켜야 할 선호 사항과 지침을 설명합니다. -->
