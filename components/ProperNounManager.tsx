@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import { useProperNoun } from "@/hooks/useProperNoun";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faTrash, faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 
 export default function ProperNounManager() {
   const { properNouns, addProperNoun, removeProperNoun } = useProperNoun();
   const [original, setOriginal] = useState("");
   const [translation, setTranslation] = useState("");
+  const [isOpen, setIsOpen] = useState<boolean>(false); // 아코디언 상태 추가
 
   const handleAdd = () => {
     addProperNoun(original, translation);
@@ -31,34 +34,55 @@ export default function ProperNounManager() {
           placeholder="번역"
           value={translation}
           onChange={(e) => setTranslation(e.target.value)}
-          className="border p-2  flex-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border p-2 flex-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={handleAdd}
-          className="px-4 py-2  bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
         >
-          추가
+          <FontAwesomeIcon icon={faPlus} /> 추가
         </button>
       </div>
 
-      <ul className="space-y-2">
-        {properNouns.map((noun) => (
-          <li
-            key={noun.original}
-            className="flex justify-between items-center p-2 border border-gray-300"
-          >
-            <span className="text-gray-700 italic">
-              {noun.original} -> {noun.translation}
-            </span>
-            <button
-              onClick={() => removeProperNoun(noun.original)}
-              className="text-red-500 hover:text-red-700 transition"
-            >
-              ❌ 삭제
-            </button>
-          </li>
-        ))}
-      </ul>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition"
+      >
+        {isOpen ? (
+          <>
+            <FontAwesomeIcon icon={faChevronUp} /> 
+          </>
+        ) : (
+          <>
+            <FontAwesomeIcon icon={faChevronDown} />
+          </>
+        )}
+      </button>
+
+      {isOpen && (
+        <ul className="space-y-2 mt-4">
+          {properNouns.length > 0 ? (
+            properNouns.map((noun) => (
+              <li
+                key={noun.original}
+                className="flex justify-between items-center p-2 border border-gray-300"
+              >
+                <span className="text-gray-700 italic">
+                  {noun.original} -> {noun.translation}
+                </span>
+                <button
+                  onClick={() => removeProperNoun(noun.original)}
+                  className="text-red-500 hover:text-red-700 transition"
+                >
+                  <FontAwesomeIcon icon={faTrash} /> 삭제
+                </button>
+              </li>
+            ))
+          ) : (
+            <p className="text-gray-500">등록된 고유명사가 없습니다.</p>
+          )}
+        </ul>
+      )}
     </div>
   );
 }
