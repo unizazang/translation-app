@@ -3,7 +3,12 @@
 import { useState } from "react";
 import { useProperNoun } from "@/hooks/useProperNoun";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faTrash, faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPlus,
+  faTrash,
+  faChevronDown,
+  faChevronUp,
+} from "@fortawesome/free-solid-svg-icons";
 
 export default function ProperNounManager() {
   const { properNouns, addProperNoun, removeProperNoun } = useProperNoun();
@@ -50,7 +55,7 @@ export default function ProperNounManager() {
       >
         {isOpen ? (
           <>
-            <FontAwesomeIcon icon={faChevronUp} /> 
+            <FontAwesomeIcon icon={faChevronUp} />
           </>
         ) : (
           <>
@@ -68,7 +73,7 @@ export default function ProperNounManager() {
                 className="flex justify-between items-center p-2 border border-gray-300"
               >
                 <span className="text-gray-700 italic">
-                  {noun.original} -> {noun.translation}
+                  {`${noun.original} -> ${noun.translation}`}
                 </span>
                 <button
                   onClick={() => removeProperNoun(noun.original)}

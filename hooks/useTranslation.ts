@@ -72,7 +72,10 @@ export function useTranslation() {
 
       setTranslations(newTranslations);
     } catch (error) {
-      console.error("Translation Error:", error);
+      console.error(
+        "Translation Error:",
+        (error as any).response?.data || error
+      );
     }
   };
 
@@ -99,11 +102,22 @@ export function useTranslation() {
     });
   };
 
+  /**
+   * ✅ 모든 번역을 클립보드에 복사하는 함수
+   */
+  const copyAllTranslations = () => {
+    const allTranslations = savedTranslations.join("\n");
+    navigator.clipboard.writeText(allTranslations).then(() => {
+      console.log("📌 모든 번역이 클립보드에 복사되었습니다.");
+    });
+  };
+
   return {
     translations,
     translateText,
     saveTranslation,
     updateTranslation,
     savedTranslations,
+    copyAllTranslations, // ✅ 추가
   };
 }

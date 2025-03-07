@@ -28,7 +28,10 @@ export async function translateWithGoogle(
 
     return response.data.data.translations[0].translatedText;
   } catch (error) {
-    console.error("🚨 Google Translate Error:", error.response?.data || error);
+    console.error(
+      "🚨 Google Translate Error:",
+      (error as any).response?.data || error
+    );
     return null;
   }
 }
@@ -38,15 +41,23 @@ export async function translateWithGoogle(
  */
 export async function translateWithPapago(text: string, sourceLang: string) {
   try {
-    const response = await axios.post("/api/translate", {
-      text,
-      sourceLang,
-      provider: "papago",
-    });
-
-    return response.data.translatedText;
+    const response = await axios.post(
+      "https://naveropenapi.apigw.ntruss.com/nmt/v1/translation",
+      { source: sourceLang || "auto", target: "ko", text },
+      {
+        headers: {
+          "X-NCP-APIGW-API-KEY-ID": process.env.PAPAGO_API_KEY_ID!,
+          "X-NCP-APIGW-API-KEY": process.env.PAPAGO_API_KEY!,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data.message.result.translatedText;
   } catch (error) {
-    console.error("Papago Translate Error:", error.response?.data || error);
+    console.error(
+      "🚨 Papago Translate Error:",
+      (error as any).response?.data || error
+    );
     return null;
   }
 }
@@ -56,15 +67,25 @@ export async function translateWithPapago(text: string, sourceLang: string) {
  */
 export async function translateWithDeepL(text: string, sourceLang: string) {
   try {
-    const response = await axios.post("/api/translate", {
-      text,
-      sourceLang,
-      provider: "deepl",
-    });
-
-    return response.data.translatedText;
+    const response = await axios.post(
+      "https://api-free.deepl.com/v2/translate",
+      new URLSearchParams({
+        text,
+        source_lang: sourceLang.toUpperCase(),
+        target_lang: "KO",
+      }),
+      {
+        headers: {
+          Authorization: `DeepL-Auth-Key ${process.env.DEEPL_API_KEY}`,
+        },
+      }
+    );
+    return response.data.translations[0].text;
   } catch (error) {
-    console.error("DeepL Translate Error:", error.response?.data || error);
+    console.error(
+      "🚨 DeepL Translate Error:",
+      (error as any).response?.data || error
+    );
     return null;
   }
 }
