@@ -14,6 +14,7 @@ export default function SavedTranslations({
   updateTranslation,
 }: SavedTranslationsProps) {
   const [editText, setEditText] = useState(savedTranslations.join("\n"));
+  const [showToast, setShowToast] = useState(false); // Toast 메시지 상태 추가
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // ✅ 저장된 번역이 변경될 때 textarea 업데이트
@@ -37,6 +38,14 @@ export default function SavedTranslations({
     console.log("📌 저장된 번역 업데이트됨:", updatedTranslations);
   };
 
+  // ✅ 클립보드에 텍스트를 복사하는 함수
+  const handleCopyAll = () => {
+    navigator.clipboard.writeText(editText).then(() => {
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000); // 2초 후 Toast 메시지 숨기기
+    });
+  };
+
   return (
     <div className="w-full border p-4 rounded-lg mt-4">
       <h2 className="text-xl font-semibold">저장된 번역</h2>
@@ -44,7 +53,7 @@ export default function SavedTranslations({
       {/* ✅ 전체 복사 버튼 */}
       <button
         className="mt-2 px-3 py-1 bg-blue-600 text-white rounded"
-        onClick={onCopyAll}
+        onClick={handleCopyAll} // ✅ 전체 복사 함수 호출
       >
         전체 복사
       </button>
@@ -73,6 +82,13 @@ export default function SavedTranslations({
       >
         저장하기
       </button>
+
+      {/* ✅ Toast 메시지 */}
+      {showToast && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-400 bg-opacity-75 text-white px-6 py-3 rounded-full animate-bounce">
+          클립보드에 복사되었습니다.
+        </div>
+      )}
     </div>
   );
 }
