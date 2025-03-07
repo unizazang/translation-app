@@ -11,12 +11,14 @@ import { useTranslation } from "@/hooks/useTranslation";
 import ProperNounManager from "@/components/ProperNounManager"; // ✅ 추가
 import { useProperNoun } from "@/hooks/useProperNoun"; // ✅ 추가
 import SavedTranslations from "@/components/SavedTranslations";
+import "@/fontawesome"; // ✅ FontAwesome 설정 파일 import
 
 export default function Home() {
   const [pdfText, setPdfText] = useState<string>("");
   const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isTranslating, setIsTranslating] = useState<boolean>(false);
+  const [isPdfUploaded, setIsPdfUploaded] = useState<boolean>(false); // ✅ 추가
 
   const { groupedSentences, processText } = useTextProcessing();
   const {
@@ -34,6 +36,7 @@ export default function Home() {
     setPdfText(extractedText);
     processText(extractedText);
     setCurrentIndex(0);
+    setIsPdfUploaded(true); // ✅ 추가
   };
 
   const handleTranslate = async (index: number) => {
@@ -70,56 +73,66 @@ export default function Home() {
     <div className="grid grid-rows-[auto_1fr_auto] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 bg-white">
       <h1 className="text-3xl font-bold text-gray-800">PDF 번역기</h1>
 
-      <ProperNounManager />
+      {!isPdfUploaded ? (
+        <PdfUploader onTextExtracted={handleTextExtracted} />
+      ) : (
+        <>
+          <ProperNounManager />
 
-      <LanguageSelector onSelectLanguage={setSelectedLanguage} />
+          <LanguageSelector onSelectLanguage={setSelectedLanguage} />
 
-      <PdfUploader onTextExtracted={handleTextExtracted} />
+          <button
+            onClick={() => handleTranslate(currentIndex)}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+            disabled={isTranslating}
+          >
+            {isTranslating ? "번역 중..." : "번역하기"}
+          </button>
 
-      <button
-        onClick={() => handleTranslate(currentIndex)}
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-        disabled={isTranslating}
-      >
-        {isTranslating ? "번역 중..." : "번역하기"}
-      </button>
+          <div>
+            {groupedSentences.length > 0 && (
+              <TranslationCard
+                originalText={groupedSentences[currentIndex].join(" ")}
+                translations={translations}
+                onSave={saveTranslation}
+              />
+            )}
+          </div>
 
-      <div>
-        {groupedSentences.length > 0 && (
-          <TranslationCard
-            originalText={groupedSentences[currentIndex].join(" ")}
-            translations={translations}
-            onSave={saveTranslation}
+          <div className="flex gap-4 mt-4">
+            {currentIndex > 0 && (
+              <button
+                onClick={handlePrevious}
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
+                disabled={isTranslating}
+              >
+                {isTranslating ? "번역 중..." : "이전 문장"}
+              </button>
+            )}
+            {currentIndex < groupedSentences.length - 1 && (
+              <button
+                onClick={handleNext}
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
+                disabled={isTranslating}
+              >
+                {isTranslating ? "번역 중..." : "다음 문장"}
+              </button>
+            )}
+          </div>
+
+          <SavedTranslations
+            savedTranslations={savedTranslations}
+            onCopyAll={copyAllTranslations}
+            updateTranslation={updateTranslation} // ✅ 추가
           />
-        )}
-      </div>
+        </>
+      )}
 
-      <div className="flex gap-4 mt-4">
-        {currentIndex > 0 && (
-          <button
-            onClick={handlePrevious}
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
-            disabled={isTranslating}
-          >
-            {isTranslating ? "번역 중..." : "이전 문장"}
-          </button>
-        )}
-        {currentIndex < groupedSentences.length - 1 && (
-          <button
-            onClick={handleNext}
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
-            disabled={isTranslating}
-          >
-            {isTranslating ? "번역 중..." : "다음 문장"}
-          </button>
-        )}
-      </div>
-
-      <SavedTranslations
-        savedTranslations={savedTranslations}
-        onCopyAll={copyAllTranslations}
-        updateTranslation={updateTranslation} // ✅ 추가
-      />
+      {isPdfUploaded && (
+        <div className="mt-8">
+          <PdfUploader onTextExtracted={handleTextExtracted} />
+        </div>
+      )}
     </div>
   );
 }
