@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import PdfUploader from "@/components/PdfUploader";
 import TranslationResult from "@/components/TranslationResult";
@@ -8,9 +9,14 @@ import TranslationCard from "@/components/TranslationCard";
 import { useTextProcessing } from "@/hooks/useTextProcessing";
 import { useTranslation } from "@/hooks/useTranslation";
 
-import ProperNounManager from "@/components/ProperNounManager"; // ✅ 추가
-import { useProperNoun } from "@/hooks/useProperNoun"; // ✅ 추가
-import SavedTranslations from "@/components/SavedTranslations";
+const ProperNounManager = dynamic(
+  () => import("@/components/ProperNounManager"),
+  { ssr: false }
+);
+const SavedTranslations = dynamic(
+  () => import("@/components/SavedTranslations"),
+  { ssr: false }
+);
 import "@/src/fontawesome"; // ✅ FontAwesome 설정 파일 import
 
 export default function Home() {
@@ -31,8 +37,6 @@ export default function Home() {
     savedTranslations,
     copyAllTranslations, // ✅ 추가
   } = useTranslation();
-
-  const { properNouns } = useProperNoun();
 
   const handleTextExtracted = (extractedText: string) => {
     setPdfText(extractedText);

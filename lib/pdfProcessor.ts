@@ -2,6 +2,7 @@ import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 
 // ✅ Web Worker 경로를 고정된 버전으로 직접 설정
 GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js`;
+
 /**
  * PDF 파일을 로드하는 함수
  */
@@ -13,6 +14,7 @@ export async function loadPdf(file: File) {
     reader.readAsArrayBuffer(file);
   });
 }
+
 /**
  * ✅ 이상한 공백이랑 특수문자 치환하는 함수
  */
