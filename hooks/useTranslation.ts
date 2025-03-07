@@ -71,7 +71,6 @@ export function useTranslation() {
       };
 
       setTranslations(newTranslations);
-      saveTranslation(newTranslations.papago); // 번역 결과를 저장
     } catch (error) {
       console.error("Translation Error:", error);
     }
