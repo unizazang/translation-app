@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 interface SavedTranslationsProps {
   savedTranslations: string[];
   onCopyAll: () => void;
-  updateTranslation: (newText: string) => void;
+  updateTranslation: (index: number, newText: string) => void;
 }
 
 export default function SavedTranslations({
@@ -14,11 +14,9 @@ export default function SavedTranslations({
   updateTranslation,
 }: SavedTranslationsProps) {
   const [editText, setEditText] = useState(savedTranslations.join("\n"));
-
-  // ✅ textarea의 스크롤을 제어할 ref 생성
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // ✅ 저장된 번역이 변경될 때 textarea에도 반영
+  // ✅ 저장된 번역이 변경될 때 textarea 업데이트
   useEffect(() => {
     setEditText(savedTranslations.join("\n"));
   }, [savedTranslations]);
@@ -29,6 +27,15 @@ export default function SavedTranslations({
       textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
     }
   }, [editText]); // 🔹 `editText`가 변경될 때 스크롤을 내림
+
+  // ✅ 수정된 번역을 저장하는 함수
+  const handleSave = () => {
+    const updatedTranslations = editText.split("\n");
+    updatedTranslations.forEach((text, index) => {
+      updateTranslation(index, text); // ✅ 수정 내용 저장
+    });
+    console.log("📌 저장된 번역 업데이트됨:", updatedTranslations);
+  };
 
   return (
     <div className="w-full border p-4 rounded-lg mt-4">
@@ -45,24 +52,27 @@ export default function SavedTranslations({
       {/* ✅ textarea 내부에서 스크롤 가능하도록 설정 */}
       <div className="mt-4 border rounded p-2 bg-gray-50">
         <textarea
-          ref={textareaRef} // ✅ textarea에 ref 추가
+          ref={textareaRef}
           className="w-full h-48 p-2 border rounded resize-none overflow-y-auto"
           value={editText}
           onChange={(e) => setEditText(e.target.value)}
+          onBlur={handleSave} // ✅ 입력 후 자동 저장
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSave();
+            }
+          }}
         />
       </div>
 
-      {/* ✅ 저장 버튼 추가 */}
+      {/* ✅ 저장 버튼 */}
       <button
         className="mt-2 px-3 py-1 bg-green-600 text-white rounded"
-        style={{ cursor: "pointer", pointerEvents: "auto" }} // ✅ 강제 스타일 적용
-        disabled={false} // ✅ 버튼이 항상 활성화되도록 수정
-        onClick={() => updateTranslation(editText)}
+        onClick={handleSave} // ✅ 버튼 클릭 시 저장
       >
         저장하기
       </button>
     </div>
   );
 }
-
-// .

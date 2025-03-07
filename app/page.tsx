@@ -23,6 +23,7 @@ export default function Home() {
     translations,
     translateText,
     saveTranslation,
+    updateTranslation, // ✅ 추가
     savedTranslations,
     copyAllTranslations,
   } = useTranslation();
@@ -117,6 +118,7 @@ export default function Home() {
       <SavedTranslations
         savedTranslations={savedTranslations}
         onCopyAll={copyAllTranslations}
+        updateTranslation={updateTranslation} // ✅ 추가
       />
     </div>
   );
