@@ -47,7 +47,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ translatedText }, { status: 200 });
   } catch (error) {
-    console.error("🚨 API Translation Error:", error.response?.data || error);
+    console.error(
+      "🚨 API Translation Error:",
+      (error as any).response?.data || error
+    );
     return NextResponse.json(
       { error: "번역 요청 중 오류 발생" },
       { status: 500 }

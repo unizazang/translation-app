@@ -11,7 +11,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import ProperNounManager from "@/components/ProperNounManager"; // ✅ 추가
 import { useProperNoun } from "@/hooks/useProperNoun"; // ✅ 추가
 import SavedTranslations from "@/components/SavedTranslations";
-import "@/fontawesome"; // ✅ FontAwesome 설정 파일 import
+import "@/src/fontawesome"; // ✅ FontAwesome 설정 파일 import
 
 export default function Home() {
   const [pdfText, setPdfText] = useState<string>("");
@@ -29,7 +29,7 @@ export default function Home() {
     saveTranslation,
     updateTranslation, // ✅ 추가
     savedTranslations,
-    copyAllTranslations,
+    copyAllTranslations, // ✅ 추가
   } = useTranslation();
 
   const { properNouns } = useProperNoun();
