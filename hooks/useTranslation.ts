@@ -46,7 +46,11 @@ export function useTranslation() {
   /**
    * ✅ 입력된 텍스트를 번역하는 함수
    */
-  const translateText = async (text: string, sourceLang: string) => {
+  const translateText = async (
+    text: string,
+    sourceLang: string,
+    index: number
+  ) => {
     try {
       const cleanedText = cleanExtractedText(text);
       const { transformedText, tokenMap } = replaceProperNounsWithTokens(
@@ -67,6 +71,7 @@ export function useTranslation() {
       };
 
       setTranslations(newTranslations);
+      saveTranslation(newTranslations.papago); // 번역 결과를 저장
     } catch (error) {
       console.error("Translation Error:", error);
     }
@@ -78,6 +83,7 @@ export function useTranslation() {
   const saveTranslation = (translation: string) => {
     setSavedTranslations((prev) => {
       const updatedList = [...prev, translation];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList)); // ✅ localStorage 업데이트
       return updatedList;
     });
   };
@@ -89,6 +95,7 @@ export function useTranslation() {
     setSavedTranslations((prev) => {
       const updatedList = [...prev];
       updatedList[index] = newText;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList)); // ✅ localStorage 업데이트
       return updatedList;
     });
   };
