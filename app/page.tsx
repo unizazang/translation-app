@@ -19,6 +19,8 @@ export default function Home() {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isTranslating, setIsTranslating] = useState<boolean>(false);
   const [isPdfUploaded, setIsPdfUploaded] = useState<boolean>(false); // ✅ 추가
+  const [isTranslateButtonVisible, setIsTranslateButtonVisible] =
+    useState<boolean>(true); // ✅ 추가
 
   const { groupedSentences, processText } = useTextProcessing();
   const {
@@ -48,6 +50,7 @@ export default function Home() {
         index
       );
       setIsTranslating(false);
+      setIsTranslateButtonVisible(false); // ✅ 번역 시작 버튼 숨기기
     }
   };
 
@@ -81,13 +84,15 @@ export default function Home() {
 
           <LanguageSelector onSelectLanguage={setSelectedLanguage} />
 
-          <button
-            onClick={() => handleTranslate(currentIndex)}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-            disabled={isTranslating}
-          >
-            {isTranslating ? "번역 중..." : "번역 시작"}
-          </button>
+          {isTranslateButtonVisible && (
+            <button
+              onClick={() => handleTranslate(currentIndex)}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+              disabled={isTranslating}
+            >
+              {isTranslating ? "번역 중..." : "번역 시작"}
+            </button>
+          )}
 
           <div>
             {groupedSentences.length > 0 && (
@@ -129,7 +134,7 @@ export default function Home() {
       )}
 
       {isPdfUploaded && (
-        <div className="mt-8">
+        <div className="mt-10 pt-10 ">
           <PdfUploader onTextExtracted={handleTextExtracted} />
         </div>
       )}
