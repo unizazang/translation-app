@@ -55,6 +55,8 @@ export default function SavedTranslations({
       {/* ✅ 저장 버튼 추가 */}
       <button
         className="mt-2 px-3 py-1 bg-green-600 text-white rounded"
+        style={{ cursor: "pointer", pointerEvents: "auto" }} // ✅ 강제 스타일 적용
+        disabled={false} // ✅ 버튼이 항상 활성화되도록 수정
         onClick={() => updateTranslation(editText)}
       >
         저장하기
