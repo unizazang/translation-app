@@ -27,7 +27,7 @@ export function useTranslation() {
     deepL: "",
   });
 
-  // ✅ 저장된 번역 목록을 관리하는 상태 (배열 -> 한 줄씩 저장)
+  // ✅ 저장된 번역 목록을 관리하는 상태
   const [savedTranslations, setSavedTranslations] = useState<string[]>([]);
 
   // ✅ 로컬 스토리지에서 번역 불러오기
@@ -38,13 +38,9 @@ export function useTranslation() {
     }
   }, []);
 
-  // ✅ 페이지가 닫힐 때 자동 저장 (beforeunload 이벤트)
+  // ✅ localStorage가 변경될 때 자동 저장
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedTranslations));
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedTranslations));
   }, [savedTranslations]);
 
   /**
@@ -77,12 +73,11 @@ export function useTranslation() {
   };
 
   /**
-   * ✅ 번역 결과 저장 함수 (로컬 스토리지 포함)
+   * ✅ 번역 결과 저장 함수
    */
   const saveTranslation = (translation: string) => {
     setSavedTranslations((prev) => {
       const updatedList = [...prev, translation];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
       return updatedList;
     });
   };
@@ -94,7 +89,6 @@ export function useTranslation() {
     setSavedTranslations((prev) => {
       const updatedList = [...prev];
       updatedList[index] = newText;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
       return updatedList;
     });
   };
