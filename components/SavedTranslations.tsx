@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface SavedTranslationsProps {
   savedTranslations: string[];
@@ -16,6 +16,17 @@ export default function SavedTranslations({
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editText, setEditText] = useState("");
 
+  // ✅ 스크롤 컨테이너를 참조할 ref 생성
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // ✅ 저장된 번역이 추가될 때마다 스크롤을 맨 아래로 이동
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop =
+        scrollContainerRef.current.scrollHeight;
+    }
+  }, [savedTranslations]);
+
   return (
     <div className="w-full border p-4 rounded-lg mt-4">
       <h2 className="text-xl font-semibold">저장된 번역</h2>
@@ -26,8 +37,11 @@ export default function SavedTranslations({
         전체 복사
       </button>
 
-      {/* ✅ 스크롤 가능하도록 스타일 적용 */}
-      <div className="mt-4 max-h-60 overflow-y-auto border rounded p-2 bg-gray-50">
+      {/* ✅ 스크롤 컨테이너에 ref 추가 */}
+      <div
+        ref={scrollContainerRef}
+        className="mt-4 max-h-60 overflow-y-auto border rounded p-2 bg-gray-50"
+      >
         {savedTranslations.length === 0 ? (
           <p className="text-gray-500 text-center">저장된 번역이 없습니다.</p>
         ) : (
