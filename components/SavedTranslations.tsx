@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 interface SavedTranslationsProps {
   savedTranslations: string[];
   onCopyAll: () => void;
-  updateTranslation: (index: number, newText: string) => void;
+  updateTranslation: (newText: string) => void;
 }
 
 export default function SavedTranslations({
@@ -13,23 +13,28 @@ export default function SavedTranslations({
   onCopyAll,
   updateTranslation,
 }: SavedTranslationsProps) {
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editText, setEditText] = useState("");
+  const [editText, setEditText] = useState(savedTranslations.join("\n"));
 
-  // ✅ 스크롤 컨테이너를 참조할 ref 생성
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  // ✅ textarea의 스크롤을 제어할 ref 생성
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // ✅ 저장된 번역이 추가될 때마다 스크롤을 맨 아래로 이동
+  // ✅ 저장된 번역이 변경될 때 textarea에도 반영
   useEffect(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop =
-        scrollContainerRef.current.scrollHeight;
-    }
+    setEditText(savedTranslations.join("\n"));
   }, [savedTranslations]);
+
+  // ✅ 저장된 번역이 추가될 때 textarea의 스크롤을 맨 아래로 이동
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
+    }
+  }, [editText]); // 🔹 `editText`가 변경될 때 스크롤을 내림
 
   return (
     <div className="w-full border p-4 rounded-lg mt-4">
       <h2 className="text-xl font-semibold">저장된 번역</h2>
+
+      {/* ✅ 전체 복사 버튼 */}
       <button
         className="mt-2 px-3 py-1 bg-blue-600 text-white rounded"
         onClick={onCopyAll}
@@ -37,53 +42,23 @@ export default function SavedTranslations({
         전체 복사
       </button>
 
-      {/* ✅ 스크롤 컨테이너에 ref 추가 */}
-      <div
-        ref={scrollContainerRef}
-        className="mt-4 max-h-60 overflow-y-auto border rounded p-2 bg-gray-50"
-      >
-        {savedTranslations.length === 0 ? (
-          <p className="text-gray-500 text-center">저장된 번역이 없습니다.</p>
-        ) : (
-          <ul className="space-y-2">
-            {savedTranslations.map((entry, index) => (
-              <li
-                key={index}
-                className="border p-2 rounded bg-white hover:bg-gray-100 transition"
-              >
-                {editingIndex === index ? (
-                  <textarea
-                    className="w-full p-1 border rounded resize-none"
-                    value={editText}
-                    onChange={(e) => setEditText(e.target.value)}
-                    onBlur={() => {
-                      updateTranslation(index, editText);
-                      setEditingIndex(null);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        updateTranslation(index, editText);
-                        setEditingIndex(null);
-                      }
-                    }}
-                    autoFocus
-                  />
-                ) : (
-                  <pre
-                    className="whitespace-pre-wrap cursor-pointer"
-                    onClick={() => {
-                      setEditingIndex(index);
-                      setEditText(entry);
-                    }}
-                  >
-                    {entry}
-                  </pre>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
+      {/* ✅ textarea 내부에서 스크롤 가능하도록 설정 */}
+      <div className="mt-4 border rounded p-2 bg-gray-50">
+        <textarea
+          ref={textareaRef} // ✅ textarea에 ref 추가
+          className="w-full h-48 p-2 border rounded resize-none overflow-y-auto"
+          value={editText}
+          onChange={(e) => setEditText(e.target.value)}
+        />
       </div>
+
+      {/* ✅ 저장 버튼 추가 */}
+      <button
+        className="mt-2 px-3 py-1 bg-green-600 text-white rounded"
+        onClick={() => updateTranslation(editText)}
+      >
+        저장하기
+      </button>
     </div>
   );
 }
