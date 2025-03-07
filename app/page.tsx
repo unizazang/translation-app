@@ -99,7 +99,7 @@ export default function Home() {
               <TranslationCard
                 originalText={groupedSentences[currentIndex].join(" ")}
                 translations={translations}
-                onSave={saveTranslation}
+                onSave={saveTranslation} // ✅ 추가
               />
             )}
           </div>
