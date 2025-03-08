@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 
-// ✅ 환경 변수에서 올바른 값 가져오기
-const PAPAGO_API_KEY_ID = process.env.PAPAGO_API_KEY_ID;
-const PAPAGO_API_KEY = process.env.PAPAGO_API_KEY;
+// ✅ 환경 변수에서 API 키 가져오기
+const PAPAGO_CLIENT_ID = process.env.PAPAGO_CLIENT_ID;
+const PAPAGO_CLIENT_SECRET = process.env.PAPAGO_CLIENT_SECRET;
 const DEEPL_API_KEY = process.env.DEEPL_API_KEY;
 
 export async function POST(req: NextRequest) {
@@ -13,23 +13,22 @@ export async function POST(req: NextRequest) {
 
     if (provider === "papago") {
       console.log("🔹 Papago API 요청 시작:", text);
-
       const response = await axios.post(
-        "https://naveropenapi.apigw.ntruss.com/nmt/v1/translation", // ✅ URL 수정
-        { source: sourceLang || "auto", target: "ko", text }, // ✅ 요청 바디 수정
+        "https://naveropenapi.apigw.ntruss.com/nmt/v1/translation",
+        { source: sourceLang || "auto", target: "ko", text },
         {
           headers: {
-            "X-NCP-APIGW-API-KEY-ID": PAPAGO_API_KEY_ID!, // ✅ 헤더 수정
-            "X-NCP-APIGW-API-KEY": PAPAGO_API_KEY!,
+            "X-NCP-APIGW-API-KEY-ID": PAPAGO_CLIENT_ID!,
+            "X-NCP-APIGW-API-KEY": PAPAGO_CLIENT_SECRET!,
             "Content-Type": "application/json",
           },
         }
       );
-
       translatedText = response.data.message.result.translatedText;
     }
 
     if (provider === "deepl") {
+      console.log("🔹 DeepL API 요청 시작:", text);
       const response = await axios.post(
         "https://api-free.deepl.com/v2/translate",
         new URLSearchParams({
@@ -41,19 +40,15 @@ export async function POST(req: NextRequest) {
           headers: { Authorization: `DeepL-Auth-Key ${DEEPL_API_KEY}` },
         }
       );
-
       translatedText = response.data.translations[0].text;
     }
 
     return NextResponse.json({ translatedText }, { status: 200 });
   } catch (error) {
     console.error(
-      "🚨 API Translation Error:",
+      "🚨 번역 API 요청 중 오류 발생:",
       (error as any).response?.data || error
     );
-    return NextResponse.json(
-      { error: "번역 요청 중 오류 발생" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "번역 요청 실패" }, { status: 500 });
   }
 }
