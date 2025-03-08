@@ -5,6 +5,11 @@ const nextConfig = {
     return config;
   },
   reactStrictMode: true,
+  experimental: {
+    serverActions: false,
+    appDir: true, // App Router 사용 시 반드시 true
+    serverComponentsExternalPackages: ["canvas"],
+  },
 };
 
 module.exports = nextConfig;

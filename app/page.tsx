@@ -1,6 +1,8 @@
 "use client";
 
-import dynamic from "next/dynamic";
+export const dynamic = "force-dynamic"; // Next.js 빌드 설정용으로 export
+
+import dynamicComponent from "next/dynamic";
 import { useState, useEffect } from "react";
 import PdfUploader from "@/components/PdfUploader";
 import TranslationResult from "@/components/TranslationResult";
@@ -9,11 +11,11 @@ import TranslationCard from "@/components/TranslationCard";
 import { useTextProcessing } from "@/hooks/useTextProcessing";
 import { useTranslation } from "@/hooks/useTranslation";
 
-const ProperNounManager = dynamic(
+const ProperNounManager = dynamicComponent(
   () => import("@/components/ProperNounManager"),
   { ssr: false }
 );
-const SavedTranslations = dynamic(
+const SavedTranslations = dynamicComponent(
   () => import("@/components/SavedTranslations"),
   { ssr: false }
 );
