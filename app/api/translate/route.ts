@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 
 // ✅ 환경 변수에서 API 키 가져오기
-const PAPAGO_CLIENT_ID = process.env.PAPAGO_CLIENT_ID;
-const PAPAGO_CLIENT_SECRET = process.env.PAPAGO_CLIENT_SECRET;
+const PAPAGO_API_KEY_ID = process.env.PAPAGO_API_KEY_ID;
+const PAPAGO_API_KEY = process.env.PAPAGO_API_KEY;
 const DEEPL_API_KEY = process.env.DEEPL_API_KEY;
 
 export async function POST(req: NextRequest) {
@@ -18,8 +18,8 @@ export async function POST(req: NextRequest) {
         { source: sourceLang || "auto", target: "ko", text },
         {
           headers: {
-            "X-NCP-APIGW-API-KEY-ID": PAPAGO_CLIENT_ID!,
-            "X-NCP-APIGW-API-KEY": PAPAGO_CLIENT_SECRET!,
+            "X-NCP-APIGW-API-KEY-ID": PAPAGO_API_KEY_ID!,
+            "X-NCP-APIGW-API-KEY": PAPAGO_API_KEY!,
             "Content-Type": "application/json",
           },
         }
