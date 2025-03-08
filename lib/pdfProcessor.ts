@@ -1,8 +1,6 @@
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 
-// ✅ Web Worker 경로를 고정된 버전으로 직접 설정
 GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js`;
-
 /**
  * PDF 파일을 로드하는 함수
  */
