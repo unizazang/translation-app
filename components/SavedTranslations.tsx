@@ -30,7 +30,7 @@ export default function SavedTranslations({
   }, [editText]); // 🔹 `editText`가 변경될 때 스크롤을 내림
   // ✅ TXT 파일로 저장하는 함수
   const handleDownloadTxt = () => {
-    const blob = new Blob([editText], { type: "text/plain" }); // ✅ 텍스트 데이터를 Blob으로 변환
+    const blob = new Blob([editText], { type: "text/plain;charset=utf-8" }); // ✅ 텍스트 데이터를 Blob으로 변환
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -97,7 +97,7 @@ export default function SavedTranslations({
         </button>
 
         <button
-          className="px-3 py-1 bg-gray-700 text-white cursor-pointer rounded"
+          className="mt-2 px-3 py-1  bg-gray-700 text-white cursor-pointer rounded"
           onClick={handleDownloadTxt}
         >
           txt로 저장
