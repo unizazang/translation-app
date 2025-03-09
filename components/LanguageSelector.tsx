@@ -18,9 +18,16 @@ export default function LanguageSelector({
   };
 
   return (
-    <div>
-      <label htmlFor="language">원본 언어 선택: </label>
-      <select id="language" value={selectedLanguage} onChange={handleChange}>
+    <div className="text-black">
+      <label htmlFor="language" className=" text-black">
+        원본 언어 선택:{" "}
+      </label>
+      <select
+        className="text-black"
+        id="language"
+        value={selectedLanguage}
+        onChange={handleChange}
+      >
         <option value="en">영어</option>
         <option value="zh">중국어</option>
         <option value="ja">일본어</option>

@@ -24,12 +24,13 @@ export default function ProperNounManager() {
   };
 
   return (
-    <div className="p-6 border rounded-lg shadow-md bg-white">
+    <div className="p-6 border rounded-lg shadow-md bg-white  text-black">
       <h2 className="text-lg font-semibold mb-4">🔹 고유명사 관리</h2>
       <div className="flex gap-2 mb-4">
         <input
           type="text"
           placeholder="원본"
+          text-black
           value={original}
           onChange={(e) => setOriginal(e.target.value)}
           className="border p-2 flex-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -37,6 +38,7 @@ export default function ProperNounManager() {
         <input
           type="text"
           placeholder="번역"
+          text-black
           value={translation}
           onChange={(e) => setTranslation(e.target.value)}
           className="border p-2 flex-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -70,7 +72,7 @@ export default function ProperNounManager() {
             properNouns.map((noun) => (
               <li
                 key={noun.original}
-                className="flex justify-between items-center p-2 border border-gray-300"
+                className="flex justify-between items-center p-2  text-black border border-gray-300"
               >
                 <span className="text-gray-700 italic">
                   {`${noun.original} -> ${noun.translation}`}
@@ -84,7 +86,7 @@ export default function ProperNounManager() {
               </li>
             ))
           ) : (
-            <p className="text-gray-500">등록된 고유명사가 없습니다.</p>
+            <p className=" text-black">등록된 고유명사가 없습니다.</p>
           )}
         </ul>
       )}
