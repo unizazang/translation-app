@@ -25,7 +25,7 @@ export default function TranslationCard({
       <h3 className="text-lg font-semibold mt-10 border-t border-gray-300 pt-10 pb-10">
         번역 결과
       </h3>
-      <div className="grid grid-cols-3 gap-4 space-y-4 mt-4 text-center ">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 space-y-4 mt-4 text-center gap-4 space-y-4 mt-4 text-center ">
         <div className=" border border-gray-300 bg-white p-4 rounded-xl shadow-lg flex flex-col h-full">
           <strong className="block text-gray-700   m-3  text-lg">Google</strong>
           <p className="p-2 m-2">{translations.google}</p>
