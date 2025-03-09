@@ -80,6 +80,8 @@ export function useTranslation() {
         properNouns || [] // ✅ properNouns가 없으면 빈 배열([]) 사용
       );
 
+      console.log("📌 번역 전 텍스트:", transformedText); // ✅ 번역 전 텍스트 로그 추가
+
       const [google, papago, deepL] = await Promise.all([
         translateWithGoogle(transformedText, sourceLang),
         translateWithPapago(transformedText, papagoLang),
