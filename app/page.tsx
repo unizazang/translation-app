@@ -55,7 +55,8 @@ export default function Home() {
       await translateText(
         groupedSentences[index].join(" "),
         selectedLanguage,
-        index
+        index,
+        properNouns // ✅ properNouns 전달
       );
       setIsTranslating(false);
       setIsTranslateButtonVisible(false); // ✅ 번역 시작 버튼 숨기기
