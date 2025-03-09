@@ -59,7 +59,7 @@ export default function SavedTranslations({
   };
 
   return (
-    <div className="w-full border p-4 rounded-lg mt-4">
+    <div className="w-full border p-4 rounded-lg mt-4 text-black">
       <h2 className="text-xl font-semibold">저장된 번역</h2>
 
       {/* ✅ 전체 복사 버튼 */}
@@ -71,10 +71,10 @@ export default function SavedTranslations({
       </button>
 
       {/* ✅ textarea 내부에서 스크롤 가능하도록 설정 */}
-      <div className="mt-4 border rounded p-2 bg-gray-50">
+      <div className="mt-4 border rounded p-2 bg-gray-50  text-black">
         <textarea
           ref={textareaRef}
-          className="w-full h-96 p-2 border rounded resize-none overflow-y-auto"
+          className="w-full h-96  text-black p-2 border rounded resize-none overflow-y-auto"
           value={editText}
           onChange={(e) => setEditText(e.target.value)}
           onBlur={handleSave} // ✅ 입력 후 자동 저장
