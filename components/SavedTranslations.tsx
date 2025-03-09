@@ -62,7 +62,7 @@ export default function SavedTranslations({
       <div className="mt-4 border rounded p-2 bg-gray-50">
         <textarea
           ref={textareaRef}
-          className="w-full h-48 p-2 border rounded resize-none overflow-y-auto"
+          className="w-full h-96 p-2 border rounded resize-none overflow-y-auto"
           value={editText}
           onChange={(e) => setEditText(e.target.value)}
           onBlur={handleSave} // ✅ 입력 후 자동 저장
