@@ -13,6 +13,10 @@ import {
 import { useProperNoun } from "@/hooks/useProperNoun";
 import { cleanExtractedText } from "@/lib/pdfProcessor";
 
+const normalizeLanguageForPapago = (lang: string) => {
+  if (lang === "zh") return "zh-TW";
+  return lang;
+};
 const STORAGE_KEY = "savedTranslations";
 
 export function useTranslation() {
@@ -29,6 +33,15 @@ export function useTranslation() {
 
   // ✅ 저장된 번역 목록을 관리하는 상태
   const [savedTranslations, setSavedTranslations] = useState<string[]>([]);
+
+  // ✅ 번역 결과를 캐싱하는 상태 추가
+  const [cachedTranslations, setCachedTranslations] = useState<{
+    [key: number]: {
+      google: string;
+      papago: string;
+      deepL: string;
+    };
+  }>({});
 
   // ✅ 로컬 스토리지에서 번역 불러오기
   useEffect(() => {
@@ -52,6 +65,14 @@ export function useTranslation() {
     index: number
   ) => {
     try {
+      // 캐시된 번역 결과가 있는지 확인
+      if (cachedTranslations[index]) {
+        setTranslations(cachedTranslations[index]);
+        console.log("📌 캐시된 번역 결과 사용:", cachedTranslations[index]);
+        return;
+      }
+      const papagoLang = normalizeLanguageForPapago(sourceLang);
+
       const cleanedText = cleanExtractedText(text);
       const { transformedText, tokenMap } = replaceProperNounsWithTokens(
         cleanedText,
@@ -60,7 +81,7 @@ export function useTranslation() {
 
       const [google, papago, deepL] = await Promise.all([
         translateWithGoogle(transformedText, sourceLang),
-        translateWithPapago(transformedText, sourceLang),
+        translateWithPapago(transformedText, papagoLang),
         translateWithDeepL(transformedText, sourceLang),
       ]);
 
