@@ -1,8 +1,11 @@
 # 📰 PDF 번역 자동화 웹 애플리케이션
 
 ## **📌 프로젝트 소개**
-컬럼 형식의 PDF 문서도 정확하게 분석하고,
-사용자 지정 용어를 반영하여 AI 번역을 제공하는 웹 애플리케이션입니다.
+번역이 번거로운 다단(컬럼) 형식의 PDF 문서도 정확하게 분석하고, 사용자 지정 용어를 반영하여 AI 번역을 제공하는 웹 애플리케이션입니다.
+텍스트가 여러 단으로 나뉜 PDF 문서도 정확하게 분석 및 정제하여 추출할 수 있으며, Google, Papago, DeepL API를 활용해 자동 번역 후 한눈에 비교할 수 있습니다.
+한 줄씩 번역하고 다음 문장으로 자연스럽게 이어지는 구조로 가독성과 사용자 경험을 극대화했습니다.
+
+특히, 사용자가 직접 등록한 전문 용어 사전을 적용하여, 고유명사 및 기술 용어의 일관된 번역이 가능하도록 설계했습니다. 이를 통해 기존 번역기에서 자주 발생하는 전문 용어 오역 문제를 해결하고, 보다 정확한 번역 결과를 제공합니다.
 
 이 프로젝트는 PDF 문서에서 **여러 단(컬럼)으로 구성된 텍스트도 올바르게 분석하여 추출**하고,  
 **Google, Papago, DeepL API**를 활용해 자동 번역하는 기능을 제공합니다.  
@@ -47,6 +50,10 @@ Next.js 기반으로 개발되었으며, **Vercel을 통해 배포**하여 어�
 ✔ 불필요한 API 호출을 줄이기 위해 **캐싱 전략 적용**  
 ✔ Next.js **서버 컴포넌트를 활용해 렌더링 성능 개선**  
 
+### ** 번역 저장 및 수정**  
+- 사용자가 원하는 번역을 **저장 & 수정 가능**  
+- **LocalStorage & Vercel 서버 저장**  
+
 ---
 
 ## **📌 기술 스택**
@@ -55,32 +62,6 @@ Next.js 기반으로 개발되었으며, **Vercel을 통해 배포**하여 어�
 - **PDF 처리**: pdf.js, pdf-lib
 - **번역 API**: Google Translate API, Papago API, DeepL API
 - **배포**: Vercel
-
----
-
-## **📌 실행 방법**
-
-### **1. 프로젝트 클론**
-```bash
-git clone [레포지토리 URL]
-cd translation-app
-```
-
-### **2. 환경 변수 설정 (.env.local)**
-```
-PAPAGO_CLIENT_ID=your-client-id
-PAPAGO_CLIENT_SECRET=your-client-secret
-DEEPL_API_KEY=your-deepl-api-key
-NEXT_PUBLIC_GOOGLE_API_KEY=your-google-api-key
-```
-
-### **3. 패키지 설치 및 실행**
-```bash
-npm install
-npm run dev
-```
-
-✅ 이제 `localhost:3000`에서 프로젝트를 실행할 수 있습니다!
 
 ---
 
