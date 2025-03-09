@@ -62,7 +62,8 @@ export function useTranslation() {
   const translateText = async (
     text: string,
     sourceLang: string,
-    index: number
+    index: number,
+    properNouns?: { original: string; translation: string }[] // ✅ 선택적 인자로 전달
   ) => {
     try {
       // 캐시된 번역 결과가 있는지 확인
@@ -76,7 +77,7 @@ export function useTranslation() {
       const cleanedText = cleanExtractedText(text);
       const { transformedText, tokenMap } = replaceProperNounsWithTokens(
         cleanedText,
-        properNouns
+        properNouns || [] // ✅ properNouns가 없으면 빈 배열([]) 사용
       );
 
       const [google, papago, deepL] = await Promise.all([

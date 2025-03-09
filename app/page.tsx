@@ -10,6 +10,7 @@ import LanguageSelector from "@/components/LanguageSelector";
 import TranslationCard from "@/components/TranslationCard";
 import { useTextProcessing } from "@/hooks/useTextProcessing";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useProperNoun } from "@/hooks/useProperNoun"; // ✅ 고유명사 훅 추가
 
 const ProperNounManager = dynamicComponent(
   () => import("@/components/ProperNounManager"),
@@ -30,6 +31,7 @@ export default function Home() {
   const [isTranslateButtonVisible, setIsTranslateButtonVisible] =
     useState<boolean>(true); // ✅ 추가
 
+  const { properNouns } = useProperNoun(); // ✅ 최신 고유명사 목록 가져오기
   const { groupedSentences, processText } = useTextProcessing();
   const {
     translations,
@@ -65,6 +67,17 @@ export default function Home() {
       handleTranslate(currentIndex);
     }
   }, [currentIndex]);
+
+  useEffect(() => {
+    if (groupedSentences.length > 0 && currentIndex < groupedSentences.length) {
+      translateText(
+        groupedSentences[currentIndex].join(" "),
+        selectedLanguage,
+        currentIndex,
+        properNouns
+      );
+    }
+  }, [properNouns]); // ✅ properNouns 변경 감지
 
   const handleNext = () => {
     if (currentIndex < groupedSentences.length - 1) {
