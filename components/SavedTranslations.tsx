@@ -28,6 +28,18 @@ export default function SavedTranslations({
       textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
     }
   }, [editText]); // 🔹 `editText`가 변경될 때 스크롤을 내림
+  // ✅ TXT 파일로 저장하는 함수
+  const handleDownloadTxt = () => {
+    const blob = new Blob([editText], { type: "text/plain" }); // ✅ 텍스트 데이터를 Blob으로 변환
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "translations.txt"; // ✅ 파일명 지정
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url); // ✅ 메모리 정리
+  };
 
   // ✅ 수정된 번역을 저장하는 함수
   const handleSave = () => {
@@ -76,12 +88,21 @@ export default function SavedTranslations({
       </div>
 
       {/* ✅ 저장 버튼 */}
-      <button
-        className="mt-2 px-3 py-1 bg-green-600 text-white rounded"
-        onClick={handleSave} // ✅ 버튼 클릭 시 저장
-      >
-        저장하기
-      </button>
+      <div className="flex gap-2 mt-2">
+        <button
+          className="mt-2 px-3 py-1 bg-green-600 text-white cursor-pointer rounded"
+          onClick={handleSave} // ✅ 버튼 클릭 시 저장
+        >
+          브라우저 저장
+        </button>
+
+        <button
+          className="px-3 py-1 bg-gray-700 text-white cursor-pointer rounded"
+          onClick={handleDownloadTxt}
+        >
+          txt로 저장
+        </button>
+      </div>
 
       {/* ✅ Toast 메시지 */}
       {showToast && (
