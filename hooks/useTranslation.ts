@@ -20,7 +20,6 @@ const normalizeLanguageForPapago = (lang: string) => {
 const STORAGE_KEY = "savedTranslations";
 
 export function useTranslation() {
-  const { properNouns } = useProperNoun();
   const [translations, setTranslations] = useState<{
     google: string;
     papago: string;
@@ -75,12 +74,10 @@ export function useTranslation() {
       const papagoLang = normalizeLanguageForPapago(sourceLang);
 
       const cleanedText = cleanExtractedText(text);
-
-      // ✅ properNouns를 translateText 내부에서 최신 상태로 가져오기
       const { properNouns } = useProperNoun();
       const { transformedText, tokenMap } = replaceProperNounsWithTokens(
         cleanedText,
-        properNouns ?? [] // ✅ 최신 properNouns 사용
+        properNouns || [] // ✅ properNouns가 없으면 빈 배열([]) 사용
       );
 
       console.log("📌 번역 전 텍스트:", transformedText); // ✅ 번역 전 텍스트 로그 추가
