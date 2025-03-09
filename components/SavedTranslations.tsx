@@ -13,7 +13,7 @@ export default function SavedTranslations({
   onCopyAll,
   updateTranslation,
 }: SavedTranslationsProps) {
-  const [editText, setEditText] = useState(savedTranslations.join("\n"));
+  const [editText, setEditText] = useState(savedTranslations.join(" "));
   const [showToast, setShowToast] = useState(false); // Toast 메시지 상태 추가
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
