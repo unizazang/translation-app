@@ -16,6 +16,7 @@ export default function SavedTranslations({
   const [editText, setEditText] = useState(savedTranslations.join("\n"));
   const [showToast, setShowToast] = useState(false); // Toast 메시지 상태 추가
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [toastMessage, setToastMessage] = useState(""); // ✅ 토스트 메시지 상태 추가
 
   // ✅ 저장된 번역이 변경될 때 textarea 업데이트
   useEffect(() => {
@@ -28,6 +29,7 @@ export default function SavedTranslations({
       textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
     }
   }, [editText]); // 🔹 `editText`가 변경될 때 스크롤을 내림
+
   // ✅ TXT 파일로 저장하는 함수
   const handleDownloadTxt = () => {
     const blob = new Blob([editText], { type: "text/plain;charset=utf-8" }); // ✅ 텍스트 데이터를 Blob으로 변환
@@ -41,6 +43,13 @@ export default function SavedTranslations({
     URL.revokeObjectURL(url); // ✅ 메모리 정리
   };
 
+  // ✅ Toast 메시지를 표시하는 함수
+  const showToastMessage = (message: string) => {
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 2000); // 2초 후 숨김
+  };
+
   // ✅ 수정된 번역을 저장하는 함수
   const handleSave = () => {
     const updatedTranslations = editText.split("\n");
@@ -48,13 +57,21 @@ export default function SavedTranslations({
       updateTranslation(index, text); // ✅ 수정 내용 저장
     });
     console.log("📌 저장된 번역 업데이트됨:", updatedTranslations);
+    showToastMessage("번역이 저장되었습니다."); // ✅ 저장 후 토스트 메시지 표시
+  };
+
+  // ✅ 번역 초기화 함수
+  const handleResetTranslations = () => {
+    setEditText(""); // textarea 초기화
+    savedTranslations.forEach((_, index) => updateTranslation(index, "")); // 저장된 번역 초기화
+    console.log("🔄 모든 번역이 초기화되었습니다.");
+    showToastMessage("번역이 초기화되었습니다."); // ✅ 초기화 후 토스트 메시지 표시
   };
 
   // ✅ 클립보드에 텍스트를 복사하는 함수
   const handleCopyAll = () => {
     navigator.clipboard.writeText(editText).then(() => {
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 2000); // 2초 후 Toast 메시지 숨기기
+      showToastMessage("클립보드에 복사되었습니다."); // ✅ 복사 후 토스트 메시지 표시
     });
   };
 
@@ -68,6 +85,12 @@ export default function SavedTranslations({
         onClick={handleCopyAll} // ✅ 전체 복사 함수 호출
       >
         전체 복사
+      </button>
+      <button
+        className="px-3 py-1 bg-red-400 text-white rounded"
+        onClick={handleResetTranslations} // ✅ 초기화 버튼 추가
+      >
+        초기화
       </button>
 
       {/* ✅ textarea 내부에서 스크롤 가능하도록 설정 */}
@@ -107,7 +130,7 @@ export default function SavedTranslations({
       {/* ✅ Toast 메시지 */}
       {showToast && (
         <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-400 bg-opacity-75 text-white px-6 py-3 rounded-full animate-bounce">
-          클립보드에 복사되었습니다.
+          {toastMessage}
         </div>
       )}
     </div>
