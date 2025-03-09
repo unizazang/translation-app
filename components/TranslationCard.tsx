@@ -18,7 +18,7 @@ export default function TranslationCard({
   }, [translations]);
 
   return (
-    <div className="w-full border-gray-500 p-10 rounded-lg bg-white text-center">
+    <div className="w-full border-gray-500 p-10 rounded-lg bg-white text-center text-black">
       <h3 className="text-lg font-semibold mb-5 ">원본 문장</h3>
       <p className="">{originalText}</p>
 
@@ -28,7 +28,7 @@ export default function TranslationCard({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 space-y-4 mt-4 text-center gap-4 space-y-4 mt-4 text-center ">
         <div className=" border border-gray-300 bg-white p-4 rounded-xl shadow-lg flex flex-col h-full">
           <strong className="block text-gray-700   m-3  text-lg">Google</strong>
-          <p className="p-2 m-2">{translations.google}</p>
+          <p className="p-2 m-2 text-black">{translations.google}</p>
           <button
             className="mt-auto px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer"
             onClick={() => onSave(translations.google)}
@@ -38,7 +38,7 @@ export default function TranslationCard({
         </div>
         <div className="border border-gray-300 bg-white p-4 rounded-xl  text-center  shadow-lg flex flex-col h-full">
           <strong className="block text-gray-700   m-3  text-lg">Papago</strong>
-          <p className="p-2 m-2">{translations.papago}</p>
+          <p className="p-2 m-2 text-black">{translations.papago}</p>
           <button
             className="mt-auto px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer"
             onClick={() => onSave(translations.papago)}
@@ -48,7 +48,7 @@ export default function TranslationCard({
         </div>
         <div className="border border-gray-300 bg-white p-4 rounded-xl  text-center  shadow-lg flex flex-col h-full">
           <strong className="block text-gray-700 m-3 text-lg">DeepL</strong>
-          <p className="p-2 m-2">{translations.deepL}</p>
+          <p className="p-2 m-2 text-black">{translations.deepL}</p>
           <button
             className="mt-auto px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer"
             onClick={() => onSave(translations.deepL)}
