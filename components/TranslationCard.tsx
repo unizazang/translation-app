@@ -31,7 +31,7 @@ export default function TranslationCard({
           <p className="p-2 m-2 text-black">{translations.google}</p>
           <button
             className="mt-auto px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer"
-            onClick={() => onSave(translations.google)}
+            onClick={() => onSave(translations.google + " ")}
           >
             저장하기
           </button>
@@ -41,7 +41,7 @@ export default function TranslationCard({
           <p className="p-2 m-2 text-black">{translations.papago}</p>
           <button
             className="mt-auto px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer"
-            onClick={() => onSave(translations.papago)}
+            onClick={() => onSave(translations.papago + " ")}
           >
             저장하기
           </button>
@@ -51,7 +51,7 @@ export default function TranslationCard({
           <p className="p-2 m-2 text-black">{translations.deepL}</p>
           <button
             className="mt-auto px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer"
-            onClick={() => onSave(translations.deepL)}
+            onClick={() => onSave(translations.deepL + " ")}
           >
             저장하기
           </button>
