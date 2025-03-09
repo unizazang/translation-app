@@ -20,6 +20,7 @@ const normalizeLanguageForPapago = (lang: string) => {
 const STORAGE_KEY = "savedTranslations";
 
 export function useTranslation() {
+  const { properNouns } = useProperNoun();
   const [translations, setTranslations] = useState<{
     google: string;
     papago: string;
@@ -74,7 +75,7 @@ export function useTranslation() {
       const papagoLang = normalizeLanguageForPapago(sourceLang);
 
       const cleanedText = cleanExtractedText(text);
-      const { properNouns } = useProperNoun();
+
       const { transformedText, tokenMap } = replaceProperNounsWithTokens(
         cleanedText,
         properNouns || [] // ✅ properNouns가 없으면 빈 배열([]) 사용
