@@ -87,7 +87,7 @@ export default function SavedTranslations({
         전체 복사
       </button>
       <button
-        className="px-3 py-1 bg-red-400 text-white rounded"
+        className="px-3 ml-2 py-1 bg-red-400 text-white rounded"
         onClick={handleResetTranslations} // ✅ 초기화 버튼 추가
       >
         초기화
