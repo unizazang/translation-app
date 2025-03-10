@@ -36,7 +36,14 @@ export const restoreProperNounsFromTokens = (
 ) => {
   let restoredText = text;
 
-  Object.keys(tokenMap).forEach((token) => {
+  // 🔹 숫자가 큰(긴) 토큰을 먼저 변환하기 위해 내림차순 정렬
+  const sortedTokens = Object.keys(tokenMap).sort((a, b) => {
+    const numA = parseInt(a.match(/\d+/)?.[0] || "0", 10);
+    const numB = parseInt(b.match(/\d+/)?.[0] || "0", 10);
+    return numB - numA; // 숫자가 큰 순으로 정렬
+  });
+
+  sortedTokens.forEach((token) => {
     const regex = new RegExp(token, "g");
     restoredText = restoredText.replace(regex, tokenMap[token]);
   });

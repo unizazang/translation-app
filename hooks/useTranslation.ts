@@ -91,7 +91,10 @@ export function useTranslation() {
 
       const newTranslations = {
         google: restoreProperNounsFromTokens(google || "", tokenMap),
-        papago: restoreProperNounsFromTokens(papago || "", tokenMap),
+        papago: restoreProperNounsFromTokens(
+          papago?.replace(/PPER_NUN_(\d+)/g, "PPER_NOUN_$1") || "", // ✅ 변형된 토큰 복구
+          tokenMap
+        ),
         deepL: restoreProperNounsFromTokens(deepL || "", tokenMap),
       };
 
