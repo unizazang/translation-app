@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "@/hooks/useTranslation"; // ✅ useTranslation 훅 임포트
+
 
 interface SavedTranslationsProps {
   savedTranslations: string[];
@@ -17,6 +19,7 @@ export default function SavedTranslations({
   const [showToast, setShowToast] = useState(false); // Toast 메시지 상태 추가
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [toastMessage, setToastMessage] = useState(""); // ✅ 토스트 메시지 상태 추가
+  const { resetAllTranslations } = useTranslation(); // ✅ 훅 호출 및 함수 추출
 
   // ✅ 저장된 번역이 변경될 때 textarea 업데이트
   useEffect(() => {
@@ -60,12 +63,15 @@ export default function SavedTranslations({
     showToastMessage("번역이 저장되었습니다."); // ✅ 저장 후 토스트 메시지 표시
   };
 
-  // ✅ 번역 초기화 함수
+  // ✅ 번역 초기화 함수 (완전 삭제)
   const handleResetTranslations = () => {
-    setEditText(""); // textarea 초기화
-    savedTranslations.forEach((_, index) => updateTranslation(index, "")); // 저장된 번역 초기화
+    const isConfirmed = window.confirm("정말 초기화할까요?"); // ✅ 사용자 확인 요청
+    if (!isConfirmed) return; // 사용자가 취소하면 아무 동작하지 않음
+    
+    setEditText(""); // 🔹 textarea 초기화
+    resetAllTranslations(); // 🔹 전체 번역 초기화 실행
     console.log("🔄 모든 번역이 초기화되었습니다.");
-    showToastMessage("번역이 초기화되었습니다."); // ✅ 초기화 후 토스트 메시지 표시
+    showToastMessage("번역이 초기화되었습니다."); // ✅ 사용자 피드백 제공
   };
 
   // ✅ 클립보드에 텍스트를 복사하는 함수

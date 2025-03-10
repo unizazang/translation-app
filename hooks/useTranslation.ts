@@ -43,6 +43,9 @@ export function useTranslation() {
     };
   }>({});
 
+
+
+
   // ✅ 로컬 스토리지에서 번역 불러오기
   useEffect(() => {
     const storedTranslations = localStorage.getItem(STORAGE_KEY);
@@ -56,6 +59,16 @@ export function useTranslation() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(savedTranslations));
   }, [savedTranslations]);
 
+
+      /**
+   * ✅ 번역 목록 초기화 함수 (전체 삭제)
+   */
+  const resetAllTranslations = () => {
+    setSavedTranslations([]); // 🔹 저장된 번역 전체 삭제
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([])); // ✅ 로컬 스토리지 업데이트
+    console.log("🔄 모든 번역이 완전히 삭제되었습니다.");
+  };
+  
   /**
    * ✅ 입력된 텍스트를 번역하는 함수
    */
@@ -118,6 +131,8 @@ export function useTranslation() {
     });
   };
 
+
+
   /**
    * ✅ 번역 수정 함수 (사용자가 직접 수정 가능)
    */
@@ -147,5 +162,6 @@ export function useTranslation() {
     updateTranslation,
     savedTranslations,
     copyAllTranslations, // ✅ 추가
+    resetAllTranslations, // ✅ 추가
   };
 }
