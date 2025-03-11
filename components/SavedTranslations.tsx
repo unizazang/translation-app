@@ -70,6 +70,7 @@ const handleResetTranslations = () => {
 
   resetAllTranslations(); // ✅ 전체 번역 초기화 실행
   setEditText(""); // ✅ textarea도 즉시 초기화
+
   console.log("🔄 모든 번역이 초기화되었습니다.");
   showToastMessage("번역이 초기화되었습니다."); // ✅ 사용자 피드백 제공
 };

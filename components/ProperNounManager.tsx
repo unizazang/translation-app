@@ -95,7 +95,7 @@ export default function ProperNounManager() {
       {/* ✅ 초기화 버튼 추가 */}
       <button
         onClick={handleResetProperNouns}
-        className="mt-2 ml-2 px-4 py-2 bg-red-400 text-white rounded hover:bg-red-600 transition"
+        className="mt-2 ml-2 px-4 py-2 bg-red-400 cursor-pointer text-white rounded-md hover:bg-red-600 transition"
       >
        <FontAwesomeIcon icon={faEraser} /> 목록 초기화
       </button>
