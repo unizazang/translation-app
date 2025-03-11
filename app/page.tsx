@@ -140,7 +140,7 @@ export default function Home() {
             {currentIndex < groupedSentences.length - 1 && (
               <button
                 onClick={handleNext}
-                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
+                className="px-4 py-2 cursor-pointer bg-gray-500 text-white rounded hover:bg-gray-600 transition"
                 disabled={isTranslating}
               >
                 {isTranslating ? "번역 중..." : "다음 문장"}

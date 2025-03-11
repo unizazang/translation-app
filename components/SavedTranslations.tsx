@@ -73,10 +73,12 @@ export default function SavedTranslations({
     if (!isConfirmed) return;
   
     resetAllTranslations(); // ✅ 전체 번역 초기화 실행
-    setEditText(""); // ✅ textarea도 즉시 초기화
+    setTimeout(() => setEditText(""), 0); // ✅ textarea 즉시 초기화 (비동기)
+  
     console.log("🔄 모든 번역이 초기화되었습니다.");
     showToastMessage("번역이 초기화되었습니다.");
   };
+  
 
 
   // ✅ 클립보드에 텍스트를 복사하는 함수
@@ -98,7 +100,7 @@ export default function SavedTranslations({
         전체 복사
       </button>
       <button
-        className="px-3 ml-2 py-1 bg-red-400  hover:bg-red-600  text-white rounded-md"
+        className="px-3 ml-2 py-1 bg-red-400 cursor-pointer hover:bg-red-600  text-white rounded-md"
         onClick={handleResetTranslations} // ✅ 초기화 버튼 추가
       >
         초기화
