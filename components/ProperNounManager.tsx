@@ -43,20 +43,20 @@ export default function ProperNounManager() {
       <h2 className="text-lg font-semibold mb-4">🔹 고유명사 관리</h2>
 
       {/* ✅ 입력 필드는 항상 표시 */}
-      <div className="flex gap-2 mb-4">
+      <div className="flex gap-2 mb-4 h-3">
         <input
           type="text"
           placeholder="원본"
           value={original}
           onChange={(e) => setOriginal(e.target.value)}
-          className="border py-1 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <input
           type="text"
           placeholder="번역"
           value={translation}
           onChange={(e) => setTranslation(e.target.value)}
-          className="border py-1 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={handleAdd}
