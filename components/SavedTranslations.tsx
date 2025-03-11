@@ -69,7 +69,7 @@ const handleResetTranslations = () => {
   if (!isConfirmed) return; // 사용자가 취소하면 아무 동작하지 않음
 
   resetAllTranslations(); // ✅ 전체 번역 초기화 실행
-  setEditText(""); // ✅ textarea도 즉시 초기화
+  setTimeout(() => setEditText(""), 0); // ✅ textarea도 즉시 초기화 (비동기 처리)
 
   console.log("🔄 모든 번역이 초기화되었습니다.");
   showToastMessage("번역이 초기화되었습니다."); // ✅ 사용자 피드백 제공

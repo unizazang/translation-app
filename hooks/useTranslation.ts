@@ -54,10 +54,10 @@ export function useTranslation() {
     }
   }, []);
 
-  // ✅ localStorage가 변경될 때 자동 저장 (초기화된 경우 다시 불러오지 않도록 수정)
+// ✅ localStorage가 변경될 때 자동 저장
 useEffect(() => {
   if (savedTranslations.length === 0) {
-    localStorage.removeItem(STORAGE_KEY); // ✅ 완전히 비울 경우 삭제
+    localStorage.removeItem(STORAGE_KEY); // ✅ 데이터가 없으면 완전히 삭제
   } else {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(savedTranslations));
   }
@@ -67,12 +67,11 @@ useEffect(() => {
   /**
  * ✅ 번역 목록 초기화 함수 (전체 삭제)
  */
-const resetAllTranslations = () => {
-  setSavedTranslations([]); // 🔹 상태를 먼저 업데이트하여 UI 반영
-  localStorage.removeItem(STORAGE_KEY); // ✅ 로컬 스토리지에서도 삭제
-  
-  console.log("🔄 모든 번역이 완전히 삭제되었습니다.");
-};
+  const resetAllTranslations = () => {
+    localStorage.removeItem(STORAGE_KEY); // ✅ 1. 로컬 스토리지에서 삭제
+    setSavedTranslations([]); // ✅ 2. 상태를 빈 배열로 업데이트
+    console.log("🔄 모든 번역이 완전히 삭제되었습니다.");
+  };
   
   /**
    * ✅ 입력된 텍스트를 번역하는 함수
