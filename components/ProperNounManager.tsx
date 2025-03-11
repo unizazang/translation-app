@@ -74,7 +74,7 @@ export default function ProperNounManager() {
         />
         <button
           onClick={handleAdd}
-          className="p-1 bg-blue-500 flex-1 text-white rounded hover:bg-blue-600 transition"
+          className="p-1 bg-blue-400 flex-1 text-white rounded hover:bg-blue-600 transition"
         >
           <FontAwesomeIcon icon={faPlus} /> 추가
         </button>
@@ -82,7 +82,7 @@ export default function ProperNounManager() {
 
        {/* ✅ 파일 업로드 버튼 추가 (스타일 적용) */}
        <label className="cursor-pointer px-4 py-2 bg-blue-400 text-white rounded-md hover:bg-blue-600 transition inline-block mt-2">
-        <FontAwesomeIcon icon={faFileUpload} /> 파일로 추가
+        <FontAwesomeIcon icon={faFileUpload}  className="font-bold"/> 파일로 추가
         <input
           type="file"
           accept=".txt"
@@ -97,7 +97,7 @@ export default function ProperNounManager() {
         onClick={handleResetProperNouns}
         className="mt-2 ml-2 px-4 py-2 bg-red-400 cursor-pointer text-white rounded-md hover:bg-red-600 transition"
       >
-       <FontAwesomeIcon icon={faEraser} /> 목록 초기화
+       <FontAwesomeIcon icon={faEraser} className="font-bold"/> 목록 초기화
       </button>
 
       {/* ✅ 아코디언 토글 버튼 */}
@@ -118,7 +118,7 @@ export default function ProperNounManager() {
 
       {/* ✅ 고유명사 목록 (아코디언 적용 + 스크롤 가능하도록 수정) */}
       {isOpen && (
-        <div className="mt-4 border rounded p-2 bg-gray-50 max-h-60 overflow-y-auto">
+        <div className="mt-4 border rounded p-2 bg-gray-50 max-h-60 overflow-y-auto text-black">
           <ul className="space-y-2">
             {properNouns.length > 0 ? (
               properNouns.map((noun) => (
@@ -133,7 +133,7 @@ export default function ProperNounManager() {
                     onClick={() => removeProperNoun(noun.original)}
                     className="text-red-500 hover:text-red-700 transition"
                   >
-                    <FontAwesomeIcon icon={faTrash} /> 삭제
+                    <FontAwesomeIcon icon={faTrash} className="cursor-pointer" /> 삭제
                   </button>
                 </li>
               ))

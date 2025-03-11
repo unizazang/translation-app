@@ -95,7 +95,7 @@ const handleResetTranslations = () => {
         전체 복사
       </button>
       <button
-        className="px-3 ml-2 py-1 bg-red-400 text-white rounded"
+        className="px-3 ml-2 py-1 bg-red-400  hover:bg-red-600  text-white rounded-md"
         onClick={handleResetTranslations} // ✅ 초기화 버튼 추가
       >
         초기화
@@ -121,14 +121,14 @@ const handleResetTranslations = () => {
       {/* ✅ 저장 버튼 */}
       <div className="flex gap-2 mt-2">
         <button
-          className="mt-2 px-3 py-1 bg-green-600 text-white cursor-pointer rounded"
+          className="mt-2 px-3 py-1 bg-green-600 text-white cursor-pointer rounded-md"
           onClick={handleSave} // ✅ 버튼 클릭 시 저장
         >
           브라우저 저장
         </button>
 
         <button
-          className="mt-2 px-3 py-1  bg-gray-700 text-white cursor-pointer rounded"
+          className="mt-2 px-3 py-1  bg-gray-700 text-white cursor-pointer rounded-md"
           onClick={handleDownloadTxt}
         >
           txt로 저장
