@@ -53,29 +53,30 @@ export default function SavedTranslations({
     setTimeout(() => setShowToast(false), 2000); // 2초 후 숨김
   };
 
-  // ✅ 수정된 번역을 저장하는 함수
   const handleSave = () => {
-    if (savedTranslations.length === 0) return; // ✅ 초기화된 상태면 저장하지 않음
-
+    if (savedTranslations.length === 0) {
+      setEditText(""); // ✅ 초기화된 상태에서는 textarea도 비우기
+      return; // ✅ 저장 동작 방지
+    }
+  
     const updatedTranslations = editText.split("\n").filter(text => text.trim() !== ""); // ✅ 빈 줄 방지
     updatedTranslations.forEach((text, index) => {
       updateTranslation(index, text);
     });
     console.log("📌 저장된 번역 업데이트됨:", updatedTranslations);
-    showToastMessage("번역이 저장되었습니다."); // ✅ 저장 후 토스트 메시지 표시
+    showToastMessage("번역이 저장되었습니다.");
   };
 
   // ✅ 번역 초기화 함수 (완전 삭제)
-const handleResetTranslations = () => {
-  const isConfirmed = window.confirm("정말 초기화할까요?"); // ✅ 사용자 확인 요청
-  if (!isConfirmed) return; // 사용자가 취소하면 아무 동작하지 않음
-
-  resetAllTranslations(); // ✅ 전체 번역 초기화 실행
-  setEditText(""); // ✅ textarea도 즉시 초기화
+  const handleResetTranslations = () => {
+    const isConfirmed = window.confirm("정말 초기화할까요?");
+    if (!isConfirmed) return;
   
-  console.log("🔄 모든 번역이 초기화되었습니다.");
-  showToastMessage("번역이 초기화되었습니다."); // ✅ 사용자 피드백 제공
-};
+    resetAllTranslations(); // ✅ 전체 번역 초기화 실행
+    setEditText(""); // ✅ textarea도 즉시 초기화
+    console.log("🔄 모든 번역이 초기화되었습니다.");
+    showToastMessage("번역이 초기화되었습니다.");
+  };
 
 
   // ✅ 클립보드에 텍스트를 복사하는 함수
