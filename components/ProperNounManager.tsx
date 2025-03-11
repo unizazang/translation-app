@@ -62,18 +62,18 @@ export default function ProperNounManager() {
           placeholder="원본"
           value={original}
           onChange={(e) => setOriginal(e.target.value)}
-          className="border p-4 rounded w-full flex-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border p-2 rounded w-full flex-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <input
           type="text"
           placeholder="번역"
           value={translation}
           onChange={(e) => setTranslation(e.target.value)}
-          className="border p-4 rounded w-full  flex-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border p-2 rounded w-full  flex-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={handleAdd}
-          className="p-4 bg-blue-500 flex-1 text-white rounded hover:bg-blue-600 transition"
+          className="p-2 bg-blue-500 flex-1 text-white rounded hover:bg-blue-600 transition"
         >
           <FontAwesomeIcon icon={faPlus} /> 추가
         </button>
