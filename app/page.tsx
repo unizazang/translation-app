@@ -11,6 +11,8 @@ import TranslationCard from "@/components/TranslationCard";
 import { useTextProcessing } from "@/hooks/useTextProcessing";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useProperNoun } from "@/hooks/useProperNoun"; // ✅ 고유명사 훅 추가
+import HelpButton from "@/components/HelpButton"; // ✅ FAB 버튼 추가
+
 
 const ProperNounManager = dynamicComponent(
   () => import("@/components/ProperNounManager"),
@@ -98,6 +100,8 @@ export default function Home() {
 
       {/* ✅ 첫 화면에서도 ProperNounManager 표시 */}
       <ProperNounManager />
+
+      <HelpButton /> {/* ✅ 도움말 버튼 추가 */}
 
       {!isPdfUploaded ? (
         <>
