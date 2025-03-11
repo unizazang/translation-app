@@ -69,10 +69,14 @@ useEffect(() => {
  * ✅ 번역 목록 초기화 함수 (전체 삭제)
  */
   const resetAllTranslations = () => {
-    localStorage.removeItem(STORAGE_KEY); // ✅ 1. 로컬 스토리지에서 삭제
-    setSavedTranslations([]); // ✅ 2. 상태를 빈 배열로 업데이트
-  
+    localStorage.removeItem(STORAGE_KEY); // ✅ 로컬 스토리지에서 삭제
+    setSavedTranslations([]); // ✅ 상태 업데이트 요청
     console.log("🔄 모든 번역이 완전히 삭제되었습니다.");
+  
+    // ✅ 상태 동기화를 강제 적용하여 즉시 업데이트
+    setTimeout(() => {
+      setSavedTranslations([]);
+    }, 0);
   };
   
   
@@ -132,14 +136,19 @@ useEffect(() => {
    */
   const saveTranslation = (translation: string) => {
     setSavedTranslations((prev) => {
-      if (prev.length === 0) {
-        return [translation]; // ✅ 초기화된 후 첫 저장이면 새 배열 생성
+      const storedTranslations = localStorage.getItem(STORAGE_KEY);
+      const existingTranslations = storedTranslations ? JSON.parse(storedTranslations) : [];
+  
+      if (existingTranslations.length === 0) {
+        return [translation]; // ✅ 기존 번역이 없으면 새로운 배열 생성
       }
-      const updatedList = [...prev, translation];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
+  
+      const updatedList = [...existingTranslations, translation]; // ✅ 항상 최신 상태를 기준으로 추가
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList)); // ✅ 동기화
       return updatedList;
     });
   };
+  
   
 
 
