@@ -64,15 +64,16 @@ export default function SavedTranslations({
   };
 
   // ✅ 번역 초기화 함수 (완전 삭제)
-  const handleResetTranslations = () => {
-    const isConfirmed = window.confirm("정말 초기화할까요?"); // ✅ 사용자 확인 요청
-    if (!isConfirmed) return; // 사용자가 취소하면 아무 동작하지 않음
-    
-    setEditText(""); // 🔹 textarea 초기화
-    resetAllTranslations(); // 🔹 전체 번역 초기화 실행
-    console.log("🔄 모든 번역이 초기화되었습니다.");
-    showToastMessage("번역이 초기화되었습니다."); // ✅ 사용자 피드백 제공
-  };
+const handleResetTranslations = () => {
+  const isConfirmed = window.confirm("정말 초기화할까요?"); // ✅ 사용자 확인 요청
+  if (!isConfirmed) return; // 사용자가 취소하면 아무 동작하지 않음
+
+  resetAllTranslations(); // ✅ 전체 번역 초기화 실행
+  setEditText(""); // ✅ textarea도 즉시 초기화
+  console.log("🔄 모든 번역이 초기화되었습니다.");
+  showToastMessage("번역이 초기화되었습니다."); // ✅ 사용자 피드백 제공
+};
+
 
   // ✅ 클립보드에 텍스트를 복사하는 함수
   const handleCopyAll = () => {

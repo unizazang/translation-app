@@ -64,8 +64,9 @@ export function useTranslation() {
    * ✅ 번역 목록 초기화 함수 (전체 삭제)
    */
   const resetAllTranslations = () => {
-    setSavedTranslations([]); // 🔹 저장된 번역 전체 삭제
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([])); // ✅ 로컬 스토리지 업데이트
+    localStorage.removeItem(STORAGE_KEY); // ✅ 로컬 스토리지에서 삭제
+    setSavedTranslations([]); // 🔹 저장된 상태 삭제
+    
     console.log("🔄 모든 번역이 완전히 삭제되었습니다.");
   };
   
