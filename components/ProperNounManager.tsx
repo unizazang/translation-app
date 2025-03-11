@@ -63,14 +63,14 @@ export default function ProperNounManager() {
           placeholder="원본"
           value={original}
           onChange={(e) => setOriginal(e.target.value)}
-          className="border p-1 rounded w-full flex-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border p-2 rounded w-full flex-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <input
           type="text"
           placeholder="번역"
           value={translation}
           onChange={(e) => setTranslation(e.target.value)}
-          className="border p-1 rounded w-full  flex-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border p-2 rounded w-full  flex-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={handleAdd}
@@ -95,7 +95,7 @@ export default function ProperNounManager() {
       {/* ✅ 초기화 버튼 추가 */}
       <button
         onClick={handleResetProperNouns}
-        className="mt-2  px-4 py-2 bg-red-400 text-white rounded hover:bg-red-600 transition"
+        className="mt-2 ml-2 px-4 py-2 bg-red-400 text-white rounded hover:bg-red-600 transition"
       >
        <FontAwesomeIcon icon={faEraser} /> 목록 초기화
       </button>
