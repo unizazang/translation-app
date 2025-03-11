@@ -9,6 +9,7 @@ import {
   faFileUpload,
   faChevronDown,
   faChevronUp,
+  faEraser ,
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function ProperNounManager() {
@@ -94,9 +95,9 @@ export default function ProperNounManager() {
       {/* ✅ 초기화 버튼 추가 */}
       <button
         onClick={handleResetProperNouns}
-        className="mt-2 px-3 py-1 bg-red-400 text-white rounded hover:bg-red-600 transition"
+        className="mt-2  px-4 py-2 bg-red-400 text-white rounded hover:bg-red-600 transition"
       >
-        고유명사 목록 초기화
+       <FontAwesomeIcon icon={faEraser} /> 목록 초기화
       </button>
 
       {/* ✅ 아코디언 토글 버튼 */}
