@@ -49,14 +49,14 @@ export default function ProperNounManager() {
           placeholder="원본"
           value={original}
           onChange={(e) => setOriginal(e.target.value)}
-          className="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border py-1 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <input
           type="text"
           placeholder="번역"
           value={translation}
           onChange={(e) => setTranslation(e.target.value)}
-          className="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border py-1 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={handleAdd}
