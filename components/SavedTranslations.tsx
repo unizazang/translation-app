@@ -55,9 +55,11 @@ export default function SavedTranslations({
 
   // ✅ 수정된 번역을 저장하는 함수
   const handleSave = () => {
-    const updatedTranslations = editText.split("\n");
+    if (savedTranslations.length === 0) return; // ✅ 초기화된 상태면 저장하지 않음
+
+    const updatedTranslations = editText.split("\n").filter(text => text.trim() !== ""); // ✅ 빈 줄 방지
     updatedTranslations.forEach((text, index) => {
-      updateTranslation(index, text); // ✅ 수정 내용 저장
+      updateTranslation(index, text);
     });
     console.log("📌 저장된 번역 업데이트됨:", updatedTranslations);
     showToastMessage("번역이 저장되었습니다."); // ✅ 저장 후 토스트 메시지 표시
@@ -69,8 +71,8 @@ const handleResetTranslations = () => {
   if (!isConfirmed) return; // 사용자가 취소하면 아무 동작하지 않음
 
   resetAllTranslations(); // ✅ 전체 번역 초기화 실행
-  setTimeout(() => setEditText(""), 0); // ✅ textarea도 즉시 초기화 (비동기 처리)
-
+  setEditText(""); // ✅ textarea도 즉시 초기화
+  
   console.log("🔄 모든 번역이 초기화되었습니다.");
   showToastMessage("번역이 초기화되었습니다."); // ✅ 사용자 피드백 제공
 };
