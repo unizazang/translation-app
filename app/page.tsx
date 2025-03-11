@@ -96,12 +96,15 @@ export default function Home() {
     <div className="grid grid-rows-[auto_1fr_auto] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 bg-white">
       <h1 className="text-3xl font-bold text-gray-800">PDF 번역기</h1>
 
+      {/* ✅ 첫 화면에서도 ProperNounManager 표시 */}
+      <ProperNounManager />
+
       {!isPdfUploaded ? (
-        <PdfUploader onTextExtracted={handleTextExtracted} />
+        <>
+          <PdfUploader onTextExtracted={handleTextExtracted} />
+        </>
       ) : (
         <>
-          <ProperNounManager />
-
           <LanguageSelector onSelectLanguage={setSelectedLanguage} />
 
           {isTranslateButtonVisible && (
@@ -154,7 +157,7 @@ export default function Home() {
       )}
 
       {isPdfUploaded && (
-        <div className="mt-10 pt-10 ">
+        <div className="mt-10 pt-10">
           <PdfUploader onTextExtracted={handleTextExtracted} />
         </div>
       )}
