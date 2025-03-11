@@ -79,15 +79,24 @@ export default function ProperNounManager() {
         </button>
       </div>
 
-      {/* ✅ 파일 업로드 버튼 추가 */}
-      <input type="file" accept=".txt" onChange={handleFileUpload} className="mt-2" />
+       {/* ✅ 파일 업로드 버튼 추가 (스타일 적용) */}
+       <label className="cursor-pointer px-4 py-2 bg-blue-400 text-white rounded-md hover:bg-blue-600 transition inline-block mt-2">
+        <FontAwesomeIcon icon={faFileUpload} /> 파일로 추가
+        <input
+          type="file"
+          accept=".txt"
+          onChange={handleFileUpload}
+          className="hidden"
+        />
+      </label>
+
 
       {/* ✅ 초기화 버튼 추가 */}
       <button
         onClick={handleResetProperNouns}
-        className="mt-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
+        className="mt-2 px-3 py-1 bg-red-400 text-white rounded hover:bg-red-600 transition"
       >
-        초기화
+        고유명사 목록 초기화
       </button>
 
       {/* ✅ 아코디언 토글 버튼 */}
