@@ -101,7 +101,7 @@ export default function Home() {
       {/* ✅ 첫 화면에서도 ProperNounManager 표시 */}
       <ProperNounManager />
 
-      <HelpButton /> {/* ✅ 도움말 버튼 추가 */}
+      <HelpButton onClick={()=>{}} /> {/* ✅ 도움말 버튼 추가 */}
 
       {!isPdfUploaded ? (
         <>
