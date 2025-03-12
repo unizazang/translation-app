@@ -11,7 +11,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={` antialiased`}>{children}
-        {/* 사용법 가이드 위젯 */}
       </body>
     </html>
   );

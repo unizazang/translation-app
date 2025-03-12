@@ -12,6 +12,7 @@ import { useTextProcessing } from "@/hooks/useTextProcessing";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useProperNoun } from "@/hooks/useProperNoun"; // ✅ 고유명사 훅 추가
 import HelpButton from "@/components/HelpButton"; // ✅ FAB 버튼 추가
+import HelpWidget from "@/components/HelpWidget"; // ✅ HelpWidget 추가
 
 
 const ProperNounManager = dynamicComponent(
@@ -101,7 +102,11 @@ export default function Home() {
       {/* ✅ 첫 화면에서도 ProperNounManager 표시 */}
       <ProperNounManager />
 
-      <HelpButton onClick={()=>{}} /> {/* ✅ 도움말 버튼 추가 */}
+      
+
+        {/* ✅ Help 패널 전체 위젯을 추가 */}
+        <HelpWidget />
+
 
       {!isPdfUploaded ? (
         <>
