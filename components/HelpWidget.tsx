@@ -9,7 +9,7 @@ export default function HelpWidget() {
 
   return (
     <>
-      {/* ✅ 도움말 버튼 */}
+      {/* ✅ 도움말 버튼 (이제 onClick이 isOpen 상태를 변경함) */}
       <HelpButton onClick={() => setIsOpen(!isOpen)} />
 
       {/* ✅ 패널 (isOpen 상태에 따라 표시) */}
