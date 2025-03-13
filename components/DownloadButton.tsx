@@ -1,21 +1,16 @@
 "use client";
 
-import { TranslatedTextBlock } from "@/lib/pdfLayout"; // ✅ 올바르게 export된 타입 사용
+import { TranslatedTextBlock } from "@/lib/pdfLayout";
 import { generateTranslatedPdf } from "@/lib/pdfGenerator";
 
 interface DownloadButtonProps {
-  translatedBlocks: TranslatedTextBlock[];
+  translatedBlocks: TranslatedTextBlock[][];
 }
 
 export default function DownloadButton({ translatedBlocks }: DownloadButtonProps) {
   const handleDownload = async () => {
     try {
-      // ✅ 배열을 페이지 단위의 2차원 배열로 변환
-      const pdfData = await generateTranslatedPdf([translatedBlocks]);
-      
-      // ✅ Uint8Array → Blob 변환
-      const pdfBlob = new Blob([pdfData], { type: "application/pdf" });
-
+      const pdfBlob = await generateTranslatedPdf(translatedBlocks);
       const url = URL.createObjectURL(pdfBlob);
       const a = document.createElement("a");
       a.href = url;
