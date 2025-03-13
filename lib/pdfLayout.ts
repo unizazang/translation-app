@@ -1,48 +1,24 @@
-import { PDFDocument, rgb } from "pdf-lib";
+import { PdfPageData, PdfTextBlock } from "./pdfProcessor"; // ✅ 기존 타입 활용
 
-/**
- * 번역된 텍스트를 원래 좌표에 배치하여 PDF로 생성
- */
-export async function createTranslatedPdf(
-  originalPdfBuffer: ArrayBuffer,
-  translatedTextData: { text: string; x: number; y: number; width: number; height: number }[][]
-) {
-  const pdfDoc = await PDFDocument.load(originalPdfBuffer);
-  const pages = pdfDoc.getPages();
-
-  translatedTextData.forEach((pageData, pageIndex) => {
-    const page = pages[pageIndex];
-    pageData.forEach(({ text, x, y }) => {
-      page.drawText(text, {
-        x,
-        y,
-        size: 12,
-        color: rgb(0, 0, 0),
-      });
-    });
-  });
-
-  return pdfDoc.save();
+// ✅ 번역된 텍스트를 원본 레이아웃에 배치하는 타입 정의
+interface TranslatedTextBlock extends PdfTextBlock {
+  translatedText: string;
 }
 
-
-
-export function detectColumns(
-    textData: { text: string; x: number; y: number; width: number; height: number }[][],
-    columnThreshold = 300
-  ) {
-    return textData.map((page) => {
-      const columns: { [key: number]: string[] } = {};
-  
-      page.forEach(({ text, x }) => {
-        const columnKey = Math.floor(x / columnThreshold); // ✅ x 좌표를 기준으로 단 감지
-        if (!columns[columnKey]) {
-          columns[columnKey] = [];
-        }
-        columns[columnKey].push(text);
-      });
-  
-      return columns;
-    });
-  }
-  
+/**
+ * ✅ 번역된 텍스트를 원본 위치에 배치하는 함수
+ * @param originalPages - 원본 PDF의 텍스트 데이터
+ * @param translatedTexts - 번역된 문장 배열 (페이지별 배열)
+ * @returns 번역된 텍스트가 배치된 PDF 페이지 데이터
+ */
+export function applyTranslationsToLayout(
+  originalPages: PdfPageData[],
+  translatedTexts: string[][]
+): TranslatedTextBlock[][] {
+  return originalPages.map((page, pageIndex) => {
+    return page.texts.map((block, blockIndex) => ({
+      ...block,
+      translatedText: translatedTexts[pageIndex]?.[blockIndex] || "", // ✅ 번역된 텍스트 매핑
+    }));
+  });
+}
