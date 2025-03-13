@@ -1,12 +1,12 @@
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 
-// ✅ Web Worker 경로를 고정된 버전으로 직접 설정
+// ✅ Web Worker 경로를 설정
 GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
 
 /**
  * PDF 파일을 로드하는 함수
  */
-export async function loadPdf(file: File) {
+export async function loadPdf(file: File): Promise<ArrayBuffer> {
   const reader = new FileReader();
   return new Promise<ArrayBuffer>((resolve, reject) => {
     reader.onload = () => resolve(reader.result as ArrayBuffer);
@@ -29,13 +29,29 @@ export function cleanExtractedText(text: string): string {
 }
 
 /**
- * ✅ PDF에서 텍스트를 추출하는 함수 (cleanExtractedText 적용)
+ * ✅ PDF 텍스트 및 레이아웃 정보 타입 정의
  */
-export async function extractTextFromPdf(pdfBuffer: ArrayBuffer) {
+export interface PdfTextBlock {
+  text: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface PdfPageData {
+  pageNumber: number;
+  textBlocks: PdfTextBlock[];
+}
+
+/**
+ * ✅ PDF에서 텍스트를 추출하는 함수 (좌표 정보 포함)
+ */
+export async function extractTextFromPdf(pdfBuffer: ArrayBuffer): Promise<PdfPageData[]> {
   const pdf = await getDocument({ data: pdfBuffer }).promise;
   console.log("✅ PDF 문서 열기 완료, 총 페이지 수:", pdf.numPages);
 
-  const extractedText: { text: string; x: number; y: number }[][] = []; // ✅ 좌표 정보 유지
+  const extractedText: PdfPageData[] = [];
 
   for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
     const page = await pdf.getPage(pageNum);
@@ -45,43 +61,40 @@ export async function extractTextFromPdf(pdfBuffer: ArrayBuffer) {
       console.warn(`⚠️ 페이지 ${pageNum}에서 추출된 텍스트가 없습니다.`);
     }
 
-    // ✅ 텍스트 정제 적용 (cleanExtractedText 추가)
-    const lines = textContent.items.map((item: any) => ({
-      text: cleanExtractedText(item.str), // ✅ 여기서 정제
+    // ✅ 텍스트 블록 단위로 좌표 정보 유지
+    const textBlocks: PdfTextBlock[] = textContent.items.map((item: any) => ({
+      text: cleanExtractedText(item.str),
       x: item.transform[4], // x 좌표
       y: item.transform[5], // y 좌표
+      width: item.width || 0, // ✅ 블록 너비 추가
+      height: item.height || 0, // ✅ 블록 높이 추가
     }));
 
-    extractedText.push(lines);
+    extractedText.push({ pageNumber: pageNum, textBlocks });
   }
 
-  console.log("📝 정제된 PDF 텍스트:", extractedText);
+  console.log("📝 정제된 PDF 텍스트 및 위치 정보:", extractedText);
   return extractedText;
 }
 
 /**
- * ✅ x 좌표 기준으로 컬럼을 자동 분리하는 함수 (정제된 텍스트 적용)
+ * ✅ 여러 단(column)으로 된 페이지를 자동으로 감지하여 분리하는 함수
  */
 export function splitTextByColumns(
-  textData: { text: string; x: number; y: number }[][],
+  textData: PdfPageData[],
   columnThreshold = 300
-) {
+): { pageNumber: number; columns: { [key: number]: PdfTextBlock[] } }[] {
   return textData.map((page) => {
-    const leftColumn: string[] = [];
-    const rightColumn: string[] = [];
+    const columns: { [key: number]: PdfTextBlock[] } = {};
 
-    page.forEach(({ text, x }) => {
-      const cleanedText = cleanExtractedText(text); // ✅ 컬럼별 텍스트 정제 적용
-      if (x < columnThreshold) {
-        leftColumn.push(cleanedText);
-      } else {
-        rightColumn.push(cleanedText);
+    page.textBlocks.forEach((block) => {
+      const columnKey = Math.floor(block.x / columnThreshold); // ✅ x 좌표를 기준으로 단 감지
+      if (!columns[columnKey]) {
+        columns[columnKey] = [];
       }
+      columns[columnKey].push(block);
     });
 
-    return {
-      leftColumn: leftColumn.join(" "),
-      rightColumn: rightColumn.join(" "),
-    };
+    return { pageNumber: page.pageNumber, columns };
   });
 }
