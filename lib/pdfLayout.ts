@@ -1,5 +1,7 @@
 import { type PdfPageData, type PdfTextBlock } from "./pdfProcessor";
 
+
+
 export interface TranslatedTextBlock extends PdfTextBlock {
   translatedText: string;
 }

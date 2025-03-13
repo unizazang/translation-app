@@ -22,6 +22,7 @@ export interface PdfPageData {
   y: number;
   width?: number;
   height?: number;
+  textBlocks: PdfTextBlock[]; // ✅ textBlocks 속성 추가 (배열 타입)
 }
 
 /**
@@ -53,7 +54,7 @@ export function cleanExtractedText(text: string): string {
  * ✅ PDF에서 텍스트를 추출하는 함수
  */
 export async function extractTextFromPdf(pdfBuffer: ArrayBuffer): Promise<PdfPageData[][]> {
-  const pdf = await getDocument({ data: pdfBuffer }).promise();
+  const pdf = await getDocument({ data: pdfBuffer }).promise;
   console.log("✅ PDF 문서 열기 완료, 총 페이지 수:", pdf.numPages);
 
   const extractedText: PdfPageData[][] = []; // ✅ 좌표 정보 유지
@@ -75,6 +76,9 @@ export async function extractTextFromPdf(pdfBuffer: ArrayBuffer): Promise<PdfPag
     }));
 
     extractedText.push(lines);
+// extractedText.push([{ textBlocks: lines }]); // ✅ PdfPageData 타입에 맞게 배열 구조 수정
+// 하라는데 이것도 안 됨 일단 ㅐㄴ일 물어봐
+
   }
 
   console.log("📝 정제된 PDF 텍스트:", extractedText);
