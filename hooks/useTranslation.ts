@@ -11,12 +11,13 @@ import {
   restoreProperNounsFromTokens,
 } from "@/lib/properNounHandler";
 import { useProperNoun } from "@/hooks/useProperNoun";
-import { cleanExtractedText } from "@/lib/pdfProcessor";
+import { cleanExtractedText } from "@/lib/pdfProcessor"; // ✅ 올바르게 import
 
 const normalizeLanguageForPapago = (lang: string) => {
   if (lang === "zh") return "zh-TW";
   return lang;
 };
+
 const STORAGE_KEY = "savedTranslations";
 
 export function useTranslation() {
@@ -43,9 +44,6 @@ export function useTranslation() {
     };
   }>({});
 
-
-
-
   // ✅ 로컬 스토리지에서 번역 불러오기
   useEffect(() => {
     const storedTranslations = localStorage.getItem(STORAGE_KEY);
@@ -54,80 +52,60 @@ export function useTranslation() {
     }
   }, []);
 
-// ✅ localStorage가 변경될 때 자동 저장
-useEffect(() => {
-  if (savedTranslations.length === 0) {
-    localStorage.removeItem(STORAGE_KEY); // ✅ 데이터가 없으면 완전히 삭제
-  } else {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedTranslations));
-  }
-}, [savedTranslations]);
-
-
+  // ✅ localStorage가 변경될 때 자동 저장
+  useEffect(() => {
+    if (savedTranslations.length === 0) {
+      localStorage.removeItem(STORAGE_KEY);
+    } else {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedTranslations));
+    }
+  }, [savedTranslations]);
 
   /**
- * ✅ 번역 목록 초기화 함수 (전체 삭제)
- */
+   * ✅ 번역 목록 초기화 함수 (전체 삭제)
+   */
   const resetAllTranslations = () => {
-    localStorage.removeItem(STORAGE_KEY); // ✅ 로컬 스토리지에서 삭제
-    setSavedTranslations([]); // ✅ 상태 업데이트 요청
+    localStorage.removeItem(STORAGE_KEY);
+    setSavedTranslations([]);
     console.log("🔄 모든 번역이 완전히 삭제되었습니다.");
-  
-    // ✅ 상태 동기화를 강제 적용하여 즉시 업데이트
-    setTimeout(() => {
-      setSavedTranslations([]);
-    }, 0);
   };
-  
-  
+
   /**
    * ✅ 입력된 텍스트를 번역하는 함수
    */
   const translateText = async (
     text: string,
     sourceLang: string,
-    index: number,
-    properNouns?: { original: string; translation: string }[] // ✅ 선택적 인자로 전달
+    index: number
   ) => {
     try {
-      // 캐시된 번역 결과가 있는지 확인
       if (cachedTranslations[index]) {
         setTranslations(cachedTranslations[index]);
-        console.log("📌 캐시된 번역 결과 사용:", cachedTranslations[index]);
         return;
       }
+
       const papagoLang = normalizeLanguageForPapago(sourceLang);
-
-      const cleanedText = cleanExtractedText(text);
-
-      const { transformedText, tokenMap } = replaceProperNounsWithTokens(
-        cleanedText,
-        properNouns || [] // ✅ properNouns가 없으면 빈 배열([]) 사용
-      );
-
-      console.log("📌 번역 전 텍스트:", transformedText); // ✅ 번역 전 텍스트 로그 추가
+      const cleanedText = cleanExtractedText(text); // ✅ 텍스트 정제 적용
 
       const [google, papago, deepL] = await Promise.all([
-        translateWithGoogle(transformedText, sourceLang),
-        translateWithPapago(transformedText, papagoLang),
-        translateWithDeepL(transformedText, sourceLang),
+        translateWithGoogle(cleanedText, sourceLang),
+        translateWithPapago(cleanedText, papagoLang),
+        translateWithDeepL(cleanedText, sourceLang),
       ]);
 
       const newTranslations = {
-        google: restoreProperNounsFromTokens(google || "", tokenMap),
-        papago: restoreProperNounsFromTokens(
-          papago?.replace(/PPER_NUN_(\d+)/g, "PPER_NOUN_$1") || "", // ✅ 변형된 토큰 복구
-          tokenMap
-        ),
-        deepL: restoreProperNounsFromTokens(deepL || "", tokenMap),
+        google: google || "",
+        papago: papago || "",
+        deepL: deepL || "",
       };
 
       setTranslations(newTranslations);
+      setCachedTranslations((prev) => ({
+        ...prev,
+        [index]: newTranslations,
+      }));
     } catch (error) {
-      console.error(
-        "Translation Error:",
-        (error as any).response?.data || error
-      );
+      console.error("Translation Error:", error);
     }
   };
 
@@ -136,22 +114,11 @@ useEffect(() => {
    */
   const saveTranslation = (translation: string) => {
     setSavedTranslations((prev) => {
-      const storedTranslations = localStorage.getItem(STORAGE_KEY);
-      const existingTranslations = storedTranslations ? JSON.parse(storedTranslations) : [];
-  
-      if (existingTranslations.length === 0) {
-        return [translation]; // ✅ 기존 번역이 없으면 새로운 배열 생성
-      }
-  
-      const updatedList = [...existingTranslations, translation]; // ✅ 항상 최신 상태를 기준으로 추가
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList)); // ✅ 동기화
+      const updatedList = [...prev, translation];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
       return updatedList;
     });
   };
-  
-  
-
-
 
   /**
    * ✅ 번역 수정 함수 (사용자가 직접 수정 가능)
@@ -160,18 +127,8 @@ useEffect(() => {
     setSavedTranslations((prev) => {
       const updatedList = [...prev];
       updatedList[index] = newText;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList)); // ✅ localStorage 업데이트
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
       return updatedList;
-    });
-  };
-
-  /**
-   * ✅ 모든 번역을 클립보드에 복사하는 함수
-   */
-  const copyAllTranslations = () => {
-    const allTranslations = savedTranslations.join("\n");
-    navigator.clipboard.writeText(allTranslations).then(() => {
-      console.log("📌 모든 번역이 클립보드에 복사되었습니다.");
     });
   };
 
@@ -181,7 +138,6 @@ useEffect(() => {
     saveTranslation,
     updateTranslation,
     savedTranslations,
-    copyAllTranslations, // ✅ 추가
-    resetAllTranslations, // ✅ 추가
+    resetAllTranslations,
   };
 }

@@ -1,13 +1,26 @@
+"use client";
+
 import { useState } from "react";
-import { extractTextFromPdf } from "@/lib/pdfProcessor";
+import { loadPdf, extractTextFromPdf, PdfPageData } from "@/lib/pdfProcessor";
 
 export function useTextExtraction() {
-  const [extractedText, setExtractedText] = useState<string>("");
+  const [pdfText, setPdfText] = useState<PdfPageData[][]>([]);
 
+  /**
+   * ✅ PDF에서 텍스트를 추출하는 함수
+   */
   const extractText = async (file: File) => {
-    const text = await extractTextFromPdf(file);
-    setExtractedText(text);
+    try {
+      const pdfBuffer: ArrayBuffer = await loadPdf(file); // ✅ 올바른 타입 적용
+      const textData: PdfPageData[][] = await extractTextFromPdf(pdfBuffer);
+      setPdfText(textData); // ✅ 올바른 타입 적용
+    } catch (error) {
+      console.error("❌ PDF 텍스트 추출 중 오류 발생:", error);
+    }
   };
 
-  return { extractedText, extractText };
+  return {
+    pdfText,
+    extractText,
+  };
 }
