@@ -13,6 +13,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useProperNoun } from "@/hooks/useProperNoun"; // ✅ 고유명사 훅 추가
 import HelpButton from "@/components/HelpButton"; // ✅ FAB 버튼 추가
 import HelpWidget from "@/components/HelpWidget"; // ✅ HelpWidget 추가
+import { PdfPageData } from "@/lib/pdfProcessor"; // ✅ PdfPageData import 추가
 
 
 const ProperNounManager = dynamicComponent(
@@ -45,12 +46,18 @@ export default function Home() {
     copyAllTranslations, // ✅ 추가
   } = useTranslation();
 
-  const handleTextExtracted = (extractedText: string) => {
-    setPdfText(extractedText);
-    processText(extractedText);
+  const handleTextExtracted = (extractedText: PdfPageData[][]) => {
+    // PdfPageData[][] -> string 변환
+    const extractedString = extractedText
+      .map(page => page.map(block => block.text).join(" ")) // 각 페이지에서 텍스트만 추출 후 합치기
+      .join("\n\n"); // 페이지 간 구분
+  
+    setPdfText(extractedString);
+    processText(extractedString);
     setCurrentIndex(0);
-    setIsPdfUploaded(true); // ✅ 추가
+    setIsPdfUploaded(true);
   };
+  
 
   const handleTranslate = async (index: number) => {
     if (groupedSentences[index]) {
