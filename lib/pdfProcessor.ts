@@ -144,9 +144,12 @@ export async function extractTextWithLayout(pdfBuffer: ArrayBuffer): Promise<Pdf
     }));
 
     extractedData.push({
-      textBlocks,
+      text: textBlocks.map(block => block.text).join(" "), // 페이지 전체 텍스트 합치기
+      x: 0, // 기본값 설정 (필요한 경우 좌표값 계산 가능)
+      y: 0,
       width: viewport.width,
       height: viewport.height,
+      textBlocks,
     });
   }
 
