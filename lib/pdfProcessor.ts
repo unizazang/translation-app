@@ -61,24 +61,32 @@ export async function extractTextFromPdf(pdfBuffer: ArrayBuffer): Promise<PdfPag
 
   for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
     const page = await pdf.getPage(pageNum);
+    const viewport = page.getViewport({ scale: 1 });
     const textContent = await page.getTextContent();
 
     if (textContent.items.length === 0) {
       console.warn(`⚠️ 페이지 ${pageNum}에서 추출된 텍스트가 없습니다.`);
     }
 
-    const lines = textContent.items.map((item: any) => ({
+    const lines: PdfTextBlock[] = textContent.items.map((item: any) => ({
       text: cleanExtractedText(item.str), // ✅ 텍스트 정제
       x: item.transform[4], // x 좌표
-      y: item.transform[5], // y 좌표
+      y: viewport.height - item.transform[5], // ✅ PDF 좌표계 변환 (위치 보정)
       width: item.width || 0, // ✅ 기본값 0 설정
       height: item.height || 0,
     }));
 
-    extractedText.push(lines);
-// extractedText.push([{ textBlocks: lines }]); // ✅ PdfPageData 타입에 맞게 배열 구조 수정
-// 하라는데 이것도 안 됨 일단 ㅐㄴ일 물어봐
-
+    // ✅ PdfPageData 타입을 올바르게 생성하여 추가
+    extractedText.push([
+      {
+        text: lines.map(block => block.text).join(" "), // 페이지 전체 텍스트 합치기
+        x: 0, // 기본값 설정 (필요한 경우 좌표값 계산 가능)
+        y: 0,
+        width: viewport.width,
+        height: viewport.height,
+        textBlocks: lines, // 추출된 텍스트 블록 배열 추가
+      },
+    ]);
   }
 
   console.log("📝 정제된 PDF 텍스트:", extractedText);
