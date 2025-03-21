@@ -266,9 +266,9 @@ export default function Home() {
             updateTranslation={updateTranslation} // ✅ 추가
           />
 
-          {isPdfUploaded && translatedBlocks.length > 0 && (
+          {/* {isPdfUploaded && translatedBlocks.length > 0 && (
             <DownloadButton translatedBlocks={translatedBlocks} />
-          )}
+          )} */}
         </>
       )}
 
