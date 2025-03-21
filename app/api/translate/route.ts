@@ -31,16 +31,13 @@ export async function POST(req: NextRequest) {
       console.log("🔹 DeepL API 요청 시작:", text);
       const response = await axios.post(
         "https://api-free.deepl.com/v2/translate",
-        {
-          text: [text],
+        new URLSearchParams({
+          text,
           source_lang: sourceLang.toUpperCase(),
           target_lang: "KO",
-        },
+        }),
         {
-          headers: {
-            Authorization: `DeepL-Auth-Key ${DEEPL_API_KEY}`,
-            "Content-Type": "application/json",
-          },
+          headers: { Authorization: `DeepL-Auth-Key ${DEEPL_API_KEY}` },
         }
       );
       translatedText = response.data.translations[0].text;
