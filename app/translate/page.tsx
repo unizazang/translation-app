@@ -50,6 +50,13 @@ export default function Home() {
     copyAllTranslations, // ✅ 추가
   } = useTranslation();
 
+  // 번역 진행 상태 계산
+  const currentPage = Math.floor(currentIndex / 10) + 1; // 페이지당 10개 문장 가정
+  const totalPages = Math.ceil(groupedSentences.length / 10);
+  const progressPercentage = Math.round(
+    (currentIndex / groupedSentences.length) * 100
+  );
+
   const handleTextExtracted = (extractedText: PdfPageData[][]) => {
     const extractedString = extractedText
       .map((page) => page.map((block) => block.text).join(" "))
@@ -157,6 +164,29 @@ export default function Home() {
       ) : (
         <>
           <LanguageSelector onSelectLanguage={setSelectedLanguage} />
+
+          {/* 번역 진행 상태 표시 */}
+          {groupedSentences.length > 0 && (
+            <div className="w-full max-w-2xl bg-white p-4 rounded-lg shadow-md">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm text-gray-600">
+                  페이지 {currentPage} / {totalPages}
+                </span>
+                <span className="text-sm text-gray-600">
+                  진행률: {progressPercentage}%
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                  style={{ width: `${progressPercentage}%` }}
+                ></div>
+              </div>
+              <div className="mt-2 text-sm text-gray-500">
+                {currentIndex + 1} / {groupedSentences.length} 문장
+              </div>
+            </div>
+          )}
 
           {isTranslateButtonVisible && (
             <button
