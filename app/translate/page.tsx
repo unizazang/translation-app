@@ -14,7 +14,8 @@ import { useProperNoun } from "@/hooks/useProperNoun"; // ✅ 고유명사 훅 �
 import HelpButton from "@/components/HelpButton"; // ✅ FAB 버튼 추가
 import HelpWidget from "@/components/HelpWidget"; // ✅ HelpWidget 추가
 import { PdfPageData } from "@/lib/pdfProcessor"; // ✅ PdfPageData import 추가
-
+import { TranslatedTextBlock } from "@/lib/pdfLayout";
+import DownloadButton from "@/components/DownloadButton";
 
 const ProperNounManager = dynamicComponent(
   () => import("@/components/ProperNounManager"),
@@ -31,9 +32,12 @@ export default function Home() {
   const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isTranslating, setIsTranslating] = useState<boolean>(false);
-  const [isPdfUploaded, setIsPdfUploaded] = useState<boolean>(false); // ✅ 추가
+  const [isPdfUploaded, setIsPdfUploaded] = useState<boolean>(false);
   const [isTranslateButtonVisible, setIsTranslateButtonVisible] =
-    useState<boolean>(true); // ✅ 추가
+    useState<boolean>(true);
+  const [translatedBlocks, setTranslatedBlocks] = useState<
+    TranslatedTextBlock[][]
+  >([]);
 
   const { properNouns } = useProperNoun(); // ✅ 최신 고유명사 목록 가져오기
   const { groupedSentences, processText } = useTextProcessing();
@@ -47,17 +51,28 @@ export default function Home() {
   } = useTranslation();
 
   const handleTextExtracted = (extractedText: PdfPageData[][]) => {
-    // PdfPageData[][] -> string 변환
     const extractedString = extractedText
-      .map(page => page.map(block => block.text).join(" ")) // 각 페이지에서 텍스트만 추출 후 합치기
-      .join("\n\n"); // 페이지 간 구분
-  
+      .map((page) => page.map((block) => block.text).join(" "))
+      .join("\n\n");
+
     setPdfText(extractedString);
     processText(extractedString);
     setCurrentIndex(0);
     setIsPdfUploaded(true);
+
+    // 레이아웃 정보 저장 (타입 변환 로직 수정)
+    const initialTranslatedBlocks = extractedText.map((page) =>
+      page.map((block) => ({
+        text: block.text,
+        x: block.x,
+        y: block.y,
+        width: block.width || 0,
+        height: block.height || 0,
+        translatedText: block.text,
+      }))
+    );
+    setTranslatedBlocks(initialTranslatedBlocks);
   };
-  
 
   const handleTranslate = async (index: number) => {
     if (groupedSentences[index]) {
@@ -90,6 +105,23 @@ export default function Home() {
     }
   }, [properNouns]); // ✅ properNouns 변경 감지
 
+  useEffect(() => {
+    if (translations.google && groupedSentences[currentIndex]) {
+      setTranslatedBlocks((prev) => {
+        const newBlocks = [...prev];
+        const currentPage = Math.floor(currentIndex / 10); // 페이지당 10개 문장 가정
+        const currentBlock = currentIndex % 10;
+
+        if (newBlocks[currentPage] && newBlocks[currentPage][currentBlock]) {
+          newBlocks[currentPage][currentBlock].translatedText =
+            translations.google;
+        }
+
+        return newBlocks;
+      });
+    }
+  }, [translations.google, currentIndex, groupedSentences]);
+
   const handleNext = () => {
     if (currentIndex < groupedSentences.length - 1) {
       setCurrentIndex((prevIndex) => prevIndex + 1);
@@ -109,11 +141,8 @@ export default function Home() {
       {/* ✅ 첫 화면에서도 ProperNounManager 표시 */}
       <ProperNounManager />
 
-      
-
-        {/* ✅ Help 패널 전체 위젯을 추가 */}
-        <HelpWidget />
-
+      {/* ✅ Help 패널 전체 위젯을 추가 */}
+      <HelpWidget />
 
       {!isPdfUploaded ? (
         <>
@@ -169,6 +198,10 @@ export default function Home() {
             onCopyAll={copyAllTranslations}
             updateTranslation={updateTranslation} // ✅ 추가
           />
+
+          {isPdfUploaded && translatedBlocks.length > 0 && (
+            <DownloadButton translatedBlocks={translatedBlocks} />
+          )}
         </>
       )}
 
