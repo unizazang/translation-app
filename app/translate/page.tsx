@@ -71,6 +71,7 @@ export default function Home() {
         translatedText: block.text,
       }))
     );
+    console.log("📝 초기 번역 블록 설정:", initialTranslatedBlocks);
     setTranslatedBlocks(initialTranslatedBlocks);
   };
 
@@ -115,6 +116,11 @@ export default function Home() {
         if (newBlocks[currentPage] && newBlocks[currentPage][currentBlock]) {
           newBlocks[currentPage][currentBlock].translatedText =
             translations.google;
+          console.log("📝 번역된 블록 업데이트:", {
+            page: currentPage,
+            block: currentBlock,
+            text: translations.google,
+          });
         }
 
         return newBlocks;
