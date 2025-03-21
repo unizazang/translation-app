@@ -30,7 +30,7 @@ export default function TranslationCard({
           <strong className="block text-gray-700   m-3  text-lg">Google</strong>
           <p className="p-2 m-2 text-black">{translations.google}</p>
           <button
-            className="mt-auto px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer"
+            className="mt-auto px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-700 transition"
             onClick={() => onSave(translations.google)}
           >
             저장하기
@@ -40,7 +40,7 @@ export default function TranslationCard({
           <strong className="block text-gray-700   m-3  text-lg">Papago</strong>
           <p className="p-2 m-2 text-black">{translations.papago}</p>
           <button
-            className="mt-auto px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer"
+            className="mt-auto px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-700 transition"
             onClick={() => onSave(translations.papago)}
           >
             저장하기
@@ -50,7 +50,7 @@ export default function TranslationCard({
           <strong className="block text-gray-700 m-3 text-lg">DeepL</strong>
           <p className="p-2 m-2 text-black">{translations.deepL}</p>
           <button
-            className="mt-auto px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer"
+            className="mt-auto px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-700 transition"
             onClick={() => onSave(translations.deepL)}
           >
             저장하기
