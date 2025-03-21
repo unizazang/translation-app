@@ -23,8 +23,23 @@ export function useProperNoun() {
   // ✅ 고유명사 목록을 LocalStorage에 저장하고 불러오기
   useEffect(() => {
     if (typeof window !== "undefined") {
+      const storedNouns = localStorage.getItem(STORAGE_KEY);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(properNouns));
       console.log("📌 저장된 고유명사 목록:", properNouns);
+      if (!storedNouns) {
+        const defaultNoun = [{ original: "피카츄", translation: "Pikachu" }];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultNoun));
+        console.log("✨ 기본 고유명사 추가:", defaultNoun);
+      } else {
+        const nouns: ProperNoun[] = JSON.parse(storedNouns);
+        const hasPikachu = nouns.some((noun) => noun.original === "피카츄");
+
+        if (!hasPikachu) {
+          nouns.push({ original: "피카츄", translation: "Pikachu" });
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(nouns));
+          console.log("✨ 기존 데이터에 '피카츄' 추가 완료");
+        }
+      }
     }
   }, [properNouns]);
 
@@ -32,7 +47,11 @@ export function useProperNoun() {
    * ✅ 고유명사 추가 함수
    */
   const addProperNoun = (original: string, translation: string) => {
-    if (!original.trim() || properNouns.some((noun) => noun.original === original)) return;
+    if (
+      !original.trim() ||
+      properNouns.some((noun) => noun.original === original)
+    )
+      return;
     setProperNouns([...properNouns, { original, translation }]);
     console.log("📌 추가된 고유명사:", { original, translation });
   };
@@ -61,7 +80,11 @@ export function useProperNoun() {
       const original = parts[0].trim();
       const translation = parts.slice(1).join(":").trim();
 
-      if (original && translation && !properNouns.some((noun) => noun.original === original)) {
+      if (
+        original &&
+        translation &&
+        !properNouns.some((noun) => noun.original === original)
+      ) {
         newNouns.push({ original, translation });
       }
     });
