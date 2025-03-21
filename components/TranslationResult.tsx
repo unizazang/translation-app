@@ -1,14 +1,22 @@
 "use client";
 
+import { TranslatedTextBlock } from "@/lib/pdfLayout"; // ✅ 올바르게 export된 타입 사용
+
 interface TranslationResultProps {
-  text: string;
+  translatedBlocks: TranslatedTextBlock[];
 }
 
-export default function TranslationResult({ text }: TranslationResultProps) {
+export default function TranslationResult({ translatedBlocks }: TranslationResultProps) {
   return (
-    <div className="w-full max-w-2xl border p-4 rounded-lg">
-      <h2 className="text-xl font-semibold mb-2">추출된 문장</h2>
-      <pre className="whitespace-pre-wrap">{text}</pre>
+    <div className="p-4 border rounded-lg bg-gray-50">
+      <h2 className="text-xl font-semibold">번역 결과</h2>
+      <div className="mt-2 space-y-2">
+        {translatedBlocks.map((block, index) => (
+          <div key={index} className="p-2 border rounded bg-white shadow">
+            <p className="text-gray-800">{block.text}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
