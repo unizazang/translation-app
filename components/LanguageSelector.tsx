@@ -20,7 +20,7 @@ export default function LanguageSelector({
   return (
     <div className="text-black">
       <label htmlFor="language" className=" text-black">
-        원본 언어 선택:{" "}
+        번역을 시작할 언어:{" "}
       </label>
       <select
         className="text-black"
@@ -32,6 +32,7 @@ export default function LanguageSelector({
         <option value="zh">중국어</option>
         <option value="ja">일본어</option>
       </select>
+      <p className="text-gray-500">번역된 결과는 한국어로 제공됩니다.</p>
     </div>
   );
 }
