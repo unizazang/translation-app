@@ -57,6 +57,18 @@ export default function Home() {
     (currentIndex / groupedSentences.length) * 100
   );
 
+  // 현재 페이지 내 진행 상태 계산
+  const currentPageStartIndex = (currentPage - 1) * 10;
+  const currentPageEndIndex = Math.min(
+    currentPageStartIndex + 10,
+    groupedSentences.length
+  );
+  const currentPageProgress = Math.round(
+    ((currentIndex - currentPageStartIndex) /
+      (currentPageEndIndex - currentPageStartIndex)) *
+      100
+  );
+
   const handleTextExtracted = (extractedText: PdfPageData[][]) => {
     const extractedString = extractedText
       .map((page) => page.map((block) => block.text).join(" "))
@@ -184,6 +196,25 @@ export default function Home() {
               </div>
               <div className="mt-2 text-sm text-gray-500">
                 {currentIndex + 1} / {groupedSentences.length} 문장
+              </div>
+
+              {/* 현재 페이지 내 진행 상태 */}
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-gray-600">
+                    현재 페이지 진행률: {currentPageProgress}%
+                  </span>
+                  <span className="text-sm text-gray-600">
+                    {currentIndex - currentPageStartIndex + 1} /{" "}
+                    {currentPageEndIndex - currentPageStartIndex} 문장
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${currentPageProgress}%` }}
+                  ></div>
+                </div>
               </div>
             </div>
           )}
