@@ -59,6 +59,7 @@ export default function Home() {
   const [completedIndexes, setCompletedIndexes] = useState<Set<number>>(
     new Set()
   );
+  const [shouldAutoTranslate, setShouldAutoTranslate] = useState<boolean>(true);
 
   const { properNouns } = useProperNoun();
   const { groupedSentences, processText } = useTextProcessing();
@@ -174,60 +175,66 @@ export default function Home() {
 
   // 건너뛰기 처리 함수
   const handleSkip = () => {
+    setShouldAutoTranslate(false); // 건너뛰기 시 자동 번역 비활성화
     setSkippedIndexes((prev) => new Set([...prev, currentIndex]));
     setCompletedIndexes((prev) => new Set([...prev, currentIndex]));
-    // 다음 문장으로 자동 이동
-    if (currentIndex < groupedSentences.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
-    }
-  };
-
-  // 번역 완료 처리 함수
-  const handleTranslationSave = () => {
-    if (translations.google) {
-      saveTranslation(
-        translations.google,
-        groupedSentences[currentIndex].join(" ")
-      );
-      setTranslatedIndexes((prev) => new Set([...prev, currentIndex]));
-      setCompletedIndexes((prev) => new Set([...prev, currentIndex]));
-
-      // 번역된 블록 업데이트
-      setTranslatedBlocks((prev) => {
-        const newBlocks = [...prev];
-        const currentPage = Math.floor(currentIndex / 10);
-        const currentBlock = currentIndex % 10;
-
-        if (newBlocks[currentPage] && newBlocks[currentPage][currentBlock]) {
-          newBlocks[currentPage][currentBlock].translatedText =
-            translations.google;
-        }
-
-        return newBlocks;
-      });
-
-      // 자동 이동이 활성화된 경우에만 다음 문장으로 이동
-      if (autoMove) {
-        handleNext();
-      }
-      // 토스트 메시지 표시
-      setTooltipText("번역이 저장되었습니다.");
-      setShowTooltip(true);
-      setTimeout(() => setShowTooltip(false), 2000);
-    }
   };
 
   const handleNext = () => {
     if (currentIndex < groupedSentences.length - 1) {
-      setCurrentIndex((prevIndex) => prevIndex + 1);
-      handleTranslate(currentIndex + 1);
+      const nextIndex = currentIndex + 1;
+      setCurrentIndex(nextIndex);
     }
   };
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
       setCurrentIndex((prevIndex) => prevIndex - 1);
-      handleTranslate(currentIndex - 1);
+    }
+  };
+
+  // 번역 완료 처리 함수
+  const handleTranslationSave = () => {
+    if (translations.google) {
+      // 상태 업데이트를 한 번에 처리
+      const updates = () => {
+        setShouldAutoTranslate(true);
+        saveTranslation(
+          translations.google,
+          groupedSentences[currentIndex].join(" ")
+        );
+        setTranslatedIndexes((prev) => new Set([...prev, currentIndex]));
+        setCompletedIndexes((prev) => new Set([...prev, currentIndex]));
+
+        // 번역된 블록 업데이트
+        setTranslatedBlocks((prev) => {
+          const newBlocks = [...prev];
+          const currentPage = Math.floor(currentIndex / 10);
+          const currentBlock = currentIndex % 10;
+
+          if (newBlocks[currentPage] && newBlocks[currentPage][currentBlock]) {
+            newBlocks[currentPage][currentBlock].translatedText =
+              translations.google;
+          }
+
+          return newBlocks;
+        });
+
+        // 자동 이동이 활성화된 경우에만 다음 문장으로 이동
+        if (autoMove) {
+          const nextIndex = currentIndex + 1;
+          if (nextIndex < groupedSentences.length) {
+            setCurrentIndex(nextIndex);
+          }
+        }
+      };
+
+      updates();
+
+      // 토스트 메시지 표시
+      setTooltipText("번역이 저장되었습니다.");
+      setShowTooltip(true);
+      setTimeout(() => setShowTooltip(false), 2000);
     }
   };
 
@@ -316,20 +323,25 @@ export default function Home() {
   const currentPageSentenceCount = currentPageEndIndex - currentPageStartIndex;
   const currentPageCurrentSentence = currentIndex - currentPageStartIndex + 1;
 
+  // 번역 자동 실행을 위한 useEffect
   useEffect(() => {
-    if (groupedSentences.length > 0) {
+    if (
+      groupedSentences.length > 0 &&
+      shouldAutoTranslate &&
+      currentIndex < groupedSentences.length
+    ) {
       handleTranslate(currentIndex);
     }
-  }, [currentIndex]);
+  }, [currentIndex, shouldAutoTranslate, groupedSentences.length]);
 
+  // properNouns가 변경될 때만 번역 실행
   useEffect(() => {
-    if (groupedSentences.length > 0 && currentIndex < groupedSentences.length) {
-      translateText(
-        groupedSentences[currentIndex].join(" "),
-        selectedLanguage,
-        currentIndex,
-        properNouns
-      );
+    if (
+      groupedSentences.length > 0 &&
+      shouldAutoTranslate &&
+      currentIndex < groupedSentences.length
+    ) {
+      handleTranslate(currentIndex);
     }
   }, [properNouns]);
 
