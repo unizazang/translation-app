@@ -1,6 +1,13 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCheck,
+  faForward,
+  faStar as faStarSolid,
+  faStar as faStarRegular,
+} from "@fortawesome/free-solid-svg-icons";
 
 interface SentenceListProps {
   sentences: string[][];
@@ -13,6 +20,12 @@ interface SentenceListProps {
 }
 
 type FilterType = "all" | "translated" | "skipped" | "starred";
+
+// 문장을 축약하는 함수
+const truncateText = (text: string, maxLength: number = 20): string => {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + "...";
+};
 
 export default function SentenceList({
   sentences,
@@ -138,22 +151,31 @@ export default function SentenceList({
                 <p className="text-sm text-gray-600 mb-1">
                   {sentence.index + 1}번째 문장
                 </p>
-                <p className="text-sm">{sentence.text}</p>
+                <p className="text-sm">{truncateText(sentence.text)}</p>
               </div>
               <div className="flex items-center gap-2">
-                {sentence.isTranslated && (
-                  <span className="text-green-500">✅</span>
-                )}
-                {sentence.isSkipped && (
-                  <span className="text-yellow-500">⏩</span>
-                )}
+                <FontAwesomeIcon
+                  icon={sentence.isTranslated ? faCheck : faCheck}
+                  className={`text-lg ${
+                    sentence.isTranslated ? "text-green-500" : "text-gray-300"
+                  }`}
+                />
+                <FontAwesomeIcon
+                  icon={faForward}
+                  className={`text-lg ${
+                    sentence.isSkipped ? "text-yellow-500" : "text-gray-300"
+                  }`}
+                />
                 <button
                   onClick={(e) => handleStarClick(e, sentence.index)}
-                  className={`text-lg ${
-                    sentence.isStarred ? "text-yellow-500" : "text-gray-300"
-                  }`}
+                  className="text-lg"
                 >
-                  ⭐
+                  <FontAwesomeIcon
+                    icon={sentence.isStarred ? faStarSolid : faStarRegular}
+                    className={
+                      sentence.isStarred ? "text-yellow-500" : "text-gray-300"
+                    }
+                  />
                 </button>
               </div>
             </div>

@@ -301,6 +301,9 @@ export default function Home() {
       <div className="flex-1 overflow-y-auto p-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-8">PDF 번역기</h1>
 
+        {/* 고유명사 관리 컴포넌트 */}
+        <ProperNounManager />
+
         {!isPdfUploaded ? (
           <PdfUploader onTextExtracted={handleTextExtracted} />
         ) : (
@@ -401,13 +404,15 @@ export default function Home() {
               )}
               <button
                 onClick={handleTranslationSave}
-                className="px-4 py-2 bg-blue-500 text-white rounded"
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                disabled={isTranslating}
               >
                 저장하기
               </button>
               <button
                 onClick={handleSkip}
-                className="px-4 py-2 bg-gray-500 text-white rounded"
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
+                disabled={isTranslating}
               >
                 건너뛰기
               </button>

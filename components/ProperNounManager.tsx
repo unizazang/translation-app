@@ -11,6 +11,7 @@ import {
   faChevronUp,
   faEraser,
 } from "@fortawesome/free-solid-svg-icons";
+import FileDropzone from "./FileDropzone";
 
 export default function ProperNounManager() {
   const {
@@ -18,11 +19,11 @@ export default function ProperNounManager() {
     addProperNoun,
     removeProperNoun,
     addProperNounsFromFile,
-    resetAllProperNouns, // ✅ 추가
+    resetAllProperNouns,
   } = useProperNoun();
   const [original, setOriginal] = useState("");
   const [translation, setTranslation] = useState("");
-  const [isOpen, setIsOpen] = useState<boolean>(true); // ✅ 아코디언 상태 추가
+  const [isOpen, setIsOpen] = useState<boolean>(true);
 
   const handleAdd = () => {
     addProperNoun(original, translation);
@@ -31,20 +32,16 @@ export default function ProperNounManager() {
     console.log("📌 추가된 고유명사:", { original, translation });
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          addProperNounsFromFile(e.target.result as string);
-        }
-      };
-      reader.readAsText(file);
-    }
+  const handleFileUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        addProperNounsFromFile(e.target.result as string);
+      }
+    };
+    reader.readAsText(file);
   };
 
-  // ✅ 고유명사 초기화 함수 (Confirm 포함)
   const handleResetProperNouns = () => {
     const isConfirmed = window.confirm("정말 초기화할까요?");
     if (!isConfirmed) return;
@@ -61,7 +58,6 @@ export default function ProperNounManager() {
         있습니다.
       </p>
 
-      {/* ✅ 입력 필드는 항상 표시 */}
       <div className="flex gap-2 mb-4">
         <input
           type="text"
@@ -85,27 +81,23 @@ export default function ProperNounManager() {
         </button>
       </div>
 
-      {/* ✅ 파일 업로드 버튼 추가 (스타일 적용) */}
-      <label className="cursor-pointer px-4 py-2 bg-blue-400 text-white rounded-md hover:bg-blue-600 transition inline-block mt-2">
-        <FontAwesomeIcon icon={faFileUpload} className="font-bold" /> 파일로
-        추가
-        <input
-          type="file"
-          accept=".txt"
-          onChange={handleFileUpload}
-          className="hidden"
+      <div className="flex gap-2">
+        <FileDropzone
+          onFileAccepted={handleFileUpload}
+          accept={{
+            "text/plain": [".txt"],
+          }}
+          fileType="txt"
+          maxSize={5 * 1024 * 1024}
         />
-      </label>
+        <button
+          onClick={handleResetProperNouns}
+          className="px-4 py-2 bg-red-400 cursor-pointer text-white rounded-md hover:bg-red-600 transition"
+        >
+          <FontAwesomeIcon icon={faEraser} className="font-bold" /> 목록 초기화
+        </button>
+      </div>
 
-      {/* ✅ 초기화 버튼 추가 */}
-      <button
-        onClick={handleResetProperNouns}
-        className="mt-2 ml-2 px-4 py-2 bg-red-400 cursor-pointer text-white rounded-md hover:bg-red-600 transition"
-      >
-        <FontAwesomeIcon icon={faEraser} className="font-bold" /> 목록 초기화
-      </button>
-
-      {/* ✅ 아코디언 토글 버튼 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition"
@@ -121,7 +113,6 @@ export default function ProperNounManager() {
         )}
       </button>
 
-      {/* ✅ 고유명사 목록 (아코디언 적용 + 스크롤 가능하도록 수정) */}
       {isOpen && (
         <div className="mt-4 border rounded p-2 bg-gray-50 max-h-60 overflow-y-auto text-black">
           <ul className="space-y-2">
