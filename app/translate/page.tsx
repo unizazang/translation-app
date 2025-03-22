@@ -56,6 +56,9 @@ export default function Home() {
   const [starredIndexes, setStarredIndexes] = useState<Set<number>>(new Set());
   const [pendingTranslation, setPendingTranslation] = useState<boolean>(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+  const [completedIndexes, setCompletedIndexes] = useState<Set<number>>(
+    new Set()
+  );
 
   const { properNouns } = useProperNoun();
   const { groupedSentences, processText } = useTextProcessing();
@@ -68,6 +71,33 @@ export default function Home() {
     copyAllTranslations,
     autoMove,
   } = useTranslation();
+
+  // 진행률 계산 함수들
+  const calculatePageProgress = useCallback(() => {
+    if (!groupedSentences.length) return 0;
+    const currentPageStartIndex = Math.floor(currentIndex / 10) * 10;
+    const currentPageEndIndex = Math.min(
+      currentPageStartIndex + 10,
+      groupedSentences.length
+    );
+    const pageSize = currentPageEndIndex - currentPageStartIndex;
+
+    if (pageSize === 0) return 0;
+
+    const completedInPage = Array.from(completedIndexes).filter(
+      (index) => index >= currentPageStartIndex && index < currentPageEndIndex
+    ).length;
+
+    return Math.min(Math.round((completedInPage / pageSize) * 100), 100);
+  }, [currentIndex, groupedSentences.length, completedIndexes]);
+
+  const calculateTotalProgress = useCallback(() => {
+    if (!groupedSentences.length) return 0;
+    return Math.min(
+      Math.round((completedIndexes.size / groupedSentences.length) * 100),
+      100
+    );
+  }, [groupedSentences.length, completedIndexes]);
 
   // 리사이즈 훅 사용
   const {
@@ -113,6 +143,7 @@ export default function Home() {
     processText(extractedString);
     setCurrentIndex(0);
     setIsPdfUploaded(true);
+    setCompletedIndexes(new Set());
 
     const initialTranslatedBlocks = extractedText.map((page) =>
       page.map((block) => ({
@@ -159,6 +190,7 @@ export default function Home() {
         groupedSentences[currentIndex].join(" ")
       );
       setTranslatedIndexes((prev) => new Set([...prev, currentIndex]));
+      setCompletedIndexes((prev) => new Set([...prev, currentIndex]));
       // 자동 이동이 활성화된 경우에만 다음 문장으로 이동
       if (autoMove) {
         handleNext();
@@ -255,20 +287,14 @@ export default function Home() {
   // 번역 진행 상태 계산
   const currentPage = Math.floor(currentIndex / 10); // 페이지당 10개 문장 가정
   const totalPages = Math.ceil(groupedSentences.length / 10);
-  const progressPercentage = Math.round(
-    (currentIndex / groupedSentences.length) * 100
-  );
+  const progressPercentage = calculateTotalProgress();
+  const currentPageProgress = calculatePageProgress();
 
   // 현재 페이지 내 진행 상태 계산
   const currentPageStartIndex = (currentPage - 1) * 10;
   const currentPageEndIndex = Math.min(
     currentPageStartIndex + 10,
     groupedSentences.length
-  );
-  const currentPageProgress = Math.round(
-    ((currentIndex - currentPageStartIndex) /
-      (currentPageEndIndex - currentPageStartIndex)) *
-      100
   );
 
   useEffect(() => {
