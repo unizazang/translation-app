@@ -178,6 +178,11 @@ export default function Home() {
   const handleSkip = () => {
     setSkippedIndexes((prev) => new Set([...prev, currentIndex]));
     setCompletedIndexes((prev) => new Set([...prev, currentIndex]));
+
+    // 다음 문장으로 자동 이동
+    if (currentIndex < groupedSentences.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+    }
   };
 
   const handleNext = () => {
