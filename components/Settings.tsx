@@ -9,7 +9,7 @@ const Settings: React.FC = () => {
   return (
     <div className="p-4">
       <h2 className="text-xl font-semibold mb-4">설정</h2>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-column align-center gap-2">
         <input
           type="checkbox"
           id="autoMove"
