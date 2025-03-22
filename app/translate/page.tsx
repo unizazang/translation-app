@@ -248,19 +248,29 @@ export default function Home() {
     return (processed.size / (groupedSentences?.length || 1)) * 100;
   }, [translatedIndexes, skippedIndexes, groupedSentences]);
 
-  // 번역 완료 처리 함수
-  const handleTranslationSave = () => {
-    if (pendingTranslation) {
-      setTranslatedIndexes((prev) => new Set(prev).add(currentIndex));
-      setPendingTranslation(false);
-    }
-  };
-
   // 건너뛰기 처리 함수
   const handleSkip = () => {
     if (pendingTranslation) {
       setSkippedIndexes((prev) => new Set(prev).add(currentIndex));
       setPendingTranslation(false);
+      // 다음 문장으로 자동 이동
+      if (currentIndex < groupedSentences.length - 1) {
+        setCurrentIndex((prev) => prev + 1);
+        setPendingTranslation(true);
+      }
+    }
+  };
+
+  // 번역 완료 처리 함수
+  const handleTranslationSave = () => {
+    if (pendingTranslation) {
+      setTranslatedIndexes((prev) => new Set(prev).add(currentIndex));
+      setPendingTranslation(false);
+      // 다음 문장으로 자동 이동
+      if (currentIndex < groupedSentences.length - 1) {
+        setCurrentIndex((prev) => prev + 1);
+        setPendingTranslation(true);
+      }
     }
   };
 
