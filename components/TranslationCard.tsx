@@ -33,9 +33,9 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
   onSkip,
 }) => {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex justify-between items-start mb-4">
-        <h2 className="text-xl font-semibold text-gray-800">번역할 텍스트</h2>
+    <div className="w-full border-gray-500 p-10 rounded-lg bg-white text-center text-black">
+      <div className="flex justify-between items-center mb-5">
+        <h3 className="text-lg font-semibold">원본 문장</h3>
         <button
           onClick={onToggleStar}
           className="text-yellow-400 hover:text-yellow-500 transition-colors"
@@ -46,40 +46,44 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
           />
         </button>
       </div>
-      <div className="bg-gray-50 p-4 rounded-lg mb-6">
-        <p className="text-gray-700 whitespace-pre-wrap">{originalText}</p>
-      </div>
+      <p className="">{originalText}</p>
 
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium text-gray-700 mb-2">
-            Google 번역
-          </h3>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-gray-700 whitespace-pre-wrap">
-              {translations.google}
-            </p>
-          </div>
+      <h3 className="text-lg font-semibold mt-10 border-t border-gray-300 pt-10 pb-10">
+        번역 결과
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 space-y-4 mt-4 text-center">
+        <div className="border border-gray-300 bg-white p-4 rounded-xl shadow-lg flex flex-col h-full">
+          <strong className="block text-gray-700 m-3 text-lg">Google</strong>
+          <p className="p-2 m-2 text-black">{translations.google}</p>
+          <button
+            className="mt-auto px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-700 transition"
+            onClick={onSave}
+            disabled={isTranslating}
+          >
+            저장하기
+          </button>
         </div>
-
-        <div>
-          <h3 className="text-lg font-medium text-gray-700 mb-2">
-            Papago 번역
-          </h3>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-gray-700 whitespace-pre-wrap">
-              {translations.papago}
-            </p>
-          </div>
+        <div className="border border-gray-300 bg-white p-4 rounded-xl text-center shadow-lg flex flex-col h-full">
+          <strong className="block text-gray-700 m-3 text-lg">Papago</strong>
+          <p className="p-2 m-2 text-black">{translations.papago}</p>
+          <button
+            className="mt-auto px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-700 transition"
+            onClick={onSave}
+            disabled={isTranslating}
+          >
+            저장하기
+          </button>
         </div>
-
-        <div>
-          <h3 className="text-lg font-medium text-gray-700 mb-2">DeepL 번역</h3>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-gray-700 whitespace-pre-wrap">
-              {translations.deepL}
-            </p>
-          </div>
+        <div className="border border-gray-300 bg-white p-4 rounded-xl text-center shadow-lg flex flex-col h-full">
+          <strong className="block text-gray-700 m-3 text-lg">DeepL</strong>
+          <p className="p-2 m-2 text-black">{translations.deepL}</p>
+          <button
+            className="mt-auto px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-700 transition"
+            onClick={onSave}
+            disabled={isTranslating}
+          >
+            저장하기
+          </button>
         </div>
       </div>
 
@@ -98,13 +102,6 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
             disabled={isTranslating}
           >
             건너뛰기
-          </button>
-          <button
-            onClick={onSave}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-            disabled={isTranslating}
-          >
-            저장하기
           </button>
           <button
             onClick={onNext}
