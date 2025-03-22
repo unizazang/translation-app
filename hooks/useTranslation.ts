@@ -31,6 +31,9 @@ export function useTranslation() {
     deepL: "",
   });
 
+  // 자동 이동 설정 상태 추가
+  const [autoMove, setAutoMove] = useState<boolean>(false);
+
   // ✅ 저장된 번역 목록을 관리하는 상태
   const [savedTranslations, setSavedTranslations] = useState<
     {
@@ -55,6 +58,19 @@ export function useTranslation() {
       setSavedTranslations(JSON.parse(storedTranslations));
     }
   }, []);
+
+  // 자동 이동 설정 불러오기
+  useEffect(() => {
+    const storedAutoMove = localStorage.getItem("autoMove");
+    if (storedAutoMove !== null) {
+      setAutoMove(storedAutoMove === "true");
+    }
+  }, []);
+
+  // 자동 이동 설정 저장
+  useEffect(() => {
+    localStorage.setItem("autoMove", autoMove.toString());
+  }, [autoMove]);
 
   // ✅ localStorage가 변경될 때 자동 저장
   useEffect(() => {
@@ -188,5 +204,7 @@ export function useTranslation() {
     savedTranslations,
     copyAllTranslations,
     resetAllTranslations,
+    autoMove,
+    setAutoMove,
   };
 }

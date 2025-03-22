@@ -12,7 +12,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 interface SentenceListProps {
-  sentences: string[][];
+  groupedSentences: string[][];
   currentIndex: number;
   translatedIndexes: Set<number>;
   skippedIndexes: Set<number>;
@@ -36,7 +36,7 @@ const truncateText = (text: string, maxLength: number = 20): string => {
 };
 
 export default function SentenceList({
-  sentences,
+  groupedSentences,
   currentIndex,
   translatedIndexes,
   skippedIndexes,
@@ -65,7 +65,7 @@ export default function SentenceList({
 
   // 필터링된 문장 목록 계산
   const filteredSentences = useMemo(() => {
-    return sentences
+    return groupedSentences
       .map((sentence, index) => ({
         text: sentence.join(" "),
         index,
@@ -96,7 +96,7 @@ export default function SentenceList({
         return matchesSearch && matchesFilter;
       });
   }, [
-    sentences,
+    groupedSentences,
     searchQuery,
     filter,
     translatedIndexes,

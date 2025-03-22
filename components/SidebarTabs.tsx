@@ -1,80 +1,87 @@
-import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faList, faBook } from "@fortawesome/free-solid-svg-icons";
-import SentenceList from "./SentenceList";
-import ProperNounManager from "./ProperNounManager";
+"use client";
 
-type TabType = "sentences" | "properNouns";
+import React, { useState } from "react";
+import dynamic from "next/dynamic";
+import Settings from "./Settings";
+
+const ProperNounManager = dynamic(() => import("./ProperNounManager"), {
+  ssr: false,
+});
+
+const SentenceList = dynamic(() => import("./SentenceList"), {
+  ssr: false,
+});
 
 interface SidebarTabsProps {
-  sentences: string[][];
   currentIndex: number;
-  translatedIndexes: Set<number>;
-  skippedIndexes: Set<number>;
-  starredIndexes: Set<number>;
   onSentenceSelect: (index: number) => void;
+  groupedSentences: string[][];
+  skippedIndexes: Set<number>;
+  translatedIndexes: Set<number>;
+  starredIndexes: Set<number>;
   onToggleStar: (index: number) => void;
 }
 
-export default function SidebarTabs({
-  sentences,
+const SidebarTabs: React.FC<SidebarTabsProps> = ({
   currentIndex,
-  translatedIndexes,
-  skippedIndexes,
-  starredIndexes,
   onSentenceSelect,
+  groupedSentences,
+  skippedIndexes,
+  translatedIndexes,
+  starredIndexes,
   onToggleStar,
-}: SidebarTabsProps) {
-  const [activeTab, setActiveTab] = useState<TabType>("sentences");
+}) => {
+  const [activeTab, setActiveTab] = useState("sentences");
+
+  const tabs = [
+    { id: "sentences", label: "문장 목록" },
+    { id: "settings", label: "설정" },
+    { id: "properNouns", label: "고유명사" },
+  ];
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "sentences":
+        return (
+          <SentenceList
+            currentIndex={currentIndex}
+            onSentenceSelect={onSentenceSelect}
+            groupedSentences={groupedSentences}
+            skippedIndexes={skippedIndexes}
+            translatedIndexes={translatedIndexes}
+            starredIndexes={starredIndexes}
+            onToggleStar={onToggleStar}
+          />
+        );
+      case "settings":
+        return <Settings />;
+      case "properNouns":
+        return <ProperNounManager />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="h-full flex flex-col">
       <div className="flex border-b">
-        <button
-          onClick={() => setActiveTab("sentences")}
-          className={`flex-1 px-4 py-3 flex items-center justify-center gap-2 
-            ${
-              activeTab === "sentences"
-                ? "border-b-2 border-blue-500 text-blue-500"
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-4 py-2 text-sm font-medium ${
+              activeTab === tab.id
+                ? "text-blue-600 border-b-2 border-blue-600"
                 : "text-gray-500 hover:text-gray-700"
             }`}
-        >
-          <FontAwesomeIcon icon={faList} />
-          <span>문장 리스트</span>
-        </button>
-        <button
-          onClick={() => setActiveTab("properNouns")}
-          className={`flex-1 px-4 py-3 flex items-center justify-center gap-2
-            ${
-              activeTab === "properNouns"
-                ? "border-b-2 border-blue-500 text-blue-500"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-        >
-          <FontAwesomeIcon icon={faBook} />
-          <span>단어 추가</span>
-        </button>
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
-
-      <div className="flex-1 overflow-hidden">
-        {activeTab === "sentences" ? (
-          <div className="h-full p-4">
-            <SentenceList
-              sentences={sentences}
-              currentIndex={currentIndex}
-              translatedIndexes={translatedIndexes}
-              skippedIndexes={skippedIndexes}
-              starredIndexes={starredIndexes}
-              onSentenceSelect={onSentenceSelect}
-              onToggleStar={onToggleStar}
-            />
-          </div>
-        ) : (
-          <div className="h-full p-4">
-            <ProperNounManager />
-          </div>
-        )}
-      </div>
+      <div className="flex-1 overflow-y-auto">{renderTabContent()}</div>
     </div>
   );
-}
+};
+
+export default SidebarTabs;

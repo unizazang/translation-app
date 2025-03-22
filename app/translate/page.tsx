@@ -66,6 +66,7 @@ export default function Home() {
     updateTranslation,
     savedTranslations,
     copyAllTranslations,
+    autoMove,
   } = useTranslation();
 
   // 리사이즈 훅 사용
@@ -158,7 +159,14 @@ export default function Home() {
         groupedSentences[currentIndex].join(" ")
       );
       setTranslatedIndexes((prev) => new Set([...prev, currentIndex]));
-      handleNext();
+      // 자동 이동이 활성화된 경우에만 다음 문장으로 이동
+      if (autoMove) {
+        handleNext();
+      }
+      // 토스트 메시지 표시
+      setTooltipText("번역이 저장되었습니다.");
+      setShowTooltip(true);
+      setTimeout(() => setShowTooltip(false), 2000);
     }
   };
 
@@ -307,12 +315,12 @@ export default function Home() {
         style={{ width: isSidebarCollapsed ? 0 : sidebarWidth }}
       >
         <SidebarTabs
-          sentences={groupedSentences}
           currentIndex={currentIndex}
-          translatedIndexes={translatedIndexes}
-          skippedIndexes={skippedIndexes}
-          starredIndexes={starredIndexes}
           onSentenceSelect={handleSentenceSelect}
+          groupedSentences={groupedSentences}
+          skippedIndexes={skippedIndexes}
+          translatedIndexes={translatedIndexes}
+          starredIndexes={starredIndexes}
           onToggleStar={handleToggleStar}
         />
         {/* 리사이즈 핸들러 */}
@@ -428,23 +436,10 @@ export default function Home() {
                     onNext={handleNext}
                     onPrevious={handlePrevious}
                     isTranslating={isTranslating}
+                    isStarred={starredIndexes.has(currentIndex)}
+                    onToggleStar={() => handleToggleStar(currentIndex)}
+                    onSkip={handleSkip}
                   />
-                  <div className="flex gap-4 mt-4">
-                    <button
-                      onClick={handleSkip}
-                      className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
-                      disabled={isTranslating}
-                    >
-                      건너뛰기
-                    </button>
-                    <button
-                      onClick={handleTranslationSave}
-                      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                      disabled={isTranslating}
-                    >
-                      저장하기
-                    </button>
-                  </div>
                   <SavedTranslations
                     savedTranslations={savedTranslations}
                     onCopyAll={copyAllTranslations}
