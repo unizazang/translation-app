@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 
 interface SentenceListProps {
   sentences: string[][];
@@ -12,6 +12,8 @@ interface SentenceListProps {
   onToggleStar: (index: number) => void;
 }
 
+type FilterType = "all" | "translated" | "skipped" | "starred";
+
 export default function SentenceList({
   sentences,
   currentIndex,
@@ -21,91 +23,142 @@ export default function SentenceList({
   onSentenceSelect,
   onToggleStar,
 }: SentenceListProps) {
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [filter, setFilter] = useState<
-    "all" | "translated" | "skipped" | "starred"
-  >("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState<FilterType>("all");
 
-  const filteredSentences = sentences
-    .map((sentence, index) => ({
-      id: index,
-      text: sentence.join(" "),
-      isTranslated: translatedIndexes.has(index),
-      isSkipped: skippedIndexes.has(index),
-      isStarred: starredIndexes.has(index),
-    }))
-    .filter((sentence) => {
-      if (
-        searchQuery &&
-        !sentence.text.toLowerCase().includes(searchQuery.toLowerCase())
-      ) {
-        return false;
-      }
+  // 검색어 변경 핸들러
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchQuery(e.target.value);
+    },
+    []
+  );
 
-      switch (filter) {
-        case "translated":
-          return sentence.isTranslated;
-        case "skipped":
-          return sentence.isSkipped;
-        case "starred":
-          return sentence.isStarred;
-        default:
-          return true;
-      }
-    });
+  // 필터 변경 핸들러
+  const handleFilterChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setFilter(e.target.value as FilterType);
+    },
+    []
+  );
+
+  // 필터링된 문장 목록 계산
+  const filteredSentences = useMemo(() => {
+    return sentences
+      .map((sentence, index) => ({
+        text: sentence.join(" "),
+        index,
+        isTranslated: translatedIndexes.has(index),
+        isSkipped: skippedIndexes.has(index),
+        isStarred: starredIndexes.has(index),
+      }))
+      .filter((sentence) => {
+        // 검색어 필터링
+        const matchesSearch = sentence.text
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+
+        // 상태 필터링
+        let matchesFilter = true;
+        switch (filter) {
+          case "translated":
+            matchesFilter = sentence.isTranslated;
+            break;
+          case "skipped":
+            matchesFilter = sentence.isSkipped;
+            break;
+          case "starred":
+            matchesFilter = sentence.isStarred;
+            break;
+        }
+
+        return matchesSearch && matchesFilter;
+      });
+  }, [
+    sentences,
+    searchQuery,
+    filter,
+    translatedIndexes,
+    skippedIndexes,
+    starredIndexes,
+  ]);
+
+  // 문장 선택 핸들러
+  const handleSentenceClick = useCallback(
+    (index: number) => {
+      onSentenceSelect(index);
+    },
+    [onSentenceSelect]
+  );
+
+  // 중요 표시 토글 핸들러
+  const handleStarClick = useCallback(
+    (e: React.MouseEvent, index: number) => {
+      e.stopPropagation();
+      onToggleStar(index);
+    },
+    [onToggleStar]
+  );
 
   return (
-    <div className="w-full h-full flex flex-col">
+    <div className="h-full flex flex-col">
+      {/* 검색 및 필터 영역 */}
       <div className="p-4 border-b">
         <input
           type="text"
           placeholder="문장 검색..."
-          className="w-full px-3 py-2 border rounded mb-2"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={handleSearchChange}
+          className="w-full px-3 py-2 border rounded mb-2"
         />
         <select
-          className="w-full px-3 py-2 border rounded"
           value={filter}
-          onChange={(e) => setFilter(e.target.value as typeof filter)}
+          onChange={handleFilterChange}
+          className="w-full px-3 py-2 border rounded"
         >
-          <option value="all">전체 보기</option>
+          <option value="all">전체</option>
           <option value="translated">번역 완료</option>
-          <option value="skipped">건너뛴 문장</option>
+          <option value="skipped">건너뛰기</option>
           <option value="starred">중요 표시</option>
         </select>
       </div>
 
+      {/* 문장 목록 */}
       <div className="flex-1 overflow-y-auto">
-        {filteredSentences.map(
-          ({ id, text, isTranslated, isSkipped, isStarred }) => (
-            <div
-              key={id}
-              className={`p-3 border-b cursor-pointer hover:bg-gray-50 ${
-                currentIndex === id ? "bg-blue-50" : ""
-              }`}
-              onClick={() => onSentenceSelect(id)}
-            >
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium">#{id + 1}</span>
-                <div className="flex gap-1">
-                  {isTranslated && <span title="번역 완료">✅</span>}
-                  {isSkipped && <span title="건너뛰기">⏩</span>}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onToggleStar(id);
-                    }}
-                    className="hover:text-yellow-500"
-                  >
-                    {isStarred ? "⭐" : "☆"}
-                  </button>
-                </div>
+        {filteredSentences.map((sentence) => (
+          <div
+            key={sentence.index}
+            className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${
+              currentIndex === sentence.index ? "bg-blue-50" : ""
+            }`}
+            onClick={() => handleSentenceClick(sentence.index)}
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <p className="text-sm text-gray-600 mb-1">
+                  {sentence.index + 1}번째 문장
+                </p>
+                <p className="text-sm">{sentence.text}</p>
               </div>
-              <p className="text-sm line-clamp-2">{text}</p>
+              <div className="flex items-center gap-2">
+                {sentence.isTranslated && (
+                  <span className="text-green-500">✅</span>
+                )}
+                {sentence.isSkipped && (
+                  <span className="text-yellow-500">⏩</span>
+                )}
+                <button
+                  onClick={(e) => handleStarClick(e, sentence.index)}
+                  className={`text-lg ${
+                    sentence.isStarred ? "text-yellow-500" : "text-gray-300"
+                  }`}
+                >
+                  ⭐
+                </button>
+              </div>
             </div>
-          )
-        )}
+          </div>
+        ))}
       </div>
     </div>
   );

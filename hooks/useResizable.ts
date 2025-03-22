@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 interface UseResizableProps {
   initialWidth: number;
@@ -8,20 +8,27 @@ interface UseResizableProps {
   maxWidth: number;
 }
 
-export const useResizable = ({
+export function useResizable({
   initialWidth,
   minWidth,
   maxWidth,
-}: UseResizableProps) => {
-  const [width, setWidth] = useState<number>(initialWidth);
-  const [isResizing, setIsResizing] = useState<boolean>(false);
+}: UseResizableProps) {
+  const [width, setWidth] = useState(initialWidth);
+  const [isResizing, setIsResizing] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isResizing) return;
 
-      const newWidth = Math.max(minWidth, Math.min(maxWidth, e.clientX));
-      setWidth(newWidth);
+      const newWidth = e.clientX;
+      if (newWidth < minWidth / 2) {
+        setIsCollapsed(true);
+        setWidth(0);
+      } else {
+        setIsCollapsed(false);
+        setWidth(Math.min(Math.max(newWidth, minWidth), maxWidth));
+      }
     };
 
     const handleMouseUp = () => {
@@ -43,5 +50,6 @@ export const useResizable = ({
     width,
     isResizing,
     setIsResizing,
+    isCollapsed,
   };
-};
+}

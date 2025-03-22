@@ -3,7 +3,7 @@
 export const dynamic = "force-dynamic"; // Next.js 빌드 설정용으로 export
 
 import dynamicComponent from "next/dynamic";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import PdfUploader from "@/components/PdfUploader";
 import TranslationResult from "@/components/TranslationResult";
 import LanguageSelector from "@/components/LanguageSelector";
@@ -233,16 +233,34 @@ export default function Home() {
     }
   };
 
-  // 스킵 핸들러 추가
-  const handleSkip = () => {
-    if (currentIndex < groupedSentences.length - 1) {
-      // 현재 문장을 건너뛰기 목록에 추가
-      setSkippedIndexes((prev) => new Set([...prev, currentIndex]));
+  // 진행률 계산 함수
+  const calculateProgress = useCallback(() => {
+    const processed = new Set([
+      ...Array.from(translatedIndexes),
+      ...Array.from(skippedIndexes),
+    ]);
+    return (processed.size / (groupedSentences?.length || 1)) * 100;
+  }, [translatedIndexes, skippedIndexes, groupedSentences]);
 
-      // 다음 문장으로 이동
-      setCurrentIndex((prev) => prev + 1);
-    }
-  };
+  // 번역 완료 처리 함수
+  const handleTranslationSave = useCallback(() => {
+    if (currentIndex === undefined) return;
+    setTranslatedIndexes((prev) => new Set([...prev, currentIndex]));
+    setCurrentIndex((prev) => (prev ?? 0) + 1);
+  }, [currentIndex]);
+
+  // 건너뛰기 처리 함수
+  const handleSkip = useCallback(() => {
+    if (currentIndex === undefined) return;
+    setSkippedIndexes((prev) => new Set([...prev, currentIndex]));
+    setCurrentIndex((prev) => (prev ?? 0) + 1);
+  }, [currentIndex]);
+
+  // 문장 선택 핸들러
+  const handleSentenceSelect = useCallback((index: number) => {
+    setCurrentIndex(index);
+    // 번역 상태는 변경하지 않음
+  }, []);
 
   // 중요 표시 토글 핸들러
   const handleToggleStar = (index: number) => {
@@ -270,7 +288,7 @@ export default function Home() {
           translatedIndexes={translatedIndexes}
           skippedIndexes={skippedIndexes}
           starredIndexes={starredIndexes}
-          onSentenceSelect={setCurrentIndex}
+          onSentenceSelect={handleSentenceSelect}
           onToggleStar={handleToggleStar}
         />
         <div
@@ -382,9 +400,14 @@ export default function Home() {
                 </button>
               )}
               <button
+                onClick={handleTranslationSave}
+                className="px-4 py-2 bg-blue-500 text-white rounded"
+              >
+                저장하기
+              </button>
+              <button
                 onClick={handleSkip}
-                className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
-                disabled={isTranslating}
+                className="px-4 py-2 bg-gray-500 text-white rounded"
               >
                 건너뛰기
               </button>
