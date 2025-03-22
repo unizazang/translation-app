@@ -38,6 +38,8 @@ export default function Home() {
   const [translatedBlocks, setTranslatedBlocks] = useState<
     TranslatedTextBlock[][]
   >([]);
+  const [tooltipText, setTooltipText] = useState<string>("");
+  const [showTooltip, setShowTooltip] = useState<boolean>(false);
 
   const { properNouns } = useProperNoun(); // ✅ 최신 고유명사 목록 가져오기
   const { groupedSentences, processText } = useTextProcessing();
@@ -68,6 +70,59 @@ export default function Home() {
       (currentPageEndIndex - currentPageStartIndex)) *
       100
   );
+
+  // 진행 바 클릭 핸들러
+  const handleProgressBarClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const bar = event.currentTarget;
+    const rect = bar.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const percentage = (x / rect.width) * 100;
+
+    // 백분율을 기반으로 문장 인덱스 계산
+    const targetIndex = Math.floor(
+      (percentage / 100) * groupedSentences.length
+    );
+    setCurrentIndex(targetIndex);
+  };
+
+  // 현재 페이지 진행 바 클릭 핸들러
+  const handlePageProgressBarClick = (
+    event: React.MouseEvent<HTMLDivElement>
+  ) => {
+    const bar = event.currentTarget;
+    const rect = bar.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const percentage = (x / rect.width) * 100;
+
+    // 현재 페이지 내에서의 상대적 위치 계산
+    const pageSize = currentPageEndIndex - currentPageStartIndex;
+    const targetIndex =
+      currentPageStartIndex + Math.floor((percentage / 100) * pageSize);
+    setCurrentIndex(targetIndex);
+  };
+
+  // 진행 바 호버 핸들러
+  const handleProgressBarHover = (
+    event: React.MouseEvent<HTMLDivElement>,
+    isPageProgress: boolean = false
+  ) => {
+    const bar = event.currentTarget;
+    const rect = bar.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const percentage = (x / rect.width) * 100;
+
+    let targetIndex;
+    if (isPageProgress) {
+      const pageSize = currentPageEndIndex - currentPageStartIndex;
+      targetIndex =
+        currentPageStartIndex + Math.floor((percentage / 100) * pageSize);
+    } else {
+      targetIndex = Math.floor((percentage / 100) * groupedSentences.length);
+    }
+
+    setTooltipText(`${targetIndex + 1}번째 문장`);
+    setShowTooltip(true);
+  };
 
   const handleTextExtracted = (extractedText: PdfPageData[][]) => {
     const extractedString = extractedText
@@ -188,11 +243,21 @@ export default function Home() {
                   진행률: {progressPercentage}%
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
+              <div
+                className="w-full bg-gray-200 rounded-full h-2.5 cursor-pointer relative"
+                onClick={handleProgressBarClick}
+                onMouseMove={(e) => handleProgressBarHover(e)}
+                onMouseLeave={() => setShowTooltip(false)}
+              >
                 <div
                   className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
                   style={{ width: `${progressPercentage}%` }}
-                ></div>
+                />
+                {showTooltip && (
+                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap">
+                    {tooltipText}
+                  </div>
+                )}
               </div>
               <div className="mt-2 text-sm text-gray-500">
                 {currentIndex + 1} / {groupedSentences.length} 문장
@@ -209,11 +274,21 @@ export default function Home() {
                     {currentPageEndIndex - currentPageStartIndex} 문장
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="w-full bg-gray-200 rounded-full h-2 cursor-pointer relative"
+                  onClick={handlePageProgressBarClick}
+                  onMouseMove={(e) => handleProgressBarHover(e, true)}
+                  onMouseLeave={() => setShowTooltip(false)}
+                >
                   <div
                     className="bg-green-500 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${currentPageProgress}%` }}
-                  ></div>
+                  />
+                  {showTooltip && (
+                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap">
+                      {tooltipText}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
