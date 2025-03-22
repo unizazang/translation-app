@@ -285,7 +285,7 @@ export default function Home() {
   };
 
   // 번역 진행 상태 계산
-  const currentPage = Math.floor(currentIndex / 10); // 페이지당 10개 문장 가정
+  const currentPage = Math.floor(currentIndex / 10) + 1; // 페이지는 1부터 시작
   const totalPages = Math.ceil(groupedSentences.length / 10);
   const progressPercentage = calculateTotalProgress();
   const currentPageProgress = calculatePageProgress();
@@ -296,6 +296,10 @@ export default function Home() {
     currentPageStartIndex + 10,
     groupedSentences.length
   );
+
+  // 현재 페이지의 문장 수 계산
+  const currentPageSentenceCount = currentPageEndIndex - currentPageStartIndex;
+  const currentPageCurrentSentence = currentIndex - currentPageStartIndex + 1;
 
   useEffect(() => {
     if (groupedSentences.length > 0) {
@@ -419,8 +423,8 @@ export default function Home() {
                             현재 페이지 진행률: {currentPageProgress}%
                           </span>
                           <span className="text-sm text-gray-600">
-                            {currentIndex - currentPageStartIndex + 1} /{" "}
-                            {currentPageEndIndex - currentPageStartIndex} 문장
+                            {currentPageCurrentSentence} /{" "}
+                            {currentPageSentenceCount} 문장
                           </span>
                         </div>
                         <div
