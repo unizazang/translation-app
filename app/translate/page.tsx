@@ -445,10 +445,6 @@ export default function Home() {
                       저장하기
                     </button>
                   </div>
-                  <TranslationResult
-                    translatedBlocks={translatedBlocks.flat()}
-                    onTranslationChange={handleTranslationChange}
-                  />
                   <SavedTranslations
                     savedTranslations={savedTranslations}
                     onCopyAll={copyAllTranslations}
