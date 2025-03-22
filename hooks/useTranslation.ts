@@ -32,7 +32,12 @@ export function useTranslation() {
   });
 
   // ✅ 저장된 번역 목록을 관리하는 상태
-  const [savedTranslations, setSavedTranslations] = useState<string[]>([]);
+  const [savedTranslations, setSavedTranslations] = useState<
+    {
+      original: string;
+      translated: string;
+    }[]
+  >([]);
 
   // ✅ 번역 결과를 캐싱하는 상태 추가
   const [cachedTranslations, setCachedTranslations] = useState<{
@@ -43,9 +48,6 @@ export function useTranslation() {
     };
   }>({});
 
-
-
-
   // ✅ 로컬 스토리지에서 번역 불러오기
   useEffect(() => {
     const storedTranslations = localStorage.getItem(STORAGE_KEY);
@@ -54,32 +56,29 @@ export function useTranslation() {
     }
   }, []);
 
-// ✅ localStorage가 변경될 때 자동 저장
-useEffect(() => {
-  if (savedTranslations.length === 0) {
-    localStorage.removeItem(STORAGE_KEY); // ✅ 데이터가 없으면 완전히 삭제
-  } else {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedTranslations));
-  }
-}, [savedTranslations]);
-
-
+  // ✅ localStorage가 변경될 때 자동 저장
+  useEffect(() => {
+    if (savedTranslations.length === 0) {
+      localStorage.removeItem(STORAGE_KEY); // ✅ 데이터가 없으면 완전히 삭제
+    } else {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedTranslations));
+    }
+  }, [savedTranslations]);
 
   /**
- * ✅ 번역 목록 초기화 함수 (전체 삭제)
- */
+   * ✅ 번역 목록 초기화 함수 (전체 삭제)
+   */
   const resetAllTranslations = () => {
     localStorage.removeItem(STORAGE_KEY); // ✅ 로컬 스토리지에서 삭제
     setSavedTranslations([]); // ✅ 상태 업데이트 요청
     console.log("🔄 모든 번역이 완전히 삭제되었습니다.");
-  
+
     // ✅ 상태 동기화를 강제 적용하여 즉시 업데이트
     setTimeout(() => {
       setSavedTranslations([]);
     }, 0);
   };
-  
-  
+
   /**
    * ✅ 입력된 텍스트를 번역하는 함수
    */
@@ -134,24 +133,25 @@ useEffect(() => {
   /**
    * ✅ 번역 결과 저장 함수
    */
-  const saveTranslation = (translation: string) => {
+  const saveTranslation = (translation: string, original: string) => {
     setSavedTranslations((prev) => {
       const storedTranslations = localStorage.getItem(STORAGE_KEY);
-      const existingTranslations = storedTranslations ? JSON.parse(storedTranslations) : [];
-  
+      const existingTranslations = storedTranslations
+        ? JSON.parse(storedTranslations)
+        : [];
+
       if (existingTranslations.length === 0) {
-        return [translation]; // ✅ 기존 번역이 없으면 새로운 배열 생성
+        return [{ original, translated: translation }];
       }
-  
-      const updatedList = [...existingTranslations, translation]; // ✅ 항상 최신 상태를 기준으로 추가
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList)); // ✅ 동기화
+
+      const updatedList = [
+        ...existingTranslations,
+        { original, translated: translation },
+      ];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
       return updatedList;
     });
   };
-  
-  
-
-
 
   /**
    * ✅ 번역 수정 함수 (사용자가 직접 수정 가능)
@@ -159,8 +159,11 @@ useEffect(() => {
   const updateTranslation = (index: number, newText: string) => {
     setSavedTranslations((prev) => {
       const updatedList = [...prev];
-      updatedList[index] = newText;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList)); // ✅ localStorage 업데이트
+      updatedList[index] = {
+        ...updatedList[index],
+        translated: newText,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
       return updatedList;
     });
   };
@@ -169,7 +172,9 @@ useEffect(() => {
    * ✅ 모든 번역을 클립보드에 복사하는 함수
    */
   const copyAllTranslations = () => {
-    const allTranslations = savedTranslations.join("\n");
+    const allTranslations = savedTranslations
+      .map((t) => t.translated)
+      .join("\n");
     navigator.clipboard.writeText(allTranslations).then(() => {
       console.log("📌 모든 번역이 클립보드에 복사되었습니다.");
     });
@@ -181,7 +186,7 @@ useEffect(() => {
     saveTranslation,
     updateTranslation,
     savedTranslations,
-    copyAllTranslations, // ✅ 추가
-    resetAllTranslations, // ✅ 추가
+    copyAllTranslations,
+    resetAllTranslations,
   };
 }

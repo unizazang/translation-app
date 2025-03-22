@@ -140,6 +140,28 @@ export default function Home() {
     }
   };
 
+  // 건너뛰기 처리 함수
+  const handleSkip = () => {
+    setSkippedIndexes((prev) => new Set([...prev, currentIndex]));
+    // 다음 문장으로 자동 이동
+    if (currentIndex < groupedSentences.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+      handleTranslate(currentIndex + 1);
+    }
+  };
+
+  // 번역 완료 처리 함수
+  const handleTranslationSave = () => {
+    if (translations.google) {
+      saveTranslation(
+        translations.google,
+        groupedSentences[currentIndex].join(" ")
+      );
+      setTranslatedIndexes((prev) => new Set([...prev, currentIndex]));
+      handleNext();
+    }
+  };
+
   const handleNext = () => {
     if (currentIndex < groupedSentences.length - 1) {
       setCurrentIndex((prevIndex) => prevIndex + 1);
@@ -153,6 +175,93 @@ export default function Home() {
       handleTranslate(currentIndex - 1);
     }
   };
+
+  // 번역 변경 처리 함수
+  const handleTranslationChange = (value: string) => {
+    setTranslatedBlocks((prev) => {
+      const newBlocks = [...prev];
+      const currentPage = Math.floor(currentIndex / 10);
+      const currentBlock = currentIndex % 10;
+
+      if (newBlocks[currentPage] && newBlocks[currentPage][currentBlock]) {
+        newBlocks[currentPage][currentBlock].translatedText = value;
+      }
+
+      return newBlocks;
+    });
+  };
+
+  // 진행 바 클릭 핸들러
+  const handleProgressBarClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const bar = event.currentTarget;
+    const rect = bar.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const percentage = (x / rect.width) * 100;
+
+    // 백분율을 기반으로 문장 인덱스 계산
+    const targetIndex = Math.floor(
+      (percentage / 100) * groupedSentences.length
+    );
+    setCurrentIndex(targetIndex);
+  };
+
+  // 현재 페이지 진행 바 클릭 핸들러
+  const handlePageProgressBarClick = (
+    event: React.MouseEvent<HTMLDivElement>
+  ) => {
+    const bar = event.currentTarget;
+    const rect = bar.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const percentage = (x / rect.width) * 100;
+
+    // 현재 페이지 내에서의 상대적 위치 계산
+    const pageSize = currentPageEndIndex - currentPageStartIndex;
+    const targetIndex =
+      currentPageStartIndex + Math.floor((percentage / 100) * pageSize);
+    setCurrentIndex(targetIndex);
+  };
+
+  // 진행 바 호버 핸들러
+  const handleProgressBarHover = (
+    event: React.MouseEvent<HTMLDivElement>,
+    isPageProgress: boolean = false
+  ) => {
+    const bar = event.currentTarget;
+    const rect = bar.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const percentage = (x / rect.width) * 100;
+
+    let targetIndex;
+    if (isPageProgress) {
+      const pageSize = currentPageEndIndex - currentPageStartIndex;
+      targetIndex =
+        currentPageStartIndex + Math.floor((percentage / 100) * pageSize);
+    } else {
+      targetIndex = Math.floor((percentage / 100) * groupedSentences.length);
+    }
+
+    setTooltipText(`${targetIndex + 1}번째 문장`);
+    setShowTooltip(true);
+  };
+
+  // 번역 진행 상태 계산
+  const currentPage = Math.floor(currentIndex / 10); // 페이지당 10개 문장 가정
+  const totalPages = Math.ceil(groupedSentences.length / 10);
+  const progressPercentage = Math.round(
+    (currentIndex / groupedSentences.length) * 100
+  );
+
+  // 현재 페이지 내 진행 상태 계산
+  const currentPageStartIndex = (currentPage - 1) * 10;
+  const currentPageEndIndex = Math.min(
+    currentPageStartIndex + 10,
+    groupedSentences.length
+  );
+  const currentPageProgress = Math.round(
+    ((currentIndex - currentPageStartIndex) /
+      (currentPageEndIndex - currentPageStartIndex)) *
+      100
+  );
 
   useEffect(() => {
     if (groupedSentences.length > 0) {
@@ -237,18 +346,113 @@ export default function Home() {
               <>
                 <div className="space-y-6">
                   <LanguageSelector onSelectLanguage={setSelectedLanguage} />
+
+                  {/* 번역 진행 상태 표시 */}
+                  {groupedSentences.length > 0 && (
+                    <div className="w-full max-w-2xl bg-white p-4 rounded-lg shadow-md">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm text-gray-600">
+                          페이지 {currentPage} / {totalPages}
+                        </span>
+                        <span className="text-sm text-gray-600">
+                          진행률: {progressPercentage}%
+                        </span>
+                      </div>
+                      <div
+                        className="w-full bg-gray-200 rounded-full h-2.5 cursor-pointer relative"
+                        onClick={handleProgressBarClick}
+                        onMouseMove={(e) => handleProgressBarHover(e)}
+                        onMouseLeave={() => setShowTooltip(false)}
+                      >
+                        <div
+                          className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                          style={{ width: `${progressPercentage}%` }}
+                        />
+                        {showTooltip && (
+                          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap">
+                            {tooltipText}
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-2 text-sm text-gray-500">
+                        {currentIndex + 1} / {groupedSentences.length} 문장
+                      </div>
+
+                      {/* 현재 페이지 내 진행 상태 */}
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm text-gray-600">
+                            현재 페이지 진행률: {currentPageProgress}%
+                          </span>
+                          <span className="text-sm text-gray-600">
+                            {currentIndex - currentPageStartIndex + 1} /{" "}
+                            {currentPageEndIndex - currentPageStartIndex} 문장
+                          </span>
+                        </div>
+                        <div
+                          className="w-full bg-gray-200 rounded-full h-2 cursor-pointer relative"
+                          onClick={handlePageProgressBarClick}
+                          onMouseMove={(e) => handleProgressBarHover(e, true)}
+                          onMouseLeave={() => setShowTooltip(false)}
+                        >
+                          <div
+                            className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${currentPageProgress}%` }}
+                          />
+                          {showTooltip && (
+                            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap">
+                              {tooltipText}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {isTranslateButtonVisible && (
+                    <button
+                      onClick={() => handleTranslate(currentIndex)}
+                      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                      disabled={isTranslating}
+                    >
+                      {isTranslating ? "번역 중..." : "번역 시작"}
+                    </button>
+                  )}
+
                   <TranslationCard
                     originalText={
                       groupedSentences[currentIndex]?.join(" ") || ""
                     }
                     translations={translations}
-                    onSave={saveTranslation}
+                    onSave={handleTranslationSave}
                     onNext={handleNext}
                     onPrevious={handlePrevious}
                     isTranslating={isTranslating}
                   />
+                  <div className="flex gap-4 mt-4">
+                    <button
+                      onClick={handleSkip}
+                      className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
+                      disabled={isTranslating}
+                    >
+                      건너뛰기
+                    </button>
+                    <button
+                      onClick={handleTranslationSave}
+                      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                      disabled={isTranslating}
+                    >
+                      저장하기
+                    </button>
+                  </div>
                   <TranslationResult
                     translatedBlocks={translatedBlocks.flat()}
+                    onTranslationChange={handleTranslationChange}
+                  />
+                  <SavedTranslations
+                    savedTranslations={savedTranslations}
+                    onCopyAll={copyAllTranslations}
+                    updateTranslation={updateTranslation}
                   />
                   <DownloadButton translatedBlocks={translatedBlocks} />
                 </div>

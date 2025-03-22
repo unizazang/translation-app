@@ -1,65 +1,74 @@
 "use client";
 
+import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCopy, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect, useRef } from "react";
-import { useTranslation } from "@/hooks/useTranslation"; // ✅ useTranslation 훅 임포트
-
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface SavedTranslationsProps {
-  savedTranslations: string[];
+  savedTranslations: {
+    original: string;
+    translated: string;
+  }[];
   onCopyAll: () => void;
-  updateTranslation: (index: number, newText: string) => void;
+  updateTranslation: (index: number, newTranslation: string) => void;
 }
 
-export default function SavedTranslations({
+const SavedTranslations: React.FC<SavedTranslationsProps> = ({
   savedTranslations,
   onCopyAll,
   updateTranslation,
-}: SavedTranslationsProps) {
-  const [editText, setEditText] = useState(savedTranslations.join("\n"));
-  const [showToast, setShowToast] = useState(false); // Toast 메시지 상태 추가
+}) => {
+  const [editText, setEditText] = useState(
+    savedTranslations.map((t) => t.translated).join("\n")
+  );
+  const [showToast, setShowToast] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [toastMessage, setToastMessage] = useState(""); // ✅ 토스트 메시지 상태 추가
-  const { resetAllTranslations } = useTranslation(); // ✅ 훅 호출 및 함수 추출
+  const [toastMessage, setToastMessage] = useState("");
+  const { resetAllTranslations } = useTranslation();
 
-  // ✅ 저장된 번역이 변경될 때 textarea 업데이트
+  // 저장된 번역이 변경될 때 textarea 업데이트
   useEffect(() => {
-    setEditText(savedTranslations.join("\n"));
+    setEditText(savedTranslations.map((t) => t.translated).join("\n"));
   }, [savedTranslations]);
 
-  // ✅ 저장된 번역이 추가될 때 textarea의 스크롤을 맨 아래로 이동
+  // 저장된 번역이 추가될 때 textarea의 스크롤을 맨 아래로 이동
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
     }
-  }, [editText]); // 🔹 `editText`가 변경될 때 스크롤을 내림
+  }, [editText]);
 
-  // ✅ TXT 파일로 저장하는 함수
+  // TXT 파일로 저장하는 함수
   const handleDownloadTxt = () => {
-    const blob = new Blob([editText], { type: "text/plain;charset=utf-8" }); // ✅ 텍스트 데이터를 Blob으로 변환
+    const blob = new Blob([editText], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "translations.txt"; // ✅ 파일명 지정
+    a.download = "translations.txt";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url); // ✅ 메모리 정리
+    URL.revokeObjectURL(url);
   };
 
-  // ✅ Toast 메시지를 표시하는 함수
+  // Toast 메시지를 표시하는 함수
   const showToastMessage = (message: string) => {
     setToastMessage(message);
     setShowToast(true);
-    setTimeout(() => setShowToast(false), 2000); // 2초 후 숨김
+    setTimeout(() => setShowToast(false), 2000);
   };
 
   const handleSave = () => {
     if (savedTranslations.length === 0) {
-      setEditText(""); // ✅ 초기화된 상태에서는 textarea도 비우기
-      return; // ✅ 저장 동작 방지
+      setEditText("");
+      return;
     }
-  
-    const updatedTranslations = editText.split("\n").filter(text => text.trim() !== ""); // ✅ 빈 줄 방지
+
+    const updatedTranslations = editText
+      .split("\n")
+      .filter((text) => text.trim() !== "");
     updatedTranslations.forEach((text, index) => {
       updateTranslation(index, text);
     });
@@ -67,24 +76,22 @@ export default function SavedTranslations({
     showToastMessage("번역이 저장되었습니다.");
   };
 
-  // ✅ 번역 초기화 함수 (완전 삭제)
+  // 번역 초기화 함수
   const handleResetTranslations = () => {
     const isConfirmed = window.confirm("정말 초기화할까요?");
     if (!isConfirmed) return;
-  
-    resetAllTranslations(); // ✅ 전체 번역 초기화 실행
-    setTimeout(() => setEditText(""), 0); // ✅ textarea 즉시 초기화 (비동기)
-  
+
+    resetAllTranslations();
+    setTimeout(() => setEditText(""), 0);
+
     console.log("🔄 모든 번역이 초기화되었습니다.");
     showToastMessage("번역이 초기화되었습니다.");
   };
-  
 
-
-  // ✅ 클립보드에 텍스트를 복사하는 함수
+  // 클립보드에 텍스트를 복사하는 함수
   const handleCopyAll = () => {
     navigator.clipboard.writeText(editText).then(() => {
-      showToastMessage("클립보드에 복사되었습니다."); // ✅ 복사 후 토스트 메시지 표시
+      showToastMessage("클립보드에 복사되었습니다.");
     });
   };
 
@@ -92,28 +99,28 @@ export default function SavedTranslations({
     <div className="w-full p-4 rounded-lg mt-4 text-black">
       <h2 className="text-xl font-semibold">저장된 번역</h2>
 
-      {/* ✅ 전체 복사 버튼 */}
+      {/* 전체 복사 버튼 */}
       <button
         className="mt-2 px-3 py-1 bg-blue-600 text-white rounded"
-        onClick={handleCopyAll} // ✅ 전체 복사 함수 호출
+        onClick={handleCopyAll}
       >
         전체 복사
       </button>
       <button
-        className="px-3 ml-2 py-1 bg-red-400 cursor-pointer hover:bg-red-600  text-white rounded-md"
-        onClick={handleResetTranslations} // ✅ 초기화 버튼 추가
+        className="px-3 ml-2 py-1 bg-red-400 cursor-pointer hover:bg-red-600 text-white rounded-md"
+        onClick={handleResetTranslations}
       >
         초기화
       </button>
 
-      {/* ✅ textarea 내부에서 스크롤 가능하도록 설정 */}
-      <div className="mt-4 border border-gray-300 bg-white p-4 rounded-xl shadow-lg  text-black">
+      {/* textarea 내부에서 스크롤 가능하도록 설정 */}
+      <div className="mt-4 border border-gray-300 bg-white p-4 rounded-xl shadow-lg text-black">
         <textarea
           ref={textareaRef}
-          className="w-full h-96  text-black p-2 rounded resize-none overflow-y-auto"
+          className="w-full h-96 text-black p-2 rounded resize-none overflow-y-auto"
           value={editText}
           onChange={(e) => setEditText(e.target.value)}
-          onBlur={handleSave} // ✅ 입력 후 자동 저장
+          onBlur={handleSave}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
@@ -123,24 +130,24 @@ export default function SavedTranslations({
         />
       </div>
 
-      {/* ✅ 저장 버튼 */}
+      {/* 저장 버튼 */}
       <div className="flex gap-2 mt-2">
         <button
           className="mt-2 px-3 py-1 bg-green-600 text-white cursor-pointer rounded-md"
-          onClick={handleSave} // ✅ 버튼 클릭 시 저장
+          onClick={handleSave}
         >
           브라우저 저장
         </button>
 
         <button
-          className="mt-2 px-3 py-1  bg-gray-700 text-white cursor-pointer rounded-md"
+          className="mt-2 px-3 py-1 bg-gray-700 text-white cursor-pointer rounded-md"
           onClick={handleDownloadTxt}
         >
           txt로 저장
         </button>
       </div>
 
-      {/* ✅ Toast 메시지 */}
+      {/* Toast 메시지 */}
       {showToast && (
         <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-400 bg-opacity-75 text-white px-6 py-3 rounded-full animate-bounce">
           {toastMessage}
@@ -148,4 +155,6 @@ export default function SavedTranslations({
       )}
     </div>
   );
-}
+};
+
+export default SavedTranslations;
