@@ -6,12 +6,18 @@ interface TranslationCardProps {
   originalText: string;
   translations: { google: string; papago: string; deepL: string };
   onSave: (translation: string) => void;
+  onNext: () => void;
+  onPrevious: () => void;
+  isTranslating: boolean;
 }
 
 export default function TranslationCard({
   originalText,
   translations,
   onSave,
+  onNext,
+  onPrevious,
+  isTranslating,
 }: TranslationCardProps) {
   useEffect(() => {
     // console.log("✅ useEffect 감지됨 - 업데이트된 translations:", translations);
@@ -56,6 +62,22 @@ export default function TranslationCard({
             저장하기
           </button>
         </div>
+      </div>
+      <div className="flex justify-between mt-4">
+        <button
+          onClick={onPrevious}
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
+          disabled={isTranslating}
+        >
+          이전 문장
+        </button>
+        <button
+          onClick={onNext}
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
+          disabled={isTranslating}
+        >
+          다음 문장
+        </button>
       </div>
       {/* {console.log("📌 TranslationCard에 전달된 translations:", translations)} */}
     </div>

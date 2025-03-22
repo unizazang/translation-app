@@ -6,7 +6,9 @@ interface TranslationResultProps {
   translatedBlocks: TranslatedTextBlock[];
 }
 
-export default function TranslationResult({ translatedBlocks }: TranslationResultProps) {
+export default function TranslationResult({
+  translatedBlocks,
+}: TranslationResultProps) {
   return (
     <div className="p-4 border rounded-lg bg-gray-50">
       <h2 className="text-xl font-semibold">번역 결과</h2>

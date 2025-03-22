@@ -17,6 +17,10 @@ export function useResizable({
   const [isResizing, setIsResizing] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    setIsResizing(true);
+  }, []);
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isResizing) return;
@@ -51,5 +55,6 @@ export function useResizable({
     isResizing,
     setIsResizing,
     isCollapsed,
+    handleResizeStart,
   };
 }
