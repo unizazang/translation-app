@@ -468,9 +468,14 @@ export default function Home() {
                       className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
                       disabled={isTranslating}
                     >
-                      {isTranslating ? "번역 중..." : "번역 시작"}
+                      {isTranslating ? "번역 중..." : "번역 실행"}
                     </button>
                   )}
+
+                  <p className="text-gray-700">
+                    파일이 업로드되었습니다! '번역 시작'을 눌러 번역을
+                    진행하세요.
+                  </p>
 
                   <TranslationCard
                     originalText={
