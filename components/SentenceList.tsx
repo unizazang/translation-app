@@ -7,6 +7,8 @@ import {
   faForward,
   faStar as faStarSolid,
   faStar as faStarRegular,
+  faClock,
+  faStar,
 } from "@fortawesome/free-solid-svg-icons";
 
 interface SentenceListProps {
@@ -19,7 +21,13 @@ interface SentenceListProps {
   onToggleStar: (index: number) => void;
 }
 
-type FilterType = "all" | "translated" | "skipped" | "starred";
+type FilterType =
+  | "all"
+  | "translated"
+  | "skipped"
+  | "starred"
+  | "pending"
+  | "none";
 
 // 문장을 축약하는 함수
 const truncateText = (text: string, maxLength: number = 20): string => {
@@ -113,74 +121,92 @@ export default function SentenceList({
     [onToggleStar]
   );
 
+  const getSentenceStatus = (index: number) => {
+    if (translatedIndexes.has(index)) return "translated";
+    if (skippedIndexes.has(index)) return "skipped";
+    if (index === currentIndex) return "pending";
+    return "none";
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "translated":
+        return <FontAwesomeIcon icon={faCheck} className="text-green-500" />;
+      case "skipped":
+        return <FontAwesomeIcon icon={faForward} className="text-gray-500" />;
+      case "pending":
+        return <FontAwesomeIcon icon={faClock} className="text-yellow-500" />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="h-full flex flex-col">
-      {/* 검색 및 필터 영역 */}
-      <div className="p-4 border-b">
+    <div className="w-full h-full flex flex-col">
+      <div className="flex items-center gap-2 mb-4">
         <input
           type="text"
           placeholder="문장 검색..."
           value={searchQuery}
-          onChange={handleSearchChange}
-          className="w-full px-3 py-2 border rounded mb-2"
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="flex-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <select
           value={filter}
-          onChange={handleFilterChange}
-          className="w-full px-3 py-2 border rounded"
+          onChange={(e) => setFilter(e.target.value as FilterType)}
+          className="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="all">전체</option>
-          <option value="translated">번역 완료</option>
-          <option value="skipped">건너뛰기</option>
-          <option value="starred">중요 표시</option>
+          <option value="translated">번역됨</option>
+          <option value="skipped">건너뜀</option>
+          <option value="pending">대기중</option>
+          <option value="none">미처리</option>
         </select>
       </div>
 
-      {/* 문장 목록 */}
       <div className="flex-1 overflow-y-auto">
-        {filteredSentences.map((sentence) => (
-          <div
-            key={sentence.index}
-            className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${
-              currentIndex === sentence.index ? "bg-blue-50" : ""
-            }`}
-            onClick={() => handleSentenceClick(sentence.index)}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <p className="text-sm text-gray-600 mb-1">
-                  {sentence.index + 1}번째 문장
-                </p>
-                <p className="text-sm">{truncateText(sentence.text)}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <FontAwesomeIcon
-                  icon={sentence.isTranslated ? faCheck : faCheck}
-                  className={`text-lg ${
-                    sentence.isTranslated ? "text-green-500" : "text-gray-300"
+        <ul className="space-y-2">
+          {filteredSentences.map((sentence, index) => {
+            const status = getSentenceStatus(index);
+            return (
+              <li
+                key={index}
+                onClick={() => handleSentenceClick(index)}
+                className={`flex items-center gap-2 p-3 rounded-lg cursor-pointer transition-colors
+                  ${
+                    index === currentIndex
+                      ? "bg-blue-50 border border-blue-200"
+                      : "hover:bg-gray-50 border border-gray-200"
                   }`}
-                />
-                <FontAwesomeIcon
-                  icon={faForward}
-                  className={`text-lg ${
-                    sentence.isSkipped ? "text-yellow-500" : "text-gray-300"
-                  }`}
-                />
-                <button
-                  onClick={(e) => handleStarClick(e, sentence.index)}
-                  className="text-lg"
-                >
-                  <FontAwesomeIcon
-                    icon={sentence.isStarred ? faStarSolid : faStarRegular}
-                    className={
-                      sentence.isStarred ? "text-yellow-500" : "text-gray-300"
-                    }
-                  />
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
+              >
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">#{index + 1}</span>
+                    <span className="text-gray-700">
+                      {truncateText(sentence.text)}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {getStatusIcon(status)}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleStarClick(e, index);
+                    }}
+                    className={`p-1 rounded-full hover:bg-gray-100 transition-colors ${
+                      starredIndexes.has(index)
+                        ? "text-yellow-400"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    <FontAwesomeIcon icon={faStar} />
+                  </button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </div>
   );

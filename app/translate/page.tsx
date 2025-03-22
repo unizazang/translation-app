@@ -18,6 +18,9 @@ import { TranslatedTextBlock } from "@/lib/pdfLayout";
 import DownloadButton from "@/components/DownloadButton";
 import SentenceList from "@/components/SentenceList";
 import { useResizable } from "@/hooks/useResizable";
+import "@/src/fontawesome"; // ✅ FontAwesome 설정 파일 import
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar } from "@fortawesome/free-solid-svg-icons";
 
 const ProperNounManager = dynamicComponent(
   () => import("@/components/ProperNounManager"),
@@ -27,7 +30,6 @@ const SavedTranslations = dynamicComponent(
   () => import("@/components/SavedTranslations"),
   { ssr: false }
 );
-import "@/src/fontawesome"; // ✅ FontAwesome 설정 파일 import
 
 export default function Home() {
   const [pdfText, setPdfText] = useState<string>("");
@@ -47,16 +49,20 @@ export default function Home() {
     new Set()
   );
   const [starredIndexes, setStarredIndexes] = useState<Set<number>>(new Set());
+  const [pendingTranslation, setPendingTranslation] = useState<boolean>(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+  const [startX, setStartX] = useState<number>(0);
+  const [startWidth, setStartWidth] = useState<number>(0);
 
-  const { properNouns } = useProperNoun(); // ✅ 최신 고유명사 목록 가져오기
+  const { properNouns } = useProperNoun();
   const { groupedSentences, processText } = useTextProcessing();
   const {
     translations,
     translateText,
     saveTranslation,
-    updateTranslation, // ✅ 추가
+    updateTranslation,
     savedTranslations,
-    copyAllTranslations, // ✅ 추가
+    copyAllTranslations,
   } = useTranslation();
 
   // 리사이즈 훅 사용
@@ -243,18 +249,20 @@ export default function Home() {
   }, [translatedIndexes, skippedIndexes, groupedSentences]);
 
   // 번역 완료 처리 함수
-  const handleTranslationSave = useCallback(() => {
-    if (currentIndex === undefined) return;
-    setTranslatedIndexes((prev) => new Set([...prev, currentIndex]));
-    setCurrentIndex((prev) => (prev ?? 0) + 1);
-  }, [currentIndex]);
+  const handleTranslationSave = () => {
+    if (pendingTranslation) {
+      setTranslatedIndexes((prev) => new Set(prev).add(currentIndex));
+      setPendingTranslation(false);
+    }
+  };
 
   // 건너뛰기 처리 함수
-  const handleSkip = useCallback(() => {
-    if (currentIndex === undefined) return;
-    setSkippedIndexes((prev) => new Set([...prev, currentIndex]));
-    setCurrentIndex((prev) => (prev ?? 0) + 1);
-  }, [currentIndex]);
+  const handleSkip = () => {
+    if (pendingTranslation) {
+      setSkippedIndexes((prev) => new Set(prev).add(currentIndex));
+      setPendingTranslation(false);
+    }
+  };
 
   // 문장 선택 핸들러
   const handleSentenceSelect = useCallback((index: number) => {
@@ -263,16 +271,34 @@ export default function Home() {
   }, []);
 
   // 중요 표시 토글 핸들러
-  const handleToggleStar = (index: number) => {
+  const handleToggleStar = () => {
     setStarredIndexes((prev) => {
-      const next = new Set(prev);
-      if (next.has(index)) {
-        next.delete(index);
+      const newSet = new Set(prev);
+      if (newSet.has(currentIndex)) {
+        newSet.delete(currentIndex);
       } else {
-        next.add(index);
+        newSet.add(currentIndex);
       }
-      return next;
+      return newSet;
     });
+  };
+
+  const handleNextSentence = () => {
+    if (currentIndex < groupedSentences.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+      setPendingTranslation(true);
+    }
+  };
+
+  const handlePrevSentence = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex((prev) => prev - 1);
+      setPendingTranslation(true);
+    }
+  };
+
+  const handleTranslationChange = (value: string) => {
+    // Implementation of handleTranslationChange
   };
 
   return (
