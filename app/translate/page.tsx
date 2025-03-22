@@ -59,7 +59,8 @@ export default function Home() {
   const [completedIndexes, setCompletedIndexes] = useState<Set<number>>(
     new Set()
   );
-  const [shouldAutoTranslate, setShouldAutoTranslate] = useState<boolean>(true);
+  const [shouldAutoTranslate, setShouldAutoTranslate] =
+    useState<boolean>(false);
 
   const { properNouns } = useProperNoun();
   const { groupedSentences, processText } = useTextProcessing();
@@ -175,7 +176,6 @@ export default function Home() {
 
   // 건너뛰기 처리 함수
   const handleSkip = () => {
-    setShouldAutoTranslate(false); // 건너뛰기 시 자동 번역 비활성화
     setSkippedIndexes((prev) => new Set([...prev, currentIndex]));
     setCompletedIndexes((prev) => new Set([...prev, currentIndex]));
   };
@@ -456,6 +456,7 @@ export default function Home() {
                     </div>
                   )}
 
+                  {/* 번역 시작 버튼 */}
                   {isTranslateButtonVisible && (
                     <button
                       onClick={() => handleTranslate(currentIndex)}
