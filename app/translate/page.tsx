@@ -385,7 +385,7 @@ export default function Home() {
           {/* 사이드바 토글 버튼 */}
           <button
             onClick={handleToggleSidebar}
-            className="absolute -right-4 top-4 w-8 h-8 bg-white border rounded-full shadow-md flex items-center justify-center hover:bg-gray-50"
+            className="fixed left-0 top-4 z-50 w-8 h-8 bg-white border rounded-full shadow-md flex items-center justify-center hover:bg-gray-50"
           >
             <FontAwesomeIcon
               icon={isSidebarCollapsed ? faChevronRight : faChevronLeft}

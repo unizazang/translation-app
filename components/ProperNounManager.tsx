@@ -50,7 +50,7 @@ export default function ProperNounManager() {
   };
 
   return (
-    <div className="p-6 border rounded-lg shadow-md bg-white text-black">
+    <div className="p-6 rounded-lg bg-white text-black">
       <h2 className="text-lg font-semibold mb-4">🔹 번역 예외 단어 설정</h2>
 
       <p className="text-gray-600 mb-2">
