@@ -355,42 +355,44 @@ export default function Home() {
     <div className="min-h-screen flex">
       {/* 사이드바 */}
       {isPdfUploaded && (
-        <div
-          className={`relative border-r bg-white transition-all duration-300 ease-in-out overflow-hidden
-          ${isSidebarCollapsed ? "w-0" : ""}`}
-          style={{ width: isSidebarCollapsed ? 0 : sidebarWidth }}
-        >
-          <div className="h-full">
-            <SidebarTabs
-              currentIndex={currentIndex}
-              onSentenceSelect={handleSentenceSelect}
-              groupedSentences={groupedSentences}
-              skippedIndexes={skippedIndexes}
-              translatedIndexes={translatedIndexes}
-              starredIndexes={starredIndexes}
-              onToggleStar={handleToggleStar}
-              completedIndexes={completedIndexes}
-              isPdfUploaded={isPdfUploaded}
-              onMarkAsReviewed={handleMarkAsReviewed}
-              isSidebarCollapsed={isSidebarCollapsed}
-            />
+        <>
+          <div
+            className={`relative border-r bg-white transition-all duration-300 ease-in-out overflow-hidden
+            ${isSidebarCollapsed ? "w-0" : ""}`}
+            style={{ width: isSidebarCollapsed ? 0 : sidebarWidth }}
+          >
+            <div className="h-full">
+              <SidebarTabs
+                currentIndex={currentIndex}
+                onSentenceSelect={handleSentenceSelect}
+                groupedSentences={groupedSentences}
+                skippedIndexes={skippedIndexes}
+                translatedIndexes={translatedIndexes}
+                starredIndexes={starredIndexes}
+                onToggleStar={handleToggleStar}
+                completedIndexes={completedIndexes}
+                isPdfUploaded={isPdfUploaded}
+                onMarkAsReviewed={handleMarkAsReviewed}
+                isSidebarCollapsed={isSidebarCollapsed}
+              />
+            </div>
             {/* 리사이즈 핸들러 */}
             <div
               className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize"
               onMouseDown={handleResizeStart}
             />
-            {/* 사이드바 토글 버튼 */}
-            <button
-              onClick={handleToggleSidebar}
-              className="absolute -right-4 top-4 w-8 h-8 bg-white border rounded-full shadow-md flex items-center justify-center hover:bg-gray-50"
-            >
-              <FontAwesomeIcon
-                icon={isSidebarCollapsed ? faChevronRight : faChevronLeft}
-                className="text-gray-600"
-              />
-            </button>
           </div>
-        </div>
+          {/* 사이드바 토글 버튼 */}
+          <button
+            onClick={handleToggleSidebar}
+            className="absolute -right-4 top-4 w-8 h-8 bg-white border rounded-full shadow-md flex items-center justify-center hover:bg-gray-50"
+          >
+            <FontAwesomeIcon
+              icon={isSidebarCollapsed ? faChevronRight : faChevronLeft}
+              className="text-gray-600"
+            />
+          </button>
+        </>
       )}
 
       {/* 메인 컨텐츠 */}

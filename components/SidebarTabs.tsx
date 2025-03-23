@@ -110,11 +110,8 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
               isSidebarCollapsed
                 ? {
                     top: `${tabs.findIndex((t) => t.id === tab.id) * 40}px`,
-                    transform: "translateX(100%)",
+                    transform: "translateX(0)",
                     transition: "transform 0.3s ease-in-out",
-                    ...(activeTab === tab.id
-                      ? { transform: "translateX(0)" }
-                      : {}),
                   }
                 : undefined
             }
