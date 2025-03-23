@@ -372,10 +372,12 @@ export default function Home() {
           onMarkAsReviewed={handleMarkAsReviewed}
         />
         {/* 리사이즈 핸들러 */}
-        <div
-          className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize"
-          onMouseDown={handleResizeStart}
-        />
+        {isPdfUploaded && (
+          <div
+            className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize"
+            onMouseDown={handleResizeStart}
+          />
+        )}
         {/* 사이드바 토글 버튼 */}
         <button
           onClick={handleToggleSidebar}

@@ -15,22 +15,8 @@ const SidebarProgress: React.FC<SidebarProgressProps> = ({
   completedIndexes,
   totalSentences,
 }) => {
-  // 페이지 단위로 완료된 페이지 수 계산
-  const completedPages = Array.from({ length: totalPages }, (_, pageIndex) => {
-    const pageStartIndex = pageIndex * 10;
-    const pageEndIndex = Math.min(pageStartIndex + 10, totalSentences);
-    const pageSize = pageEndIndex - pageStartIndex;
-
-    // 해당 페이지의 완료된 문장 수 계산
-    const completedInPage = Array.from(completedIndexes).filter(
-      (index) => index >= pageStartIndex && index < pageEndIndex
-    ).length;
-
-    // 페이지의 문장이 하나라도 완료되었으면 해당 페이지를 완료된 것으로 계산
-    return completedInPage > 0;
-  }).filter(Boolean).length;
-
-  const progressPercentage = (completedPages / totalPages) * 100;
+  // 전체 문장 중 완료된 문장의 비율 계산
+  const progressPercentage = (completedIndexes.size / totalSentences) * 100;
 
   return (
     <div className="p-4 border-b bg-white">

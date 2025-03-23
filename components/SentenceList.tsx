@@ -29,7 +29,7 @@ type FilterType =
   | "skipped"
   | "starred"
   | "pending"
-  | "none";
+  | "bookmarked";
 
 // 문장을 축약하는 함수
 const truncateText = (text: string, maxLength: number = 20): string => {
@@ -138,6 +138,9 @@ export default function SentenceList({
           case "starred":
             matchesFilter = sentence.isStarred;
             break;
+          case "bookmarked":
+            matchesFilter = sentence.isStarred;
+            break;
         }
 
         return matchesSearch && matchesFilter;
@@ -190,7 +193,7 @@ export default function SentenceList({
 
   return (
     <div className="w-full h-full flex flex-col">
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex flex-wrap items-center gap-2 mb-4">
         <input
           type="text"
           placeholder="문장 검색..."
@@ -207,12 +210,12 @@ export default function SentenceList({
           <option value="translated">번역됨</option>
           <option value="skipped">건너뜀</option>
           <option value="pending">대기중</option>
-          <option value="none">미처리</option>
+          <option value="bookmarked">북마크</option>
         </select>
         {selectedSentences.size > 0 && (
           <button
             onClick={handleBulkMarkAsReviewed}
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition whitespace-nowrap"
           >
             일괄 검토 완료 ({selectedSentences.size})
           </button>
