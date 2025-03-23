@@ -22,6 +22,7 @@ interface SidebarTabsProps {
   starredIndexes: Set<number>;
   onToggleStar: (index: number) => void;
   completedIndexes: Set<number>;
+  isPdfUploaded: boolean;
 }
 
 const SidebarTabs: React.FC<SidebarTabsProps> = ({
@@ -33,8 +34,13 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
   starredIndexes,
   onToggleStar,
   completedIndexes,
+  isPdfUploaded,
 }) => {
   const [activeTab, setActiveTab] = useState("sentences");
+
+  if (!isPdfUploaded) {
+    return null;
+  }
 
   const tabs = [
     { id: "sentences", label: "문장 목록" },

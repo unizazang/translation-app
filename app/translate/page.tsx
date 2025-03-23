@@ -178,7 +178,6 @@ export default function Home() {
   // 건너뛰기 처리 함수
   const handleSkip = () => {
     setSkippedIndexes((prev) => new Set([...prev, currentIndex]));
-    setCompletedIndexes((prev) => new Set([...prev, currentIndex]));
 
     // 다음 문장으로 자동 이동
     if (currentIndex < groupedSentences.length - 1) {
@@ -371,6 +370,7 @@ export default function Home() {
           starredIndexes={starredIndexes}
           onToggleStar={handleToggleStar}
           completedIndexes={completedIndexes}
+          isPdfUploaded={isPdfUploaded}
         />
         {/* 리사이즈 핸들러 */}
         <div
