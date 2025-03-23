@@ -382,6 +382,7 @@ export default function Home() {
           onToggleStar={handleToggleStar}
           completedIndexes={completedIndexes}
           isPdfUploaded={isPdfUploaded}
+          onMarkAsReviewed={handleMarkAsReviewed}
         />
         {/* 리사이즈 핸들러 */}
         <div

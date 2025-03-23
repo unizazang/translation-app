@@ -23,6 +23,7 @@ interface SidebarTabsProps {
   onToggleStar: (index: number) => void;
   completedIndexes: Set<number>;
   isPdfUploaded: boolean;
+  onMarkAsReviewed: (indexes: number[]) => void;
 }
 
 const SidebarTabs: React.FC<SidebarTabsProps> = ({
@@ -35,6 +36,7 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
   onToggleStar,
   completedIndexes,
   isPdfUploaded,
+  onMarkAsReviewed,
 }) => {
   const [activeTab, setActiveTab] = useState("sentences");
 
@@ -64,6 +66,7 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
             translatedIndexes={translatedIndexes}
             starredIndexes={starredIndexes}
             onToggleStar={onToggleStar}
+            onMarkAsReviewed={onMarkAsReviewed}
           />
         );
       case "settings":
