@@ -11,12 +11,11 @@ import TranslationCard from "@/components/TranslationCard";
 import { useTextProcessing } from "@/hooks/useTextProcessing";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useProperNoun } from "@/hooks/useProperNoun"; // ✅ 고유명사 훅 추가
-import HelpButton from "@/components/HelpButton"; // ✅ FAB 버튼 추가
-import HelpWidget from "@/components/HelpWidget"; // ✅ HelpWidget 추가
+
 import { PdfPageData } from "@/lib/pdfProcessor"; // ✅ PdfPageData import 추가
 import { TranslatedTextBlock } from "@/lib/pdfLayout";
 import DownloadButton from "@/components/DownloadButton";
-import SentenceList from "@/components/SentenceList";
+
 import { useResizable } from "@/hooks/useResizable";
 import "@/src/fontawesome"; // ✅ FontAwesome 설정 파일 import
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -467,16 +466,6 @@ export default function Home() {
                     updateTranslation={updateTranslation}
                   />
                   <DownloadButton translatedBlocks={translatedBlocks} />
-                  <SentenceList
-                    currentIndex={currentIndex}
-                    onSentenceSelect={handleSentenceSelect}
-                    groupedSentences={groupedSentences}
-                    skippedIndexes={skippedIndexes}
-                    translatedIndexes={translatedIndexes}
-                    starredIndexes={starredIndexes}
-                    onToggleStar={handleToggleStar}
-                    onMarkAsReviewed={handleMarkAsReviewed}
-                  />
                 </div>
               </>
             )}
