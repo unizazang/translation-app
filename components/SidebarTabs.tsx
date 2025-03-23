@@ -24,6 +24,7 @@ interface SidebarTabsProps {
   completedIndexes: Set<number>;
   isPdfUploaded: boolean;
   onMarkAsReviewed: (indexes: number[]) => void;
+  isSidebarCollapsed: boolean;
 }
 
 const SidebarTabs: React.FC<SidebarTabsProps> = ({
@@ -37,6 +38,7 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
   completedIndexes,
   isPdfUploaded,
   onMarkAsReviewed,
+  isSidebarCollapsed,
 }) => {
   const [activeTab, setActiveTab] = useState("sentences");
 
@@ -47,7 +49,7 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
   const tabs = [
     { id: "sentences", label: "문장 목록" },
     { id: "settings", label: "설정" },
-    { id: "properNouns", label: "고유명사" },
+    { id: "properNouns", label: "예외 단어" },
   ];
 
   // 전체 페이지 수 계산
@@ -80,22 +82,42 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
 
   return (
     <div className="h-full flex flex-col bg-white shadow-md rounded-lg border">
-      <SidebarProgress
-        totalPages={totalPages}
-        currentPage={currentPage}
-        completedIndexes={completedIndexes}
-        totalSentences={groupedSentences.length}
-      />
-      <div className="flex border-b">
+      {!isSidebarCollapsed && (
+        <SidebarProgress
+          totalPages={totalPages}
+          currentPage={currentPage}
+          completedIndexes={completedIndexes}
+          totalSentences={groupedSentences.length}
+        />
+      )}
+      <div className="flex border-b relative">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
-              activeTab === tab.id
-                ? "text-blue-600 border-b-2 border-blue-600"
-                : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-            }`}
+            className={`px-4 py-2 text-sm font-medium transition-all duration-200 relative z-10
+              ${
+                activeTab === tab.id
+                  ? "text-blue-600 bg-white border-b-2 border-blue-600 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+              }
+              ${
+                isSidebarCollapsed
+                  ? "absolute right-0 w-full text-right hover:bg-gray-50"
+                  : ""
+              }`}
+            style={
+              isSidebarCollapsed
+                ? {
+                    top: `${tabs.findIndex((t) => t.id === tab.id) * 40}px`,
+                    transform: "translateX(100%)",
+                    transition: "transform 0.3s ease-in-out",
+                    ...(activeTab === tab.id
+                      ? { transform: "translateX(0)" }
+                      : {}),
+                  }
+                : undefined
+            }
           >
             {tab.label}
           </button>
