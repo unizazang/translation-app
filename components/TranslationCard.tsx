@@ -19,7 +19,6 @@ interface TranslationCardProps {
   isStarred: boolean;
   onToggleStar: () => void;
   onSkip: () => void;
-  onMarkAsReviewed: () => void;
 }
 
 const TranslationCard: React.FC<TranslationCardProps> = ({
@@ -32,7 +31,6 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
   isStarred,
   onToggleStar,
   onSkip,
-  onMarkAsReviewed,
 }) => {
   return (
     <div className="w-full border-gray-500 p-10 rounded-lg bg-white text-center text-black">
@@ -104,13 +102,6 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
             disabled={isTranslating}
           >
             건너뛰기
-          </button>
-          <button
-            onClick={onMarkAsReviewed}
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
-            disabled={isTranslating}
-          >
-            검토 완료
           </button>
           <button
             onClick={onNext}

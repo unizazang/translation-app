@@ -10,6 +10,7 @@ import {
   faClock,
   faStar,
 } from "@fortawesome/free-solid-svg-icons";
+import ContextMenu from "./ContextMenu";
 
 interface SentenceListProps {
   groupedSentences: string[][];
@@ -19,6 +20,7 @@ interface SentenceListProps {
   starredIndexes: Set<number>;
   onSentenceSelect: (index: number) => void;
   onToggleStar: (index: number) => void;
+  onMarkAsReviewed: (indexes: number[]) => void;
 }
 
 type FilterType =
@@ -43,9 +45,18 @@ export default function SentenceList({
   starredIndexes,
   onSentenceSelect,
   onToggleStar,
+  onMarkAsReviewed,
 }: SentenceListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<FilterType>("all");
+  const [selectedSentences, setSelectedSentences] = useState<Set<number>>(
+    new Set()
+  );
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    index: number;
+  } | null>(null);
 
   // 검색어 변경 핸들러
   const handleSearchChange = useCallback(
@@ -62,6 +73,42 @@ export default function SentenceList({
     },
     []
   );
+
+  // 체크박스 선택 핸들러
+  const handleCheckboxChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+      e.stopPropagation();
+      setSelectedSentences((prev) => {
+        const newSet = new Set(prev);
+        if (e.target.checked) {
+          newSet.add(index);
+        } else {
+          newSet.delete(index);
+        }
+        return newSet;
+      });
+    },
+    []
+  );
+
+  // 우클릭 핸들러
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent, index: number) => {
+      e.preventDefault();
+      if (skippedIndexes.has(index)) {
+        setContextMenu({ x: e.clientX, y: e.clientY, index });
+      }
+    },
+    [skippedIndexes]
+  );
+
+  // 일괄 검토 완료 핸들러
+  const handleBulkMarkAsReviewed = useCallback(() => {
+    if (selectedSentences.size > 0) {
+      onMarkAsReviewed(Array.from(selectedSentences));
+      setSelectedSentences(new Set());
+    }
+  }, [selectedSentences, onMarkAsReviewed]);
 
   // 필터링된 문장 목록 계산
   const filteredSentences = useMemo(() => {
@@ -148,12 +195,12 @@ export default function SentenceList({
           type="text"
           placeholder="문장 검색..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={handleSearchChange}
           className="flex-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <select
           value={filter}
-          onChange={(e) => setFilter(e.target.value as FilterType)}
+          onChange={handleFilterChange}
           className="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="all">전체</option>
@@ -162,6 +209,14 @@ export default function SentenceList({
           <option value="pending">대기중</option>
           <option value="none">미처리</option>
         </select>
+        {selectedSentences.size > 0 && (
+          <button
+            onClick={handleBulkMarkAsReviewed}
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
+          >
+            일괄 검토 완료 ({selectedSentences.size})
+          </button>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto">
@@ -172,6 +227,7 @@ export default function SentenceList({
               <li
                 key={index}
                 onClick={() => handleSentenceClick(index)}
+                onContextMenu={(e) => handleContextMenu(e, index)}
                 className={`flex items-center gap-2 p-3 rounded-lg cursor-pointer transition-colors
                   ${
                     index === currentIndex
@@ -179,6 +235,14 @@ export default function SentenceList({
                       : "hover:bg-gray-50 border border-gray-200"
                   }`}
               >
+                {skippedIndexes.has(index) && (
+                  <input
+                    type="checkbox"
+                    checked={selectedSentences.has(index)}
+                    onChange={(e) => handleCheckboxChange(e, index)}
+                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                  />
+                )}
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-500">#{index + 1}</span>
@@ -190,10 +254,7 @@ export default function SentenceList({
                 <div className="flex items-center gap-2">
                   {getStatusIcon(status)}
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleStarClick(e, index);
-                    }}
+                    onClick={(e) => handleStarClick(e, index)}
                     className={`p-1 rounded-full hover:bg-gray-100 transition-colors ${
                       starredIndexes.has(index)
                         ? "text-yellow-400"
@@ -208,6 +269,18 @@ export default function SentenceList({
           })}
         </ul>
       </div>
+
+      {contextMenu && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          onMarkAsReviewed={() => {
+            onMarkAsReviewed([contextMenu.index]);
+            setContextMenu(null);
+          }}
+          onClose={() => setContextMenu(null)}
+        />
+      )}
     </div>
   );
 }

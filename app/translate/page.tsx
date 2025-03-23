@@ -185,9 +185,13 @@ export default function Home() {
     }
   };
 
-  const handleMarkAsReviewed = () => {
-    setCompletedIndexes((prev) => new Set([...prev, currentIndex]));
-    setTooltipText("문장이 검토 완료로 표시되었습니다.");
+  const handleMarkAsReviewed = (indexes: number[]) => {
+    setCompletedIndexes((prev) => {
+      const newSet = new Set(prev);
+      indexes.forEach((index) => newSet.add(index));
+      return newSet;
+    });
+    setTooltipText("선택한 문장이 검토 완료로 표시되었습니다.");
     setShowTooltip(true);
     setTimeout(() => setShowTooltip(false), 2000);
   };
@@ -455,7 +459,6 @@ export default function Home() {
                     isStarred={starredIndexes.has(currentIndex)}
                     onToggleStar={() => handleToggleStar(currentIndex)}
                     onSkip={handleSkip}
-                    onMarkAsReviewed={handleMarkAsReviewed}
                   />
                   <SavedTranslations
                     savedTranslations={savedTranslations}
@@ -463,6 +466,16 @@ export default function Home() {
                     updateTranslation={updateTranslation}
                   />
                   <DownloadButton translatedBlocks={translatedBlocks} />
+                  <SentenceList
+                    currentIndex={currentIndex}
+                    onSentenceSelect={handleSentenceSelect}
+                    groupedSentences={groupedSentences}
+                    skippedIndexes={skippedIndexes}
+                    translatedIndexes={translatedIndexes}
+                    starredIndexes={starredIndexes}
+                    onToggleStar={handleToggleStar}
+                    onMarkAsReviewed={handleMarkAsReviewed}
+                  />
                 </div>
               </>
             )}
