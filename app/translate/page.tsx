@@ -185,6 +185,13 @@ export default function Home() {
     }
   };
 
+  const handleMarkAsReviewed = () => {
+    setCompletedIndexes((prev) => new Set([...prev, currentIndex]));
+    setTooltipText("문장이 검토 완료로 표시되었습니다.");
+    setShowTooltip(true);
+    setTimeout(() => setShowTooltip(false), 2000);
+  };
+
   const handleNext = () => {
     if (currentIndex < groupedSentences.length - 1) {
       const nextIndex = currentIndex + 1;
@@ -448,6 +455,7 @@ export default function Home() {
                     isStarred={starredIndexes.has(currentIndex)}
                     onToggleStar={() => handleToggleStar(currentIndex)}
                     onSkip={handleSkip}
+                    onMarkAsReviewed={handleMarkAsReviewed}
                   />
                   <SavedTranslations
                     savedTranslations={savedTranslations}
