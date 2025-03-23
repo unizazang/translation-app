@@ -104,12 +104,6 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
       <div className="flex-1 overflow-y-auto max-h-[calc(100vh-12rem)]">
         {renderTabContent()}
       </div>
-      {isPdfUploaded && (
-        <div
-          className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize"
-          onMouseDown={handleResizeStart}
-        />
-      )}
     </div>
   );
 };
