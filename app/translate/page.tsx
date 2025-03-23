@@ -170,7 +170,6 @@ export default function Home() {
         properNouns
       );
       setIsTranslating(false);
-      setIsTranslateButtonVisible(false);
     }
   };
 
@@ -340,17 +339,6 @@ export default function Home() {
   // 현재 페이지의 문장 수 계산
   const currentPageSentenceCount = currentPageEndIndex - currentPageStartIndex;
   const currentPageCurrentSentence = currentIndex - currentPageStartIndex + 1;
-
-  // 번역 자동 실행을 위한 useEffect
-  useEffect(() => {
-    if (
-      groupedSentences.length > 0 &&
-      shouldAutoTranslate &&
-      currentIndex < groupedSentences.length
-    ) {
-      handleTranslate(currentIndex);
-    }
-  }, [currentIndex, shouldAutoTranslate, groupedSentences.length]);
 
   // properNouns가 변경될 때만 번역 실행
   useEffect(() => {
