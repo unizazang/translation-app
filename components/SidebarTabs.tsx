@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import Settings from "./Settings";
+import SidebarProgress from "./SidebarProgress";
 
 const ProperNounManager = dynamic(() => import("./ProperNounManager"), {
   ssr: false,
@@ -20,6 +21,7 @@ interface SidebarTabsProps {
   translatedIndexes: Set<number>;
   starredIndexes: Set<number>;
   onToggleStar: (index: number) => void;
+  completedIndexes: Set<number>;
 }
 
 const SidebarTabs: React.FC<SidebarTabsProps> = ({
@@ -30,6 +32,7 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
   translatedIndexes,
   starredIndexes,
   onToggleStar,
+  completedIndexes,
 }) => {
   const [activeTab, setActiveTab] = useState("sentences");
 
@@ -38,6 +41,10 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
     { id: "settings", label: "설정" },
     { id: "properNouns", label: "고유명사" },
   ];
+
+  // 전체 페이지 수 계산
+  const totalPages = Math.ceil(groupedSentences.length / 10);
+  const currentPage = Math.floor(currentIndex / 10) + 1;
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -64,6 +71,12 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
 
   return (
     <div className="h-full flex flex-col">
+      <SidebarProgress
+        totalPages={totalPages}
+        currentPage={currentPage}
+        completedIndexes={completedIndexes}
+        totalSentences={groupedSentences.length}
+      />
       <div className="flex border-b">
         {tabs.map((tab) => (
           <button
