@@ -355,24 +355,15 @@ export default function Home() {
     <div className="min-h-screen flex">
       {/* 사이드바 */}
       {isPdfUploaded && (
-        <>
+        <div className="relative">
+          {/* 외부 컨테이너: 토글 버튼 포함 */}
           <div
-            className={`fixed top-0 left-0 h-screen border-r bg-white transition-[width] duration-300 ease-in-out overflow-hidden
+            className={`fixed top-0 left-0 h-screen border-r bg-white transition-[width] duration-300
             ${isSidebarCollapsed ? "w-0" : ""}`}
             style={{ width: isSidebarCollapsed ? 0 : sidebarWidth }}
           >
-            {/* 사이드바 토글 버튼 */}
-            <button
-              onClick={handleToggleSidebar}
-              className={`absolute -right-4 top-4 z-50 w-8 h-8 bg-white border rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-transform duration-300
-                ${isSidebarCollapsed ? "translate-x-full" : "translate-x-1/2"}`}
-            >
-              <FontAwesomeIcon
-                icon={isSidebarCollapsed ? faChevronRight : faChevronLeft}
-                className="text-gray-600"
-              />
-            </button>
-            <div className="h-full">
+            {/* 내부 컨테이너: overflow-hidden 적용 */}
+            <div className="h-full overflow-hidden">
               <SidebarTabs
                 currentIndex={currentIndex}
                 onSentenceSelect={handleSentenceSelect}
@@ -393,7 +384,18 @@ export default function Home() {
               onMouseDown={handleResizeStart}
             />
           </div>
-        </>
+          {/* 토글 버튼 */}
+          <button
+            onClick={handleToggleSidebar}
+            className={`absolute -right-4 top-4 z-50 w-8 h-8 bg-white border rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-transform duration-300
+              ${isSidebarCollapsed ? "translate-x-full" : "translate-x-1/2"}`}
+          >
+            <FontAwesomeIcon
+              icon={isSidebarCollapsed ? faChevronRight : faChevronLeft}
+              className="text-gray-600"
+            />
+          </button>
+        </div>
       )}
 
       {/* 메인 컨텐츠 */}

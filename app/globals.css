@@ -19,7 +19,3 @@ body {
   background: white;
   font-family: Arial, Helvetica, sans-serif;
 }
-
-.sidebar-toggle-button {
-  transform: translateX(50%);
-}
