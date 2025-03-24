@@ -361,6 +361,16 @@ export default function Home() {
             ${isSidebarCollapsed ? "w-0" : ""}`}
             style={{ width: isSidebarCollapsed ? 0 : sidebarWidth }}
           >
+            {/* 사이드바 토글 버튼 */}
+            <button
+              onClick={handleToggleSidebar}
+              className="fixed left-0 top-4 z-50 w-8 h-8 bg-white border rounded-full shadow-md flex items-center justify-center hover:bg-gray-50"
+            >
+              <FontAwesomeIcon
+                icon={isSidebarCollapsed ? faChevronRight : faChevronLeft}
+                className="text-gray-600"
+              />
+            </button>
             <div className="h-full">
               <SidebarTabs
                 currentIndex={currentIndex}
@@ -382,16 +392,6 @@ export default function Home() {
               onMouseDown={handleResizeStart}
             />
           </div>
-          {/* 사이드바 토글 버튼 */}
-          <button
-            onClick={handleToggleSidebar}
-            className="fixed left-0 top-4 z-50 w-8 h-8 bg-white border rounded-full shadow-md flex items-center justify-center hover:bg-gray-50"
-          >
-            <FontAwesomeIcon
-              icon={isSidebarCollapsed ? faChevronRight : faChevronLeft}
-              className="text-gray-600"
-            />
-          </button>
         </>
       )}
 
