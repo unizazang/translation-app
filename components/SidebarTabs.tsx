@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
+import { motion, AnimatePresence } from "framer-motion";
 import Settings from "./Settings";
 import SidebarProgress from "./SidebarProgress";
 
@@ -90,8 +91,25 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
     }
   };
 
+  const slideVariants = {
+    enter: (direction: "left" | "right") => ({
+      x: direction === "right" ? 1000 : -1000,
+      opacity: 0,
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: "left" | "right") => ({
+      zIndex: 0,
+      x: direction === "right" ? -1000 : 1000,
+      opacity: 0,
+    }),
+  };
+
   return (
-    <div className="h-full p-4 flex flex-col bg-white shadow-md rounded-lg ">
+    <div className="h-full p-4 flex flex-col bg-white shadow-md rounded-lg">
       {!isSidebarCollapsed && (
         <SidebarProgress
           totalPages={totalPages}
@@ -100,12 +118,12 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
           totalSentences={groupedSentences.length}
         />
       )}
-      <div className="flex  relative pb-4">
+      <div className="flex relative pb-4">
         {tabs.map((tab) => (
-          <button
+          <motion.button
             key={tab.id}
             onClick={() => handleTabChange(tab.id)}
-            className={`flex-1 px-4 py-2 text-sm font-medium transition-all duration-300 relative z-10
+            className={`flex-1 px-4 py-2 text-sm font-medium relative z-10
               ${
                 activeTab === tab.id
                   ? "text-blue-600 bg-white border-b-2 border-blue-600 shadow-sm"
@@ -120,30 +138,36 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
               isSidebarCollapsed
                 ? {
                     top: `${tabs.findIndex((t) => t.id === tab.id) * 40}px`,
-                    transform: "translateX(0)",
-                    transition: "transform 0.3s ease-in-out",
                   }
                 : undefined
             }
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
             {tab.label}
-          </button>
+          </motion.button>
         ))}
       </div>
       <div className="flex-1 overflow-hidden relative">
-        <div
-          className={`absolute inset-0 transition-transform duration-300 ease-in-out ${
-            slideDirection === "left" ? "translate-x-0" : "-translate-x-0"
-          }`}
-          style={{
-            transform: `translateX(${slideDirection === "left" ? "0%" : "0%"})`,
-            transition: "transform 0.3s ease-in-out",
-          }}
-        >
-          <div className="h-[calc(100vh-12rem)] overflow-y-auto">
-            {renderTabContent()}
-          </div>
-        </div>
+        <AnimatePresence initial={false} custom={slideDirection}>
+          <motion.div
+            key={activeTab}
+            custom={slideDirection}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              x: { type: "spring", stiffness: 300, damping: 30 },
+              opacity: { duration: 0.2 },
+            }}
+            className="absolute inset-0"
+          >
+            <div className="h-[calc(100vh-12rem)] overflow-y-auto">
+              {renderTabContent()}
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

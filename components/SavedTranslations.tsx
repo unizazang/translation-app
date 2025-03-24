@@ -96,7 +96,7 @@ const SavedTranslations: React.FC<SavedTranslationsProps> = ({
   };
 
   return (
-    <div className="w-full p-4 rounded-lg mt-4 text-black">
+    <div className="w-full rounded-lg mt-4 text-black">
       <h2 className="text-xl font-semibold">저장된 번역</h2>
 
       {/* 전체 복사 버튼 */}

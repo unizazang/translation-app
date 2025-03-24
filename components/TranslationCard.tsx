@@ -33,7 +33,7 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
   onSkip,
 }) => {
   return (
-    <div className="w-full border-gray-500 p-10 rounded-lg bg-white text-center text-black">
+    <div className="w-full border-gray-500 rounded-lg bg-white text-center text-black">
       <div className="flex justify-between items-center mb-5">
         <h3 className="text-lg font-semibold">원본 문장</h3>
         <button

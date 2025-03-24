@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileUpload } from "@fortawesome/free-solid-svg-icons";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface FileDropzoneProps {
   onFileAccepted: (file: File) => void;
@@ -19,6 +20,7 @@ export default function FileDropzone({
   fileType,
 }: FileDropzoneProps) {
   const [error, setError] = useState<string | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -57,6 +59,8 @@ export default function FileDropzone({
     <div className="w-full">
       <div
         {...getRootProps()}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
           ${
             isDragActive
@@ -65,13 +69,40 @@ export default function FileDropzone({
           }`}
       >
         <input {...getInputProps()} />
-        <FontAwesomeIcon
-          icon={faFileUpload}
-          className="text-4xl text-gray-400 mb-4"
-        />
-        <p className="text-gray-600">{label || defaultLabel[fileType]}</p>
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{
+            scale: isHovered ? 1.01 : 1,
+            opacity: 1,
+          }}
+          transition={{ duration: 0.3 }}
+        >
+          <FontAwesomeIcon
+            icon={faFileUpload}
+            className="text-4xl text-gray-400 mb-4"
+          />
+          <motion.p
+            className="text-gray-600"
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+          >
+            {label || defaultLabel[fileType]}
+          </motion.p>
+        </motion.div>
       </div>
-      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+      <AnimatePresence>
+        {error && (
+          <motion.p
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="mt-2 text-sm text-red-500"
+          >
+            {error}
+          </motion.p>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

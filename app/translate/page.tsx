@@ -27,6 +27,7 @@ import {
 import SidebarTabs from "@/components/SidebarTabs";
 import PageProgress from "@/components/PageProgress";
 import { translate } from "pdf-lib";
+import FeatureDescription from "@/components/FeatureDescription";
 
 const ProperNounManager = dynamicComponent(
   () => import("@/components/ProperNounManager"),
@@ -404,77 +405,86 @@ export default function Home() {
 
       {/* 메인 컨텐츠 */}
       <div
-        className={`flex-1 p-6 transition-all duration-300 ${
+        className={`flex-1 transition-all duration-300 ${
           isSidebarCollapsed ? "ml-0" : `ml-[${sidebarWidth}px]`
         }`}
       >
-        <div className="max-w-4xl mx-auto space-y-6">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h1 className="text-3xl font-bold text-gray-800 mb-8">
-              PDF 번역기
-            </h1>
+        <div
+          className={`h-full flex items-center justify-center p-6 ${
+            isSidebarCollapsed ? "w-full" : "w-[calc(100%-${sidebarWidth}px)]"
+          }`}
+        >
+          <div className="w-full max-w-4xl space-y-6">
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h1 className="text-3xl font-bold text-gray-800 mb-8">
+                PDF 번역기
+              </h1>
 
-            {!isPdfUploaded ? (
-              <PdfUploader onTextExtracted={handleTextExtracted} />
-            ) : (
-              <>
-                <div className="space-y-6">
-                  <LanguageSelector onSelectLanguage={setSelectedLanguage} />
+              {!isPdfUploaded ? (
+                <>
+                  <PdfUploader onTextExtracted={handleTextExtracted} />
+                  <FeatureDescription />
+                </>
+              ) : (
+                <>
+                  <div className="space-y-6">
+                    <LanguageSelector onSelectLanguage={setSelectedLanguage} />
 
-                  {/* 번역 진행 상태 표시 */}
-                  {groupedSentences.length > 0 && (
-                    <PageProgress
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      currentIndex={currentIndex}
-                      totalSentences={groupedSentences.length}
-                      completedIndexes={completedIndexes}
-                      onProgressBarClick={handleProgressBarClick}
-                      onProgressBarHover={(e) => handleProgressBarHover(e)}
-                      onProgressBarLeave={() => setShowTooltip(false)}
-                      showTooltip={showTooltip}
-                      tooltipText={tooltipText}
+                    {/* 번역 진행 상태 표시 */}
+                    {groupedSentences.length > 0 && (
+                      <PageProgress
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        currentIndex={currentIndex}
+                        totalSentences={groupedSentences.length}
+                        completedIndexes={completedIndexes}
+                        onProgressBarClick={handleProgressBarClick}
+                        onProgressBarHover={(e) => handleProgressBarHover(e)}
+                        onProgressBarLeave={() => setShowTooltip(false)}
+                        showTooltip={showTooltip}
+                        tooltipText={tooltipText}
+                      />
+                    )}
+
+                    {/* 번역 시작 버튼 */}
+                    {isTranslateButtonVisible && (
+                      <button
+                        onClick={() => handleTranslate(currentIndex)}
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                        disabled={isTranslating}
+                      >
+                        {isTranslating ? "번역 중..." : "번역 실행"}
+                      </button>
+                    )}
+
+                    <p className="text-gray-700">
+                      파일이 업로드되었습니다! '번역 시작'을 눌러 번역을
+                      진행하세요.
+                    </p>
+
+                    <TranslationCard
+                      originalText={
+                        groupedSentences[currentIndex]?.join(" ") || ""
+                      }
+                      translations={translations}
+                      onSave={handleTranslationSave}
+                      onNext={handleNext}
+                      onPrevious={handlePrevious}
+                      isTranslating={isTranslating}
+                      isStarred={starredIndexes.has(currentIndex)}
+                      onToggleStar={() => handleToggleStar(currentIndex)}
+                      onSkip={handleSkip}
                     />
-                  )}
-
-                  {/* 번역 시작 버튼 */}
-                  {isTranslateButtonVisible && (
-                    <button
-                      onClick={() => handleTranslate(currentIndex)}
-                      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                      disabled={isTranslating}
-                    >
-                      {isTranslating ? "번역 중..." : "번역 실행"}
-                    </button>
-                  )}
-
-                  <p className="text-gray-700">
-                    파일이 업로드되었습니다! '번역 시작'을 눌러 번역을
-                    진행하세요.
-                  </p>
-
-                  <TranslationCard
-                    originalText={
-                      groupedSentences[currentIndex]?.join(" ") || ""
-                    }
-                    translations={translations}
-                    onSave={handleTranslationSave}
-                    onNext={handleNext}
-                    onPrevious={handlePrevious}
-                    isTranslating={isTranslating}
-                    isStarred={starredIndexes.has(currentIndex)}
-                    onToggleStar={() => handleToggleStar(currentIndex)}
-                    onSkip={handleSkip}
-                  />
-                  <SavedTranslations
-                    savedTranslations={savedTranslations}
-                    onCopyAll={copyAllTranslations}
-                    updateTranslation={updateTranslation}
-                  />
-                  <DownloadButton translatedBlocks={translatedBlocks} />
-                </div>
-              </>
-            )}
+                    <SavedTranslations
+                      savedTranslations={savedTranslations}
+                      onCopyAll={copyAllTranslations}
+                      updateTranslation={updateTranslation}
+                    />
+                    <DownloadButton translatedBlocks={translatedBlocks} />
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
