@@ -355,7 +355,7 @@ export default function Home() {
     <div className="min-h-screen flex">
       {/* 사이드바 */}
       {isPdfUploaded && (
-        <div className="relative">
+        <div className="relative" style={{ width: sidebarWidth }}>
           {/* 외부 컨테이너: 토글 버튼 포함 */}
           <div
             className="fixed top-0 h-screen border-r bg-white transition-all duration-300 overflow-hidden"
@@ -389,8 +389,8 @@ export default function Home() {
           {/* 토글 버튼 */}
           <button
             onClick={handleToggleSidebar}
-            className={`absolute right-0 top-4 z-50 w-8 h-8 bg-white border rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-transform duration-300
-              ${isSidebarCollapsed ? "translate-x-1/2" : "-translate-x-1/2"}`}
+            className={`fixed top-4 z-50 w-8 h-8 bg-white border rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-all duration-300
+              ${isSidebarCollapsed ? "left-0" : `left-[${sidebarWidth}px]`}`}
           >
             <FontAwesomeIcon
               icon={isSidebarCollapsed ? faChevronRight : faChevronLeft}
@@ -401,7 +401,11 @@ export default function Home() {
       )}
 
       {/* 메인 컨텐츠 */}
-      <div className="flex-1 p-6">
+      <div
+        className={`flex-1 p-6 transition-all duration-300 ${
+          isSidebarCollapsed ? "ml-0" : `ml-[${sidebarWidth}px]`
+        }`}
+      >
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="bg-white rounded-lg shadow-md p-6">
             <h1 className="text-3xl font-bold text-gray-800 mb-8">
