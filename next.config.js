@@ -16,6 +16,8 @@ const nextConfig = {
     // appDir: true, // App Router 사용 시 반드시 true
     serverComponentsExternalPackages: ["canvas"],
   },
+  // loading 컴포넌트 관련 설정 추가
+  pageExtensions: ["tsx", "ts", "jsx", "js"],
 };
 
 module.exports = nextConfig;
