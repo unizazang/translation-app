@@ -19,7 +19,7 @@ const SidebarProgress: React.FC<SidebarProgressProps> = ({
   const progressPercentage = (completedIndexes.size / totalSentences) * 100;
 
   return (
-    <div className="p-4 border-b bg-white">
+    <div className="p-4 pb-7 border-b bg-white">
       <div className="flex justify-between items-center mb-2">
         <span className="text-sm font-medium text-gray-700">
           전체 진행률: {progressPercentage.toFixed(1)}%

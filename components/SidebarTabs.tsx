@@ -41,6 +41,9 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
   isSidebarCollapsed,
 }) => {
   const [activeTab, setActiveTab] = useState("sentences");
+  const [slideDirection, setSlideDirection] = useState<"left" | "right">(
+    "right"
+  );
 
   if (!isPdfUploaded) {
     return null;
@@ -51,6 +54,13 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
     { id: "settings", label: "설정" },
     { id: "properNouns", label: "예외 단어" },
   ];
+
+  const handleTabChange = (tabId: string) => {
+    const currentIndex = tabs.findIndex((tab) => tab.id === activeTab);
+    const newIndex = tabs.findIndex((tab) => tab.id === tabId);
+    setSlideDirection(newIndex > currentIndex ? "left" : "right");
+    setActiveTab(tabId);
+  };
 
   // 전체 페이지 수 계산
   const totalPages = Math.ceil(groupedSentences.length / 10);
@@ -81,7 +91,7 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col bg-white shadow-md rounded-lg border">
+    <div className="h-full p-4 flex flex-col bg-white shadow-md rounded-lg ">
       {!isSidebarCollapsed && (
         <SidebarProgress
           totalPages={totalPages}
@@ -90,12 +100,12 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
           totalSentences={groupedSentences.length}
         />
       )}
-      <div className="flex border-b relative">
+      <div className="flex  relative pb-4">
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 px-4 py-2 text-sm font-medium transition-all duration-200 relative z-10
+            onClick={() => handleTabChange(tab.id)}
+            className={`flex-1 px-4 py-2 text-sm font-medium transition-all duration-300 relative z-10
               ${
                 activeTab === tab.id
                   ? "text-blue-600 bg-white border-b-2 border-blue-600 shadow-sm"
@@ -120,8 +130,20 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
           </button>
         ))}
       </div>
-      <div className="flex-1 overflow-y-auto h-[calc(100vh-12rem)]">
-        {renderTabContent()}
+      <div className="flex-1 overflow-hidden relative">
+        <div
+          className={`absolute inset-0 transition-transform duration-300 ease-in-out ${
+            slideDirection === "left" ? "translate-x-0" : "-translate-x-0"
+          }`}
+          style={{
+            transform: `translateX(${slideDirection === "left" ? "0%" : "0%"})`,
+            transition: "transform 0.3s ease-in-out",
+          }}
+        >
+          <div className="h-[calc(100vh-12rem)] overflow-y-auto">
+            {renderTabContent()}
+          </div>
+        </div>
       </div>
     </div>
   );

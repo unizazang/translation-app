@@ -58,27 +58,36 @@ export default function ProperNounManager() {
         있습니다.
       </p>
 
-      <div className="flex gap-2 mb-4">
+      <div className="space-y-4">
         <input
           type="text"
           placeholder="번역되지 않도록 할 단어"
           value={original}
           onChange={(e) => setOriginal(e.target.value)}
-          className="border p-2 rounded w-full flex-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <input
           type="text"
           placeholder="원하는 번역"
           value={translation}
           onChange={(e) => setTranslation(e.target.value)}
-          className="border p-2 rounded w-full  flex-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button
-          onClick={handleAdd}
-          className="p-1 bg-blue-400 flex-1 text-white rounded hover:bg-blue-600 transition"
-        >
-          <FontAwesomeIcon icon={faPlus} /> 추가
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleAdd}
+            className="flex-1 p-2 bg-blue-400 text-white rounded hover:bg-blue-600 transition"
+          >
+            <FontAwesomeIcon icon={faPlus} /> 단어 추가
+          </button>
+          <button
+            onClick={handleResetProperNouns}
+            className="flex-1 p-2 bg-red-400 text-white rounded hover:bg-red-600 transition cursor-pointer"
+          >
+            <FontAwesomeIcon icon={faEraser} className="font-bold" /> 목록
+            초기화
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-2">
@@ -90,12 +99,6 @@ export default function ProperNounManager() {
           fileType="txt"
           maxSize={5 * 1024 * 1024}
         />
-        <button
-          onClick={handleResetProperNouns}
-          className="px-4 py-2 bg-red-400 cursor-pointer text-white rounded-md hover:bg-red-600 transition"
-        >
-          <FontAwesomeIcon icon={faEraser} className="font-bold" /> 목록 초기화
-        </button>
       </div>
 
       <button

@@ -235,7 +235,7 @@ export default function SentenceList({
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto pr-2 h-[calc(100vh-12rem)]">
         <ul className="space-y-2">
           {filteredSentences.map((sentence, index) => {
             const status = getSentenceStatus(index);

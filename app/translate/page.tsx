@@ -26,6 +26,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import SidebarTabs from "@/components/SidebarTabs";
 import PageProgress from "@/components/PageProgress";
+import { translate } from "pdf-lib";
 
 const ProperNounManager = dynamicComponent(
   () => import("@/components/ProperNounManager"),
@@ -390,7 +391,8 @@ export default function Home() {
           <button
             onClick={handleToggleSidebar}
             className={`fixed top-4 z-50 w-8 h-8 bg-white border rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-all duration-300
-              ${isSidebarCollapsed ? "left-0" : `left-[${sidebarWidth}px]`}`}
+              ${isSidebarCollapsed ? "translate-x-0" : "-translate-x-1/2"}`}
+            style={{ left: isSidebarCollapsed ? `20px` : `${sidebarWidth}px` }}
           >
             <FontAwesomeIcon
               icon={isSidebarCollapsed ? faChevronRight : faChevronLeft}
