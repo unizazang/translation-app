@@ -358,12 +358,14 @@ export default function Home() {
         <div className="relative">
           {/* 외부 컨테이너: 토글 버튼 포함 */}
           <div
-            className={`fixed top-0 left-0 h-screen border-r bg-white transition-[width] duration-300
-            ${isSidebarCollapsed ? "w-0" : ""}`}
-            style={{ width: isSidebarCollapsed ? 0 : sidebarWidth }}
+            className="fixed top-0 h-screen border-r bg-white transition-all duration-300 overflow-hidden"
+            style={{
+              width: sidebarWidth,
+              left: isSidebarCollapsed ? -sidebarWidth : 0,
+            }}
           >
-            {/* 내부 컨테이너: overflow-hidden 적용 */}
-            <div className="h-full overflow-hidden">
+            {/* 내부 컨테이너 */}
+            <div className="h-full">
               <SidebarTabs
                 currentIndex={currentIndex}
                 onSentenceSelect={handleSentenceSelect}
@@ -387,8 +389,8 @@ export default function Home() {
           {/* 토글 버튼 */}
           <button
             onClick={handleToggleSidebar}
-            className={`absolute -right-4 top-4 z-50 w-8 h-8 bg-white border rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-transform duration-300
-              ${isSidebarCollapsed ? "translate-x-full" : "translate-x-1/2"}`}
+            className={`absolute right-0 top-4 z-50 w-8 h-8 bg-white border rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-transform duration-300
+              ${isSidebarCollapsed ? "translate-x-1/2" : "-translate-x-1/2"}`}
           >
             <FontAwesomeIcon
               icon={isSidebarCollapsed ? faChevronRight : faChevronLeft}
