@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
@@ -191,6 +191,19 @@ export default function SentenceList({
     }
   };
 
+  // 현재 문장으로 자동 스크롤
+  useEffect(() => {
+    const currentSentence = document.querySelector(
+      `[data-index="${currentIndex}"]`
+    );
+    if (currentSentence) {
+      currentSentence.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [currentIndex]);
+
   return (
     <div className="w-full h-full flex flex-col">
       <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -229,6 +242,7 @@ export default function SentenceList({
             return (
               <li
                 key={index}
+                data-index={index}
                 onClick={() => handleSentenceClick(index)}
                 onContextMenu={(e) => handleContextMenu(e, index)}
                 className={`flex items-center gap-2 p-3 rounded-lg cursor-pointer transition-colors

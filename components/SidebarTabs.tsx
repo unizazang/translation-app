@@ -95,7 +95,7 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 text-sm font-medium transition-all duration-200 relative z-10
+            className={`flex-1 px-4 py-2 text-sm font-medium transition-all duration-200 relative z-10
               ${
                 activeTab === tab.id
                   ? "text-blue-600 bg-white border-b-2 border-blue-600 shadow-sm"
@@ -120,7 +120,7 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
           </button>
         ))}
       </div>
-      <div className="flex-1 overflow-y-auto max-h-[calc(100vh-12rem)]">
+      <div className="flex-1 overflow-y-auto h-[calc(100vh-12rem)]">
         {renderTabContent()}
       </div>
     </div>

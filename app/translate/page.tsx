@@ -357,7 +357,7 @@ export default function Home() {
       {isPdfUploaded && (
         <>
           <div
-            className={`relative border-r bg-white transition-all duration-300 ease-in-out overflow-hidden
+            className={`fixed top-0 left-0 h-screen border-r bg-white transition-[width] duration-300 ease-in-out overflow-hidden
             ${isSidebarCollapsed ? "w-0" : ""}`}
             style={{ width: isSidebarCollapsed ? 0 : sidebarWidth }}
           >
