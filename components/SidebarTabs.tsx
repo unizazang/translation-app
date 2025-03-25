@@ -110,12 +110,14 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
   return (
     <div className="h-full p-4 flex flex-col bg-white shadow-md rounded-lg">
       {!isSidebarCollapsed && (
-        <SidebarProgress
-          totalPages={totalPages}
-          currentPage={currentPage}
-          currentIndex={currentIndex}
-          totalSentences={groupedSentences.length}
-        />
+        <div className="mb-4">
+          <SidebarProgress
+            totalPages={totalPages}
+            currentPage={currentPage}
+            currentIndex={currentIndex}
+            totalSentences={groupedSentences.length}
+          />
+        </div>
       )}
       <div className="flex relative pb-4">
         {tabs.map((tab) => (
@@ -160,9 +162,9 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
               x: { type: "spring", stiffness: 300, damping: 30 },
               opacity: { duration: 0.2 },
             }}
-            className="absolute inset-0"
+            className="absolute inset-0 overflow-hidden"
           >
-            <div className="h-[calc(100vh-12rem)] overflow-y-auto">
+            <div className="h-full overflow-y-auto">
               {renderTabContent()}
             </div>
           </motion.div>

@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic"; // Next.js 빌드 설정용으로 export
 import dynamicComponent from "next/dynamic";
 import { useState, useEffect, useCallback } from "react";
 import PdfUploader from "@/components/PdfUploader";
-import TranslationResult from "@/components/TranslationResult";
+// import TranslationResult from "@/components/TranslationResult";
 import LanguageSelector from "@/components/LanguageSelector";
 import TranslationCard from "@/components/TranslationCard";
 import { useTextProcessing } from "@/hooks/useTextProcessing";
@@ -27,6 +27,7 @@ import {
 import SidebarTabs from "@/components/SidebarTabs";
 import SidebarProgress from "@/components/SidebarProgress";
 import FeatureDescription from "@/components/FeatureDescription";
+// import Sidebar from "@/components/Sidebar";
 
 const ProperNounManager = dynamicComponent(
   () => import("@/components/ProperNounManager"),
@@ -248,46 +249,43 @@ export default function Home() {
   }, [properNouns]);
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <div
-        className={`flex flex-col bg-white shadow-lg transition-all duration-300 ${
-          isSidebarCollapsed ? "w-16" : ""
-        }`}
-        style={{
-          width: isSidebarCollapsed ? "4rem" : `${sidebarWidth}px`,
-        }}
-      >
-        <SidebarProgress
-          totalPages={totalPages}
-          currentPage={currentPage}
-          currentIndex={currentIndex}
-          totalSentences={groupedSentences.length}
-        />
-        <SidebarTabs
-          currentIndex={currentIndex}
-          onSentenceSelect={handleSentenceSelect}
-          groupedSentences={groupedSentences}
-          skippedIndexes={skippedIndexes}
-          translatedIndexes={translatedIndexes}
-          starredIndexes={starredIndexes}
-          onToggleStar={handleToggleStar}
-          completedIndexes={completedIndexes}
-          isPdfUploaded={isPdfUploaded}
-          onMarkAsReviewed={handleMarkAsReviewed}
-          isSidebarCollapsed={isSidebarCollapsed}
-        />
-      </div>
-      <div
-        className={`flex-1 transition-all duration-300 ${
-          isSidebarCollapsed ? "ml-0" : `ml-[${sidebarWidth}px]`
-        }`}
-      >
-        <div
-          className={`h-full flex items-center justify-center p-6 ${
-            isSidebarCollapsed ? "w-full" : "w-[calc(100%-${sidebarWidth}px)]"
-          }`}
-        >
-          <div className="w-full max-w-4xl space-y-6">
+    <div className="flex min-h-screen bg-gray-100">
+      {isPdfUploaded && (
+        <>
+          <button
+            onClick={handleToggleSidebar}
+            className="fixed left-0 top-1/2 transform -translate-y-1/2 z-50 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 transition-colors"
+          >
+            <FontAwesomeIcon
+              icon={isSidebarCollapsed ? faChevronRight : faChevronLeft}
+              className="text-gray-600"
+            />
+          </button>
+          <div className={`fixed left-0 top-0 min-h-screen flex flex-col bg-white shadow-lg transition-all duration-300 ${
+            isSidebarCollapsed ? "w-16" : ""
+          }`} style={{
+            width: isSidebarCollapsed ? "4rem" : `${sidebarWidth}px`,
+          }}>
+            <SidebarTabs
+              currentIndex={currentIndex}
+              onSentenceSelect={handleSentenceSelect}
+              groupedSentences={groupedSentences}
+              skippedIndexes={skippedIndexes}
+              translatedIndexes={translatedIndexes}
+              starredIndexes={starredIndexes}
+              onToggleStar={handleToggleStar}
+              isPdfUploaded={isPdfUploaded}
+              onMarkAsReviewed={handleMarkAsReviewed}
+              isSidebarCollapsed={isSidebarCollapsed}
+            />
+          </div>
+        </>
+      )}
+      <div className={`flex-1 transition-all duration-300 ${
+        isSidebarCollapsed ? "ml-16" : `ml-[${sidebarWidth}px]`
+      }`}>
+        <div className="p-6">
+          <div className="w-full max-w-4xl mx-auto space-y-6">
             <div className="bg-white rounded-lg shadow-md p-6">
               <h1 className="text-3xl text-center font-bold text-gray-800 mb-8">
                 PDF 번역기
