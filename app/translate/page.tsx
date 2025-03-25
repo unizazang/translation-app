@@ -25,8 +25,7 @@ import {
   faChevronLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import SidebarTabs from "@/components/SidebarTabs";
-import PageProgress from "@/components/PageProgress";
-import { translate } from "pdf-lib";
+import SidebarProgress from "@/components/SidebarProgress";
 import FeatureDescription from "@/components/FeatureDescription";
 
 const ProperNounManager = dynamicComponent(
@@ -49,8 +48,6 @@ export default function Home() {
   const [translatedBlocks, setTranslatedBlocks] = useState<
     TranslatedTextBlock[][]
   >([]);
-  const [tooltipText, setTooltipText] = useState<string>("");
-  const [showTooltip, setShowTooltip] = useState<boolean>(false);
   const [skippedIndexes, setSkippedIndexes] = useState<Set<number>>(new Set());
   const [translatedIndexes, setTranslatedIndexes] = useState<Set<number>>(
     new Set()
@@ -75,33 +72,6 @@ export default function Home() {
     copyAllTranslations,
     autoMove,
   } = useTranslation();
-
-  // 진행률 계산 함수들
-  const calculatePageProgress = useCallback(() => {
-    if (!groupedSentences.length) return 0;
-    const currentPageStartIndex = Math.floor(currentIndex / 10) * 10;
-    const currentPageEndIndex = Math.min(
-      currentPageStartIndex + 10,
-      groupedSentences.length
-    );
-    const pageSize = currentPageEndIndex - currentPageStartIndex;
-
-    if (pageSize === 0) return 0;
-
-    const completedInPage = Array.from(completedIndexes).filter(
-      (index) => index >= currentPageStartIndex && index < currentPageEndIndex
-    ).length;
-
-    return Math.min(Math.round((completedInPage / pageSize) * 100), 100);
-  }, [currentIndex, groupedSentences.length, completedIndexes]);
-
-  const calculateTotalProgress = useCallback(() => {
-    if (!groupedSentences.length) return 0;
-    return Math.min(
-      Math.round((completedIndexes.size / groupedSentences.length) * 100),
-      100
-    );
-  }, [groupedSentences.length, completedIndexes]);
 
   // 리사이즈 훅 사용
   const {
@@ -191,9 +161,6 @@ export default function Home() {
       indexes.forEach((index) => newSet.add(index));
       return newSet;
     });
-    setTooltipText("선택한 문장이 검토 완료로 표시되었습니다.");
-    setShowTooltip(true);
-    setTimeout(() => setShowTooltip(false), 2000);
   };
 
   const handleNext = () => {
@@ -247,11 +214,6 @@ export default function Home() {
       };
 
       updates();
-
-      // 토스트 메시지 표시
-      setTooltipText("번역이 저장되었습니다.");
-      setShowTooltip(true);
-      setTimeout(() => setShowTooltip(false), 2000);
     }
   };
 
@@ -270,77 +232,9 @@ export default function Home() {
     });
   };
 
-  // 진행 바 클릭 핸들러
-  const handleProgressBarClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    const progressBar = event.currentTarget;
-    const rect = progressBar.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const percentage = (x / rect.width) * 100;
-
-    // 현재 페이지의 시작과 끝 인덱스 계산
-    const currentPageStartIndex = (currentPage - 1) * 10;
-    const currentPageEndIndex = Math.min(
-      currentPageStartIndex + 10,
-      groupedSentences.length
-    );
-    const currentPageSize = currentPageEndIndex - currentPageStartIndex;
-
-    // 클릭한 위치에 해당하는 문장 인덱스 계산
-    const targetIndex =
-      currentPageStartIndex + Math.floor((percentage / 100) * currentPageSize);
-
-    if (
-      targetIndex >= currentPageStartIndex &&
-      targetIndex < currentPageEndIndex
-    ) {
-      handleSentenceSelect(targetIndex);
-    }
-  };
-
-  // 진행 바 호버 핸들러
-  const handleProgressBarHover = (event: React.MouseEvent<HTMLDivElement>) => {
-    const progressBar = event.currentTarget;
-    const rect = progressBar.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const percentage = (x / rect.width) * 100;
-
-    // 현재 페이지의 시작과 끝 인덱스 계산
-    const currentPageStartIndex = (currentPage - 1) * 10;
-    const currentPageEndIndex = Math.min(
-      currentPageStartIndex + 10,
-      groupedSentences.length
-    );
-    const currentPageSize = currentPageEndIndex - currentPageStartIndex;
-
-    // 호버한 위치에 해당하는 문장 인덱스 계산
-    const targetIndex =
-      currentPageStartIndex + Math.floor((percentage / 100) * currentPageSize);
-
-    if (
-      targetIndex >= currentPageStartIndex &&
-      targetIndex < currentPageEndIndex
-    ) {
-      setTooltipText(`${targetIndex + 1}번 문장으로 이동`);
-      setShowTooltip(true);
-    }
-  };
-
-  // 번역 진행 상태 계산
-  const currentPage = Math.floor(currentIndex / 10) + 1; // 페이지는 1부터 시작
+  // 현재 페이지 계산
+  const currentPage = Math.floor(currentIndex / 10) + 1;
   const totalPages = Math.ceil(groupedSentences.length / 10);
-  const progressPercentage = calculateTotalProgress();
-  const currentPageProgress = calculatePageProgress();
-
-  // 현재 페이지 내 진행 상태 계산
-  const currentPageStartIndex = (currentPage - 1) * 10;
-  const currentPageEndIndex = Math.min(
-    currentPageStartIndex + 10,
-    groupedSentences.length
-  );
-
-  // 현재 페이지의 문장 수 계산
-  const currentPageSentenceCount = currentPageEndIndex - currentPageStartIndex;
-  const currentPageCurrentSentence = currentIndex - currentPageStartIndex + 1;
 
   // properNouns가 변경될 때만 번역 실행
   useEffect(() => {
@@ -354,56 +248,35 @@ export default function Home() {
   }, [properNouns]);
 
   return (
-    <div className="min-h-screen flex">
-      {/* 사이드바 */}
-      {isPdfUploaded && (
-        <div className="relative" style={{ width: sidebarWidth }}>
-          {/* 외부 컨테이너: 토글 버튼 포함 */}
-          <div
-            className="fixed top-0 h-screen border-r bg-white transition-all duration-300 overflow-hidden"
-            style={{
-              width: sidebarWidth,
-              left: isSidebarCollapsed ? -sidebarWidth : 0,
-            }}
-          >
-            {/* 내부 컨테이너 */}
-            <div className="h-full">
-              <SidebarTabs
-                currentIndex={currentIndex}
-                onSentenceSelect={handleSentenceSelect}
-                groupedSentences={groupedSentences}
-                skippedIndexes={skippedIndexes}
-                translatedIndexes={translatedIndexes}
-                starredIndexes={starredIndexes}
-                onToggleStar={handleToggleStar}
-                completedIndexes={completedIndexes}
-                isPdfUploaded={isPdfUploaded}
-                onMarkAsReviewed={handleMarkAsReviewed}
-                isSidebarCollapsed={isSidebarCollapsed}
-              />
-            </div>
-            {/* 리사이즈 핸들러 */}
-            <div
-              className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize"
-              onMouseDown={handleResizeStart}
-            />
-          </div>
-          {/* 토글 버튼 */}
-          <button
-            onClick={handleToggleSidebar}
-            className={`fixed top-4 z-50 w-8 h-8 bg-white border rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-all duration-300
-              ${isSidebarCollapsed ? "translate-x-0" : "-translate-x-1/2"}`}
-            style={{ left: isSidebarCollapsed ? `20px` : `${sidebarWidth}px` }}
-          >
-            <FontAwesomeIcon
-              icon={isSidebarCollapsed ? faChevronRight : faChevronLeft}
-              className="text-gray-600"
-            />
-          </button>
-        </div>
-      )}
-
-      {/* 메인 컨텐츠 */}
+    <div className="flex h-screen bg-gray-100">
+      <div
+        className={`flex flex-col bg-white shadow-lg transition-all duration-300 ${
+          isSidebarCollapsed ? "w-16" : ""
+        }`}
+        style={{
+          width: isSidebarCollapsed ? "4rem" : `${sidebarWidth}px`,
+        }}
+      >
+        <SidebarProgress
+          totalPages={totalPages}
+          currentPage={currentPage}
+          currentIndex={currentIndex}
+          totalSentences={groupedSentences.length}
+        />
+        <SidebarTabs
+          currentIndex={currentIndex}
+          onSentenceSelect={handleSentenceSelect}
+          groupedSentences={groupedSentences}
+          skippedIndexes={skippedIndexes}
+          translatedIndexes={translatedIndexes}
+          starredIndexes={starredIndexes}
+          onToggleStar={handleToggleStar}
+          completedIndexes={completedIndexes}
+          isPdfUploaded={isPdfUploaded}
+          onMarkAsReviewed={handleMarkAsReviewed}
+          isSidebarCollapsed={isSidebarCollapsed}
+        />
+      </div>
       <div
         className={`flex-1 transition-all duration-300 ${
           isSidebarCollapsed ? "ml-0" : `ml-[${sidebarWidth}px]`
@@ -429,22 +302,6 @@ export default function Home() {
                 <>
                   <div className="space-y-6">
                     <LanguageSelector onSelectLanguage={setSelectedLanguage} />
-
-                    {/* 번역 진행 상태 표시 */}
-                    {groupedSentences.length > 0 && (
-                      <PageProgress
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        currentIndex={currentIndex}
-                        totalSentences={groupedSentences.length}
-                        completedIndexes={completedIndexes}
-                        onProgressBarClick={handleProgressBarClick}
-                        onProgressBarHover={(e) => handleProgressBarHover(e)}
-                        onProgressBarLeave={() => setShowTooltip(false)}
-                        showTooltip={showTooltip}
-                        tooltipText={tooltipText}
-                      />
-                    )}
 
                     {/* 번역 시작 버튼 */}
                     {isTranslateButtonVisible && (

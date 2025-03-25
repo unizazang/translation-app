@@ -22,7 +22,6 @@ interface SidebarTabsProps {
   translatedIndexes: Set<number>;
   starredIndexes: Set<number>;
   onToggleStar: (index: number) => void;
-  completedIndexes: Set<number>;
   isPdfUploaded: boolean;
   onMarkAsReviewed: (indexes: number[]) => void;
   isSidebarCollapsed: boolean;
@@ -36,7 +35,6 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
   translatedIndexes,
   starredIndexes,
   onToggleStar,
-  completedIndexes,
   isPdfUploaded,
   onMarkAsReviewed,
   isSidebarCollapsed,
@@ -75,7 +73,7 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
           <SentenceList
             currentIndex={currentIndex}
             onSentenceSelect={onSentenceSelect}
-            groupedSentences={groupedSentences}
+            sentences={groupedSentences.flat()}
             skippedIndexes={skippedIndexes}
             translatedIndexes={translatedIndexes}
             starredIndexes={starredIndexes}
@@ -115,7 +113,7 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
         <SidebarProgress
           totalPages={totalPages}
           currentPage={currentPage}
-          completedIndexes={completedIndexes}
+          currentIndex={currentIndex}
           totalSentences={groupedSentences.length}
         />
       )}

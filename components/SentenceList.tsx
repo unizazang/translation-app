@@ -13,12 +13,12 @@ import {
 import ContextMenu from "./ContextMenu";
 
 interface SentenceListProps {
-  groupedSentences: string[][];
+  sentences: string[];
   currentIndex: number;
-  translatedIndexes: Set<number>;
-  skippedIndexes: Set<number>;
-  starredIndexes: Set<number>;
   onSentenceSelect: (index: number) => void;
+  skippedIndexes: Set<number>;
+  translatedIndexes: Set<number>;
+  starredIndexes: Set<number>;
   onToggleStar: (index: number) => void;
   onMarkAsReviewed: (indexes: number[]) => void;
 }
@@ -37,16 +37,16 @@ const truncateText = (text: string, maxLength: number = 20): string => {
   return text.slice(0, maxLength) + "...";
 };
 
-export default function SentenceList({
-  groupedSentences,
+const SentenceList: React.FC<SentenceListProps> = ({
+  sentences,
   currentIndex,
-  translatedIndexes,
-  skippedIndexes,
-  starredIndexes,
   onSentenceSelect,
+  skippedIndexes,
+  translatedIndexes,
+  starredIndexes,
   onToggleStar,
   onMarkAsReviewed,
-}: SentenceListProps) {
+}) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<FilterType>("all");
   const [selectedSentences, setSelectedSentences] = useState<Set<number>>(
@@ -112,9 +112,9 @@ export default function SentenceList({
 
   // 필터링된 문장 목록 계산
   const filteredSentences = useMemo(() => {
-    return groupedSentences
+    return sentences
       .map((sentence, index) => ({
-        text: sentence.join(" "),
+        text: sentence,
         index,
         isTranslated: translatedIndexes.has(index),
         isSkipped: skippedIndexes.has(index),
@@ -145,14 +145,7 @@ export default function SentenceList({
 
         return matchesSearch && matchesFilter;
       });
-  }, [
-    groupedSentences,
-    searchQuery,
-    filter,
-    translatedIndexes,
-    skippedIndexes,
-    starredIndexes,
-  ]);
+  }, [sentences, searchQuery, filter, translatedIndexes, skippedIndexes, starredIndexes]);
 
   // 문장 선택 핸들러
   const handleSentenceClick = useCallback(
@@ -250,6 +243,12 @@ export default function SentenceList({
                     index === currentIndex
                       ? "bg-blue-50 border border-blue-200"
                       : "hover:bg-gray-50 border border-gray-200"
+                  } ${
+                    skippedIndexes.has(index)
+                      ? "bg-gray-100"
+                      : translatedIndexes.has(index)
+                      ? "bg-green-50"
+                      : ""
                   }`}
               >
                 {skippedIndexes.has(index) && (
@@ -300,4 +299,6 @@ export default function SentenceList({
       )}
     </div>
   );
-}
+};
+
+export default SentenceList;
