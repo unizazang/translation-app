@@ -51,9 +51,10 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
   }
 
   const tabs = [
+    { id: "properNouns", label: "예외 단어" },
     { id: "sentences", label: "문장 목록" },
     { id: "settings", label: "설정" },
-    { id: "properNouns", label: "예외 단어" },
+    
   ];
 
   const handleTabChange = (tabId: string) => {
