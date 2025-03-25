@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import Settings from "./Settings";
 import SidebarProgress from "./SidebarProgress";
+import { PdfPageData } from "@/lib/pdfProcessor";
 
 const ProperNounManager = dynamic(() => import("./ProperNounManager"), {
   ssr: false,
@@ -22,9 +23,11 @@ interface SidebarTabsProps {
   translatedIndexes: Set<number>;
   starredIndexes: Set<number>;
   onToggleStar: (index: number) => void;
+  completedIndexes: Set<number>;
   isPdfUploaded: boolean;
   onMarkAsReviewed: (indexes: number[]) => void;
   isSidebarCollapsed: boolean;
+  pdfPages: PdfPageData[][];
 }
 
 const SidebarTabs: React.FC<SidebarTabsProps> = ({
@@ -35,14 +38,14 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
   translatedIndexes,
   starredIndexes,
   onToggleStar,
+  completedIndexes,
   isPdfUploaded,
   onMarkAsReviewed,
   isSidebarCollapsed,
+  pdfPages,
 }) => {
-  const [activeTab, setActiveTab] = useState("sentences");
-  const [slideDirection, setSlideDirection] = useState<"left" | "right">(
-    "right"
-  );
+  const [activeTab, setActiveTab] = useState("properNouns");
+  const [slideDirection, setSlideDirection] = useState<"left" | "right">("right");
 
   if (!isPdfUploaded) {
     return null;
@@ -52,7 +55,6 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
     { id: "properNouns", label: "예외 단어" },
     { id: "sentences", label: "문장 목록" },
     { id: "settings", label: "설정" },
-    
   ];
 
   const handleTabChange = (tabId: string) => {
@@ -63,8 +65,24 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
   };
 
   // 전체 페이지 수 계산
-  const totalPages = Math.ceil(groupedSentences.length / 10);
-  const currentPage = Math.floor(currentIndex / 10) + 1;
+  const totalPages = pdfPages.length;
+  
+  // 현재 문장이 속한 페이지와 문장 수 계산
+  let currentPage = 1;
+  let totalSentencesBeforeCurrentPage = 0;
+  let currentPageSentences = 0;
+  let currentSentenceInPage = 0;
+
+  for (let i = 0; i < pdfPages.length; i++) {
+    const pageSentences = pdfPages[i][0].textBlocks.length;
+    if (currentIndex < totalSentencesBeforeCurrentPage + pageSentences) {
+      currentPage = i + 1;
+      currentPageSentences = pageSentences;
+      currentSentenceInPage = currentIndex - totalSentencesBeforeCurrentPage + 1;
+      break;
+    }
+    totalSentencesBeforeCurrentPage += pageSentences;
+  }
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -73,7 +91,7 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
           <SentenceList
             currentIndex={currentIndex}
             onSentenceSelect={onSentenceSelect}
-            sentences={groupedSentences.flat()}
+            groupedSentences={groupedSentences}
             skippedIndexes={skippedIndexes}
             translatedIndexes={translatedIndexes}
             starredIndexes={starredIndexes}
@@ -110,14 +128,13 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
   return (
     <div className="h-full p-4 flex flex-col bg-white shadow-md rounded-lg">
       {!isSidebarCollapsed && (
-        <div className="mb-4">
-          <SidebarProgress
-            totalPages={totalPages}
-            currentPage={currentPage}
-            currentIndex={currentIndex}
-            totalSentences={groupedSentences.length}
-          />
-        </div>
+        <SidebarProgress
+          totalPages={totalPages}
+          currentPage={currentPage}
+          currentIndex={currentIndex}
+          totalSentences={currentPageSentences}
+          currentSentenceInPage={currentSentenceInPage}
+        />
       )}
       <div className="flex relative pb-4">
         {tabs.map((tab) => (
@@ -162,9 +179,9 @@ const SidebarTabs: React.FC<SidebarTabsProps> = ({
               x: { type: "spring", stiffness: 300, damping: 30 },
               opacity: { duration: 0.2 },
             }}
-            className="absolute inset-0 overflow-hidden"
+            className="absolute inset-0"
           >
-            <div className="h-full overflow-y-auto">
+            <div className="h-[calc(100vh-12rem)] overflow-y-auto">
               {renderTabContent()}
             </div>
           </motion.div>

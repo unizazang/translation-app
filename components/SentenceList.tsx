@@ -13,9 +13,9 @@ import {
 import ContextMenu from "./ContextMenu";
 
 interface SentenceListProps {
-  sentences: string[];
   currentIndex: number;
   onSentenceSelect: (index: number) => void;
+  groupedSentences: string[][];
   skippedIndexes: Set<number>;
   translatedIndexes: Set<number>;
   starredIndexes: Set<number>;
@@ -37,16 +37,16 @@ const truncateText = (text: string, maxLength: number = 20): string => {
   return text.slice(0, maxLength) + "...";
 };
 
-const SentenceList: React.FC<SentenceListProps> = ({
-  sentences,
+export default function SentenceList({
   currentIndex,
   onSentenceSelect,
+  groupedSentences,
   skippedIndexes,
   translatedIndexes,
   starredIndexes,
   onToggleStar,
   onMarkAsReviewed,
-}) => {
+}: SentenceListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<FilterType>("all");
   const [selectedSentences, setSelectedSentences] = useState<Set<number>>(
@@ -112,9 +112,9 @@ const SentenceList: React.FC<SentenceListProps> = ({
 
   // 필터링된 문장 목록 계산
   const filteredSentences = useMemo(() => {
-    return sentences
+    return groupedSentences
       .map((sentence, index) => ({
-        text: sentence,
+        text: sentence.join(" "),
         index,
         isTranslated: translatedIndexes.has(index),
         isSkipped: skippedIndexes.has(index),
@@ -145,7 +145,7 @@ const SentenceList: React.FC<SentenceListProps> = ({
 
         return matchesSearch && matchesFilter;
       });
-  }, [sentences, searchQuery, filter, translatedIndexes, skippedIndexes, starredIndexes]);
+  }, [groupedSentences, searchQuery, filter, translatedIndexes, skippedIndexes, starredIndexes]);
 
   // 문장 선택 핸들러
   const handleSentenceClick = useCallback(
@@ -243,12 +243,6 @@ const SentenceList: React.FC<SentenceListProps> = ({
                     index === currentIndex
                       ? "bg-blue-50 border border-blue-200"
                       : "hover:bg-gray-50 border border-gray-200"
-                  } ${
-                    skippedIndexes.has(index)
-                      ? "bg-gray-100"
-                      : translatedIndexes.has(index)
-                      ? "bg-green-50"
-                      : ""
                   }`}
               >
                 {skippedIndexes.has(index) && (
@@ -299,6 +293,4 @@ const SentenceList: React.FC<SentenceListProps> = ({
       )}
     </div>
   );
-};
-
-export default SentenceList;
+}

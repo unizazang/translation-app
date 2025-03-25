@@ -61,6 +61,7 @@ export default function Home() {
   );
   const [shouldAutoTranslate, setShouldAutoTranslate] =
     useState<boolean>(false);
+  const [pdfPages, setPdfPages] = useState<PdfPageData[][]>([]);
 
   const { properNouns } = useProperNoun();
   const { groupedSentences, processText } = useTextProcessing();
@@ -110,6 +111,8 @@ export default function Home() {
   }, []);
 
   const handleTextExtracted = (extractedText: PdfPageData[][]) => {
+    console.log("✅ handleTextExtracted 실행됨! 추출된 텍스트:", extractedText);
+    setPdfPages(extractedText);
     const extractedString = extractedText
       .map((page) => page.map((block) => block.text).join(" "))
       .join("\n\n");
@@ -249,40 +252,57 @@ export default function Home() {
   }, [properNouns]);
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="min-h-screen flex">
+      {/* 사이드바 */}
       {isPdfUploaded && (
-        <>
+        <div className="relative" style={{ width: sidebarWidth }}>
+          {/* 외부 컨테이너: 토글 버튼 포함 */}
+          <div
+            className="fixed top-0 h-screen border-r bg-white transition-all duration-300 overflow-hidden"
+            style={{
+              width: sidebarWidth,
+              left: isSidebarCollapsed ? -sidebarWidth : 0,
+            }}
+          >
+            {/* 내부 컨테이너 */}
+            <div className="h-full">
+              <SidebarTabs
+                currentIndex={currentIndex}
+                onSentenceSelect={handleSentenceSelect}
+                groupedSentences={groupedSentences}
+                skippedIndexes={skippedIndexes}
+                translatedIndexes={translatedIndexes}
+                starredIndexes={starredIndexes}
+                onToggleStar={handleToggleStar}
+                completedIndexes={completedIndexes}
+                isPdfUploaded={isPdfUploaded}
+                onMarkAsReviewed={handleMarkAsReviewed}
+                isSidebarCollapsed={isSidebarCollapsed}
+                pdfPages={pdfPages}
+              />
+            </div>
+            {/* 리사이즈 핸들러 */}
+            <div
+              className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize"
+              onMouseDown={handleResizeStart}
+            />
+          </div>
+          {/* 토글 버튼 */}
           <button
             onClick={handleToggleSidebar}
-            className="fixed left-0 top-1/2 transform -translate-y-1/2 z-50 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 transition-colors"
+            className={`fixed top-4 z-50 w-8 h-8 bg-white border rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-all duration-300
+              ${isSidebarCollapsed ? "translate-x-0" : "-translate-x-1/2"}`}
+            style={{ left: isSidebarCollapsed ? `20px` : `${sidebarWidth}px` }}
           >
             <FontAwesomeIcon
               icon={isSidebarCollapsed ? faChevronRight : faChevronLeft}
               className="text-gray-600"
             />
           </button>
-          <div className={`fixed left-0 top-0 min-h-screen flex flex-col bg-white shadow-lg transition-all duration-300 ${
-            isSidebarCollapsed ? "w-16" : ""
-          }`} style={{
-            width: isSidebarCollapsed ? "4rem" : `${sidebarWidth}px`,
-          }}>
-            <SidebarTabs
-              currentIndex={currentIndex}
-              onSentenceSelect={handleSentenceSelect}
-              groupedSentences={groupedSentences}
-              skippedIndexes={skippedIndexes}
-              translatedIndexes={translatedIndexes}
-              starredIndexes={starredIndexes}
-              onToggleStar={handleToggleStar}
-              isPdfUploaded={isPdfUploaded}
-              onMarkAsReviewed={handleMarkAsReviewed}
-              isSidebarCollapsed={isSidebarCollapsed}
-            />
-          </div>
-        </>
+        </div>
       )}
       <div className={`flex-1 transition-all duration-300 ${
-        isSidebarCollapsed ? "ml-16" : `ml-[${sidebarWidth}px]`
+        isSidebarCollapsed ? "ml-0" : `ml-[${sidebarWidth}px]`
       }`}>
         <div className="p-6">
           <div className="w-full max-w-4xl mx-auto space-y-6">
