@@ -20,7 +20,6 @@ interface SentenceListProps {
   translatedIndexes: Set<number>;
   starredIndexes: Set<number>;
   onToggleStar: (index: number) => void;
-  onMarkAsReviewed: (indexes: number[]) => void;
 }
 
 type FilterType =
@@ -45,13 +44,9 @@ export default function SentenceList({
   translatedIndexes,
   starredIndexes,
   onToggleStar,
-  onMarkAsReviewed,
 }: SentenceListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<FilterType>("all");
-  const [selectedSentences, setSelectedSentences] = useState<Set<number>>(
-    new Set()
-  );
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
@@ -74,23 +69,6 @@ export default function SentenceList({
     []
   );
 
-  // 체크박스 선택 핸들러
-  const handleCheckboxChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-      e.stopPropagation();
-      setSelectedSentences((prev) => {
-        const newSet = new Set(prev);
-        if (e.target.checked) {
-          newSet.add(index);
-        } else {
-          newSet.delete(index);
-        }
-        return newSet;
-      });
-    },
-    []
-  );
-
   // 우클릭 핸들러
   const handleContextMenu = useCallback(
     (e: React.MouseEvent, index: number) => {
@@ -101,14 +79,6 @@ export default function SentenceList({
     },
     [skippedIndexes]
   );
-
-  // 일괄 검토 완료 핸들러
-  const handleBulkMarkAsReviewed = useCallback(() => {
-    if (selectedSentences.size > 0) {
-      onMarkAsReviewed(Array.from(selectedSentences));
-      setSelectedSentences(new Set());
-    }
-  }, [selectedSentences, onMarkAsReviewed]);
 
   // 필터링된 문장 목록 계산
   const filteredSentences = useMemo(() => {
@@ -218,14 +188,6 @@ export default function SentenceList({
           <option value="pending">대기중</option>
           <option value="bookmarked">북마크</option>
         </select>
-        {selectedSentences.size > 0 && (
-          <button
-            onClick={handleBulkMarkAsReviewed}
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition whitespace-nowrap"
-          >
-            일괄 검토 완료 ({selectedSentences.size})
-          </button>
-        )}
       </div>
 
       <div className="flex-1 overflow-y-auto pr-2 h-[calc(100vh-12rem)]">
@@ -245,14 +207,6 @@ export default function SentenceList({
                       : "hover:bg-gray-50 border border-gray-200"
                   }`}
               >
-                {skippedIndexes.has(index) && (
-                  <input
-                    type="checkbox"
-                    checked={selectedSentences.has(index)}
-                    onChange={(e) => handleCheckboxChange(e, index)}
-                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
-                  />
-                )}
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-500">#{index + 1}</span>
@@ -284,10 +238,6 @@ export default function SentenceList({
         <ContextMenu
           x={contextMenu.x}
           y={contextMenu.y}
-          onMarkAsReviewed={() => {
-            onMarkAsReviewed([contextMenu.index]);
-            setContextMenu(null);
-          }}
           onClose={() => setContextMenu(null)}
         />
       )}

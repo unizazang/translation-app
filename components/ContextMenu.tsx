@@ -5,16 +5,10 @@ import React, { useEffect, useRef } from "react";
 interface ContextMenuProps {
   x: number;
   y: number;
-  onMarkAsReviewed: () => void;
   onClose: () => void;
 }
 
-const ContextMenu: React.FC<ContextMenuProps> = ({
-  x,
-  y,
-  onMarkAsReviewed,
-  onClose,
-}) => {
+const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, onClose }) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -37,10 +31,10 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       style={{ left: x, top: y }}
     >
       <button
-        onClick={onMarkAsReviewed}
-        className="w-full px-4 py-2 text-left hover:bg-gray-100 text-gray-700"
+        onClick={onClose}
+        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
       >
-        ✅ 검토 완료
+        닫기
       </button>
     </div>
   );

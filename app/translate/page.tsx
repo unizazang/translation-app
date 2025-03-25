@@ -276,7 +276,6 @@ export default function Home() {
                 onToggleStar={handleToggleStar}
                 completedIndexes={completedIndexes}
                 isPdfUploaded={isPdfUploaded}
-                onMarkAsReviewed={handleMarkAsReviewed}
                 isSidebarCollapsed={isSidebarCollapsed}
                 pdfPages={pdfPages}
               />
