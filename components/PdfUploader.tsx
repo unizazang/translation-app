@@ -35,9 +35,9 @@ export default function PdfUploader({ onTextExtracted }: PdfUploaderProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="p-4 border rounded-lg bg-gray-50"
+      className="p-4 rounded-lg bg-gray-50"
     >
-      <h2 className="text-xl font-semibold mb-4">
+      <h2 className="text-xl text-center font-semibold mt-4 mb-6">
         PDF를 올리고 지금 바로 시작해보세요!
       </h2>
       <AnimatePresence mode="wait">

@@ -416,7 +416,7 @@ export default function Home() {
         >
           <div className="w-full max-w-4xl space-y-6">
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h1 className="text-3xl font-bold text-gray-800 mb-8">
+              <h1 className="text-3xl text-center font-bold text-gray-800 mb-8">
                 PDF 번역기
               </h1>
 

@@ -11,6 +11,7 @@ import {
   faBook,
   faNewspaper,
   faPenToSquare,
+  faBookmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { useRef } from "react";
 
@@ -21,9 +22,9 @@ const features = [
     description: "PDF에서 텍스트를 자동 추출하여 편리하게 활용하세요.",
   },
   {
-    icon: faNewspaper,
-    title: "컬럼 형식 지원",
-    description: "신문, 논문 등 복잡한 다단 형식 PDF도 문제없이 추출합니다.",
+    icon: faBook,
+    title: "사용자 번역 사전",
+    description: "나만의 번역 사전을 만들고, 단어를 원하는 대로 번역하세요.",
   },
   {
     icon: faLanguage,
@@ -32,20 +33,21 @@ const features = [
       "Google, Papago, DeepL의 번역 결과를 한 곳에서 비교하고 최적의 번역을 선택하세요.",
   },
   {
-    icon: faStar,
-    title: "즐겨찾기",
+    icon: faNewspaper,
+    title: "컬럼 형식 지원",
     description:
-      "중요한 문장을 즐겨찾기에 추가하여 나중에 쉽게 찾아볼 수 있습니다.",
+      "신문, 논문 등 복잡한 다단 형식 PDF도 문제없이 추출 가능합니다.",
+  },
+
+  {
+    icon: faBookmark,
+    title: "북마크 기능",
+    description: "중요한 문장을 북마크에 추가하여 쉽게 찾아볼 수 있습니다.",
   },
   {
     icon: faPenToSquare,
     title: "번역 결과 편집",
     description: "번역된 텍스트를 자유롭게 편집하고 저장할 수 있습니다.",
-  },
-  {
-    icon: faBook,
-    title: "사용자 번역 사전",
-    description: "나만의 번역 사전을 만들고, 단어를 원하는 대로 번역하세요.",
   },
 ];
 

@@ -5,10 +5,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
   faForward,
-  faStar as faStarSolid,
-  faStar as faStarRegular,
   faClock,
-  faStar,
+  faBookmark,
 } from "@fortawesome/free-solid-svg-icons";
 import ContextMenu from "./ContextMenu";
 
@@ -272,13 +270,18 @@ export default function SentenceList({
                   {getStatusIcon(status)}
                   <button
                     onClick={(e) => handleStarClick(e, index)}
-                    className={`p-1 rounded-full hover:bg-gray-100 transition-colors ${
+                    className={`absolute -top-2 right-4 p-1 rounded-full hover:bg-gray-100 transition-colors ${
                       starredIndexes.has(index)
                         ? "text-yellow-400"
                         : "text-gray-400"
                     }`}
                   >
-                    <FontAwesomeIcon icon={faStar} />
+                    <FontAwesomeIcon
+                      icon={faBookmark}
+                      className={`text-xl transform rotate-12 ${
+                        starredIndexes.has(index) ? "scale-110" : "scale-100"
+                      } transition-transform duration-200`}
+                    />
                   </button>
                 </div>
               </li>
