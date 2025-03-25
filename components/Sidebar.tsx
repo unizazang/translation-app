@@ -1,6 +1,7 @@
 import SidebarTabs from "./SidebarTabs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight, faChevronLeft } from "@fortawesome/free-solid-svg-icons";
+import { PdfPageData } from "../lib/pdfProcessor";
 
 interface SidebarProps {
   currentIndex: number;
@@ -10,10 +11,11 @@ interface SidebarProps {
   translatedIndexes: Set<number>;
   starredIndexes: Set<number>;
   onToggleStar: (index: number) => void;
-  onMarkAsReviewed: (indexes: number[]) => void;
   isSidebarCollapsed: boolean;
   onToggleSidebar: () => void;
   isPdfUploaded: boolean;
+  completedIndexes: Set<number>;
+  pdfPages: PdfPageData[][];
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -24,10 +26,11 @@ const Sidebar: React.FC<SidebarProps> = ({
   translatedIndexes,
   starredIndexes,
   onToggleStar,
-  onMarkAsReviewed,
   isSidebarCollapsed,
   onToggleSidebar,
   isPdfUploaded,
+  completedIndexes,
+  pdfPages,
 }) => {
   if (!isPdfUploaded) {
     return null;
@@ -55,8 +58,9 @@ const Sidebar: React.FC<SidebarProps> = ({
         starredIndexes={starredIndexes}
         onToggleStar={onToggleStar}
         isPdfUploaded={isPdfUploaded}
-        onMarkAsReviewed={onMarkAsReviewed}
         isSidebarCollapsed={isSidebarCollapsed}
+        completedIndexes={completedIndexes}
+        pdfPages={pdfPages}
       />
     </div>
   );
