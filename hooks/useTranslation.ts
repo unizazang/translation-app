@@ -209,5 +209,6 @@ export function useTranslation() {
     setAutoMove,
     targetLanguage,
     setTargetLanguage,
+    setTranslations,
   };
 }

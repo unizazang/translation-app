@@ -63,6 +63,7 @@ export default function Home() {
   const [shouldAutoTranslate, setShouldAutoTranslate] =
     useState<boolean>(false);
   const [pdfPages, setPdfPages] = useState<PdfPageData[][]>([]);
+  const [cachedTranslations, setCachedTranslations] = useState<Record<number, any>>({});
 
   const { properNouns } = useProperNoun();
   const { groupedSentences, processText } = useTextProcessing();
@@ -76,6 +77,7 @@ export default function Home() {
     autoMove,
     setAutoMove,
     setTargetLanguage: setTranslationTargetLanguage,
+    setTranslations,
   } = useTranslation();
 
   // 리사이즈 훅 사용
@@ -140,15 +142,26 @@ export default function Home() {
   };
 
   const handleTranslate = async (index: number) => {
-    if (groupedSentences[index]) {
-      setIsTranslating(true);
-      await translateText(
-        groupedSentences[index].join(" "),
-        selectedLanguage,
-        index,
-        properNouns
-      );
-      setIsTranslating(false);
+    try {
+      // 캐시된 번역 결과가 있는지 확인
+      if (cachedTranslations[index]) {
+        setTranslations(cachedTranslations[index]);
+        console.log("📌 캐시된 번역 결과 사용:", cachedTranslations[index]);
+        return;
+      }
+
+      if (groupedSentences[index]) {
+        setIsTranslating(true);
+        await translateText(
+          groupedSentences[index].join(" "),
+          selectedLanguage,
+          index,
+          properNouns
+        );
+        setIsTranslating(false);
+      }
+    } catch (error) {
+      console.error("Translation Error:", error);
     }
   };
 
@@ -174,13 +187,14 @@ export default function Home() {
     if (currentIndex < groupedSentences.length - 1) {
       const nextIndex = currentIndex + 1;
       setCurrentIndex(nextIndex);
-      handleSentenceSelect(nextIndex);
+      setShouldAutoTranslate(true);
     }
   };
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
       setCurrentIndex((prevIndex) => prevIndex - 1);
+      setShouldAutoTranslate(true);
     }
   };
 
@@ -196,6 +210,12 @@ export default function Home() {
         );
         setTranslatedIndexes((prev) => new Set([...prev, currentIndex]));
         setCompletedIndexes((prev) => new Set([...prev, currentIndex]));
+
+        // 번역 결과를 캐시에 저장
+        setCachedTranslations((prev) => ({
+          ...prev,
+          [currentIndex]: translations
+        }));
 
         // 번역된 블록 업데이트
         setTranslatedBlocks((prev) => {
@@ -251,8 +271,9 @@ export default function Home() {
       currentIndex < groupedSentences.length
     ) {
       handleTranslate(currentIndex);
+      setShouldAutoTranslate(false); // 번역 완료 후 자동 번역 비활성화
     }
-  }, [properNouns]);
+  }, [currentIndex, shouldAutoTranslate, groupedSentences]);
 
   return (
     <div className="min-h-screen flex">
