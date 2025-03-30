@@ -1,0 +1,92 @@
+{
+  "rules": {
+    "language": "ko",
+    "codeStyle": {
+      "indentation": "spaces",
+      "spacesPerIndent": 2,
+      "maxLineLength": 100
+    },
+    "naming": {
+      "components": "PascalCase",
+      "functions": "camelCase",
+      "variables": "camelCase",
+      "constants": "UPPER_SNAKE_CASE"
+    },
+    "documentation": {
+      "requireJSDoc": true,
+      "requireComponentProps": true
+    },
+    "testing": {
+      "requireTests": true,
+      "testNaming": "*.test.ts"
+    },
+    "promptRules": {
+      "implementationStrategy": {
+        "description": "기존 기능과 로직을 최대한 활용하여 구현 계획을 세우고 실행",
+        "steps": [
+          "현재 구현된 기능과 로직을 분석",
+          "구현 계획을 상세히 수립",
+          "수정이 필요한 파일과 순서를 명확히 정의",
+          "구현 계획에 따른 작업 목록 작성"
+        ]
+      },
+      "codeModification": {
+        "description": "기존 코드 보존 및 안전한 수정",
+        "rules": [
+          "기존 코드는 필수적인 경우에만 수정",
+          "기존 기능과 로직을 최대한 활용",
+          "새로운 기능은 기존 코드와 충돌하지 않도록 구현"
+        ]
+      },
+      "typescriptGuidelines": {
+        "description": "TypeScript 타입 안전성 보장",
+        "rules": [
+          "기존 타입과의 충돌 방지",
+          "타입 수정 시 사이드 이펙트 최소화",
+          "hooks, components, states, interfaces 간의 타입 일관성 유지"
+        ]
+      },
+      "styling": {
+        "description": "Tailwind CSS 사용",
+        "rules": [
+          "모든 스타일 수정은 Tailwind CSS 클래스로 구현",
+          "기존 스타일과의 일관성 유지"
+        ]
+      },
+      "complexFileHandling": {
+        "description": "복잡한 파일 처리 지침",
+        "rules": [
+          "/translate/page.tsx 파일 수정 시 사전 분석 필수",
+          "수정 계획 수립 후 코드 변경",
+          "기존 기능 보존 확인"
+        ]
+      },
+      "selfReview": {
+        "description": "구현 계획 준수 확인",
+        "rules": [
+          "구현 계획과의 일치성 지속적 검토",
+          "진행 상황 모니터링",
+          "필요한 경우 계획 조정"
+        ]
+      },
+      "progressReporting": {
+        "description": "진행 상황 보고 규칙",
+        "rules": [
+          "이전 단계의 구현 계획 대비 현재 진행 상황 명확히 보고",
+          "남은 작업 목록 상세히 분석하여 보고",
+          "각 단계별 완료 여부와 다음 단계 계획 명시"
+        ]
+      },
+      "codeReviewRules": {
+        "description": "코드 재검토 규칙",
+        "rules": [
+          "수정된 모든 파일 꼼꼼한 재검토 필수",
+          "기존 코드의 의도치 않은 수정/삭제 여부 확인",
+          "요구사항과 무관한 코드 변경 사항 식별",
+          "기존 기능 보존 상태 확인",
+          "변경 사항의 영향도 분석"
+        ]
+      }
+    }
+  }
+} 
