@@ -41,6 +41,7 @@ const SavedTranslations = dynamicComponent(
 export default function Home() {
   const [pdfText, setPdfText] = useState<string>("");
   const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
+  const [targetLanguage, setTargetLanguage] = useState<string>("ko");
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isTranslating, setIsTranslating] = useState<boolean>(false);
   const [isPdfUploaded, setIsPdfUploaded] = useState<boolean>(false);
@@ -73,6 +74,8 @@ export default function Home() {
     savedTranslations,
     copyAllTranslations,
     autoMove,
+    setAutoMove,
+    setTargetLanguage: setTranslationTargetLanguage,
   } = useTranslation();
 
   // 리사이즈 훅 사용
@@ -318,7 +321,13 @@ export default function Home() {
               ) : (
                 <>
                   <div className="space-y-6">
-                    <LanguageSelector onSelectLanguage={setSelectedLanguage} />
+                    <LanguageSelector
+                      onSelectSourceLanguage={setSelectedLanguage}
+                      onSelectTargetLanguage={(lang) => {
+                        setTargetLanguage(lang);
+                        setTranslationTargetLanguage(lang);
+                      }}
+                    />
 
                     {/* 번역 시작 버튼 */}
                     {isTranslateButtonVisible && (

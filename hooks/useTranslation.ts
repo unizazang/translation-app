@@ -33,6 +33,7 @@ export function useTranslation() {
 
   // 자동 이동 설정 상태 추가
   const [autoMove, setAutoMove] = useState<boolean>(false);
+  const [targetLanguage, setTargetLanguage] = useState<string>("ko");
 
   // ✅ 저장된 번역 목록을 관리하는 상태
   const [savedTranslations, setSavedTranslations] = useState<
@@ -102,36 +103,36 @@ export function useTranslation() {
     text: string,
     sourceLang: string,
     index: number,
-    properNouns?: { original: string; translation: string }[] // ✅ 선택적 인자로 전달
+    properNouns?: { original: string; translation: string }[]
   ) => {
     try {
-      // 캐시된 번역 결과가 있는지 확인
       if (cachedTranslations[index]) {
         setTranslations(cachedTranslations[index]);
         console.log("📌 캐시된 번역 결과 사용:", cachedTranslations[index]);
         return;
       }
       const papagoLang = normalizeLanguageForPapago(sourceLang);
+      const papagoTargetLang = normalizeLanguageForPapago(targetLanguage);
 
       const cleanedText = cleanExtractedText(text);
 
       const { transformedText, tokenMap } = replaceProperNounsWithTokens(
         cleanedText,
-        properNouns || [] // ✅ properNouns가 없으면 빈 배열([]) 사용
+        properNouns || []
       );
 
-      console.log("📌 번역 전 텍스트:", transformedText); // ✅ 번역 전 텍스트 로그 추가
+      console.log("📌 번역 전 텍스트:", transformedText);
 
       const [google, papago, deepL] = await Promise.all([
-        translateWithGoogle(transformedText, sourceLang),
-        translateWithPapago(transformedText, papagoLang),
-        translateWithDeepL(transformedText, sourceLang),
+        translateWithGoogle(transformedText, sourceLang, targetLanguage),
+        translateWithPapago(transformedText, papagoLang, papagoTargetLang),
+        translateWithDeepL(transformedText, sourceLang, targetLanguage),
       ]);
 
       const newTranslations = {
         google: restoreProperNounsFromTokens(google || "", tokenMap),
         papago: restoreProperNounsFromTokens(
-          papago?.replace(/PPER_NUN_(\d+)/g, "PPER_NOUN_$1") || "", // ✅ 변형된 토큰 복구
+          papago?.replace(/PPER_NUN_(\d+)/g, "PPER_NOUN_$1") || "",
           tokenMap
         ),
         deepL: restoreProperNounsFromTokens(deepL || "", tokenMap),
@@ -206,5 +207,7 @@ export function useTranslation() {
     resetAllTranslations,
     autoMove,
     setAutoMove,
+    targetLanguage,
+    setTargetLanguage,
   };
 }

@@ -3,36 +3,61 @@
 import { useState } from "react";
 
 interface LanguageSelectorProps {
-  onSelectLanguage: (language: string) => void;
+  onSelectSourceLanguage: (language: string) => void;
+  onSelectTargetLanguage: (language: string) => void;
 }
 
 export default function LanguageSelector({
-  onSelectLanguage,
+  onSelectSourceLanguage,
+  onSelectTargetLanguage,
 }: LanguageSelectorProps) {
-  const [selectedLanguage, setSelectedLanguage] = useState("en");
+  const [sourceLanguage, setSourceLanguage] = useState("en");
+  const [targetLanguage, setTargetLanguage] = useState("ko");
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleSourceLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const language = event.target.value;
-    setSelectedLanguage(language);
-    onSelectLanguage(language);
+    setSourceLanguage(language);
+    onSelectSourceLanguage(language);
+  };
+
+  const handleTargetLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const language = event.target.value;
+    setTargetLanguage(language);
+    onSelectTargetLanguage(language);
   };
 
   return (
-    <div className="text-black">
-      <label htmlFor="language" className=" text-black">
-        번역을 시작할 언어:{" "}
-      </label>
-      <select
-        className="text-black"
-        id="language"
-        value={selectedLanguage}
-        onChange={handleChange}
-      >
-        <option value="en">영어</option>
-        <option value="zh">중국어</option>
-        <option value="ja">일본어</option>
-      </select>
-      <p className="text-gray-500">번역된 결과는 한국어로 제공됩니다.</p>
+    <div className="flex flex-col gap-4 text-black">
+      <div>
+        <label htmlFor="sourceLanguage" className="text-black">
+          번역을 시작할 언어:{" "}
+        </label>
+        <select
+          className="text-black"
+          id="sourceLanguage"
+          value={sourceLanguage}
+          onChange={handleSourceLanguageChange}
+        >
+          <option value="en">영어</option>
+          <option value="zh">중국어</option>
+          <option value="ja">일본어</option>
+          <option value="ko">한국어</option>
+        </select>
+      </div>
+      <div>
+        <label htmlFor="targetLanguage" className="text-black">
+          번역 완료 언어:{" "}
+        </label>
+        <select
+          className="text-black"
+          id="targetLanguage"
+          value={targetLanguage}
+          onChange={handleTargetLanguageChange}
+        >
+          <option value="ko">한국어</option>
+          <option value="en">영어</option>
+        </select>
+      </div>
     </div>
   );
 }

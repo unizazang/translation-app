@@ -8,14 +8,14 @@ const DEEPL_API_KEY = process.env.DEEPL_API_KEY;
 
 export async function POST(req: NextRequest) {
   try {
-    const { text, sourceLang, provider } = await req.json();
+    const { text, sourceLang, targetLang, provider } = await req.json();
     let translatedText = "";
 
     if (provider === "papago") {
       console.log("🔹 Papago API 요청 시작:", text);
       const response = await axios.post(
         "https://naveropenapi.apigw.ntruss.com/nmt/v1/translation",
-        { source: sourceLang || "auto", target: "ko", text },
+        { source: sourceLang || "auto", target: targetLang || "ko", text },
         {
           headers: {
             "X-NCP-APIGW-API-KEY-ID": PAPAGO_API_KEY_ID!,
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
         new URLSearchParams({
           text,
           source_lang: sourceLang.toUpperCase(),
-          target_lang: "KO",
+          target_lang: (targetLang || "ko").toUpperCase(),
         }),
         {
           headers: { Authorization: `DeepL-Auth-Key ${DEEPL_API_KEY}` },

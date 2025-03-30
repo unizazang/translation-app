@@ -3,11 +3,12 @@ import axios from "axios";
 /**
  * ✅ Next.js API Route를 통해 Papago 번역 요청
  */
-export async function translateWithPapago(text: string, sourceLang: string) {
+export async function translateWithPapago(text: string, sourceLang: string, targetLang: string = "ko") {
   try {
     const response = await axios.post("/api/translate", {
       text,
       sourceLang,
+      targetLang,
       provider: "papago",
     });
 
@@ -24,11 +25,12 @@ export async function translateWithPapago(text: string, sourceLang: string) {
 /**
  * ✅ Next.js API Route를 통해 DeepL 번역 요청
  */
-export async function translateWithDeepL(text: string, sourceLang: string) {
+export async function translateWithDeepL(text: string, sourceLang: string, targetLang: string = "ko") {
   try {
     const response = await axios.post("/api/translate", {
       text,
       sourceLang,
+      targetLang,
       provider: "deepl",
     });
 
@@ -49,10 +51,10 @@ const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
 export async function translateWithGoogle(
   text: string,
   sourceLang: string,
-  targetLang = "ko"
+  targetLang: string = "ko"
 ) {
   try {
-    console.log("🔹 Google API 요청 시작:", text, sourceLang);
+    console.log("🔹 Google API 요청 시작:", text, sourceLang, targetLang);
     const response = await axios.post(
       `https://translation.googleapis.com/language/translate/v2?key=${GOOGLE_API_KEY}`,
       {
