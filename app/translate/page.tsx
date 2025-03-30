@@ -63,12 +63,22 @@ export default function Home() {
   const [shouldAutoTranslate, setShouldAutoTranslate] =
     useState<boolean>(false);
   const [pdfPages, setPdfPages] = useState<PdfPageData[][]>([]);
+  const [translations, setTranslations] = useState<{
+    google: string;
+    papago: string;
+    deepL: string;
+  }>({
+    google: "",
+    papago: "",
+    deepL: "",
+  });
+
   const [cachedTranslations, setCachedTranslations] = useState<Record<number, any>>({});
 
   const { properNouns } = useProperNoun();
   const { groupedSentences, processText } = useTextProcessing();
   const {
-    translations,
+    translations: translationContext,
     translateText,
     saveTranslation,
     updateTranslation,
@@ -77,7 +87,7 @@ export default function Home() {
     autoMove,
     setAutoMove,
     setTargetLanguage: setTranslationTargetLanguage,
-    setTranslations,
+    setTranslations: setTranslationContextTranslations,
   } = useTranslation();
 
   // 리사이즈 훅 사용
@@ -141,29 +151,137 @@ export default function Home() {
     setTranslatedBlocks(initialTranslatedBlocks);
   };
 
-  const handleTranslate = async (index: number) => {
-    try {
-      // 캐시된 번역 결과가 있는지 확인
-      if (cachedTranslations[index]) {
-        setTranslations(cachedTranslations[index]);
-        console.log("📌 캐시된 번역 결과 사용:", cachedTranslations[index]);
-        return;
-      }
+  // 캐시 데이터 검증 함수
+  const validateCacheData = useCallback((data: any): boolean => {
+    if (!data) return false;
+    if (!data.google || typeof data.google !== 'string' || data.google.length === 0) return false;
+    return true;
+  }, []);
 
-      if (groupedSentences[index]) {
-        setIsTranslating(true);
-        await translateText(
-          groupedSentences[index].join(" "),
-          selectedLanguage,
-          index,
-          properNouns
-        );
-        setIsTranslating(false);
+  // 캐시 체크 함수
+  const checkCache = useCallback((index: number): boolean => {
+    const cached = cachedTranslations[index];
+    if (!cached) return false;
+    
+    // 캐시 데이터 구조 검증
+    if (!validateCacheData(cached)) {
+      console.warn('⚠️ 유효하지 않은 캐시 데이터:', { index, cached });
+      return false;
+    }
+    
+    return true;
+  }, [cachedTranslations, validateCacheData]);
+
+  // localStorage 관련 유틸리티 함수
+  const loadCachedTranslations = useCallback(() => {
+    try {
+      const savedCache = localStorage.getItem('cachedTranslations');
+      if (savedCache) {
+        const parsedCache = JSON.parse(savedCache);
+        // 저장된 캐시 데이터 검증
+        const validCache = Object.entries(parsedCache).reduce((acc, [key, value]) => {
+          if (validateCacheData(value)) {
+            acc[Number(key)] = value;
+          }
+          return acc;
+        }, {} as Record<number, any>);
+
+        console.log('📥 localStorage에서 캐시 로드:', {
+          totalCached: Object.keys(validCache).length,
+          cachedIndexes: Object.keys(validCache),
+          invalidEntries: Object.keys(parsedCache).length - Object.keys(validCache).length
+        });
+        return validCache;
       }
     } catch (error) {
-      console.error("Translation Error:", error);
+      console.error('❌ 캐시 로드 실패:', error);
     }
-  };
+    return {};
+  }, [validateCacheData]);
+
+  const saveCachedTranslations = useCallback((cache: Record<number, any>) => {
+    try {
+      // 저장 전 캐시 데이터 검증
+      const validCache = Object.entries(cache).reduce((acc, [key, value]) => {
+        if (validateCacheData(value)) {
+          acc[Number(key)] = value;
+        }
+        return acc;
+      }, {} as Record<number, any>);
+
+      localStorage.setItem('cachedTranslations', JSON.stringify(validCache));
+      console.log('💾 localStorage에 캐시 저장:', {
+        totalCached: Object.keys(validCache).length,
+        cachedIndexes: Object.keys(validCache),
+        invalidEntries: Object.keys(cache).length - Object.keys(validCache).length
+      });
+    } catch (error) {
+      console.error('❌ 캐시 저장 실패:', error);
+    }
+  }, [validateCacheData]);
+
+  // PDF 파일 업로드 시 캐시 로드
+  useEffect(() => {
+    if (pdfText) {
+      const loadedCache = loadCachedTranslations();
+      setCachedTranslations(loadedCache);
+    }
+  }, [pdfText, loadCachedTranslations]);
+
+  // 번역 시작 시 캐시 체크
+  const handleTranslate = useCallback(async (index: number) => {
+    console.log("🔄 번역 시작:", {
+      index,
+      hasCache: checkCache(index),
+      cachedTranslations: Object.keys(cachedTranslations)
+    });
+
+    // 캐시된 번역 결과가 있으면 바로 사용
+    if (checkCache(index)) {
+      console.log("📌 캐시된 번역 결과 사용:", {
+        index,
+        translations: cachedTranslations[index]
+      });
+      setTranslationContextTranslations(cachedTranslations[index]);
+      setIsTranslating(false);
+      return;
+    }
+
+    try {
+      console.log("🌐 API 호출로 번역 시작:", {
+        index,
+        text: groupedSentences[index].join(" ")
+      });
+      setIsTranslating(true);
+      await translateText(
+        groupedSentences[index].join(" "),
+        selectedLanguage,
+        index,
+        properNouns
+      );
+      
+      // 번역 결과를 캐시에 저장
+      if (translationContext.google) {
+        console.log("💾 번역 결과 캐시 저장 (handleTranslate):", {
+          index,
+          translations: translationContext
+        });
+        setCachedTranslations(prev => {
+          const newCache = {
+            ...prev,
+            [index]: translationContext
+          };
+          saveCachedTranslations(newCache);
+          return newCache;
+        });
+      }
+      
+      setIsTranslating(false);
+    } catch (error) {
+      console.error("🚨 번역 에러:", error);
+      setIsTranslating(false);
+    }
+  }, [groupedSentences, properNouns, checkCache, cachedTranslations, setTranslationContextTranslations, saveCachedTranslations, translationContext]);
 
   // 건너뛰기 처리 함수
   const handleSkip = () => {
@@ -183,39 +301,98 @@ export default function Home() {
     });
   };
 
+  // 다음 문장 이동
   const handleNext = () => {
     if (currentIndex < groupedSentences.length - 1) {
       const nextIndex = currentIndex + 1;
-      setCurrentIndex(nextIndex);
-      setShouldAutoTranslate(true);
+      console.log("⏭️ 다음 문장으로 이동:", {
+        currentIndex,
+        nextIndex,
+        hasCache: checkCache(nextIndex),
+        cachedTranslations: Object.keys(cachedTranslations)
+      });
+
+      // 캐시된 번역 결과가 있으면 바로 사용
+      if (checkCache(nextIndex)) {
+        console.log("📌 캐시된 번역 결과 사용 (다음):", {
+          index: nextIndex,
+          translations: cachedTranslations[nextIndex]
+        });
+        setTranslationContextTranslations(cachedTranslations[nextIndex]);
+        setCurrentIndex(nextIndex);
+      } else {
+        // 캐시된 결과가 없을 때만 API 호출
+        setCurrentIndex(nextIndex);
+        setTimeout(() => {
+          setShouldAutoTranslate(true);
+        }, 0);
+      }
     }
   };
 
+  // 이전 문장 이동
   const handlePrevious = () => {
     if (currentIndex > 0) {
-      setCurrentIndex((prevIndex) => prevIndex - 1);
-      setShouldAutoTranslate(true);
+      const prevIndex = currentIndex - 1;
+      console.log("⏮️ 이전 문장으로 이동:", {
+        currentIndex,
+        prevIndex,
+        hasCache: checkCache(prevIndex),
+        cachedTranslations: Object.keys(cachedTranslations)
+      });
+
+      // 캐시된 번역 결과가 있으면 바로 사용
+      if (checkCache(prevIndex)) {
+        console.log("📌 캐시된 번역 결과 사용 (이전):", {
+          index: prevIndex,
+          translations: cachedTranslations[prevIndex]
+        });
+        setTranslationContextTranslations(cachedTranslations[prevIndex]);
+        setCurrentIndex(prevIndex);
+      } else {
+        // 캐시된 결과가 없을 때만 API 호출
+        setCurrentIndex(prevIndex);
+        setTimeout(() => {
+          setShouldAutoTranslate(true);
+        }, 0);
+      }
     }
   };
 
   // 번역 완료 처리 함수
   const handleTranslationSave = () => {
-    if (translations.google) {
+    if (translationContext.google) {
+      console.log("💾 번역 결과 저장 시작:", {
+        index: currentIndex,
+        translations: translationContext
+      });
+
       // 상태 업데이트를 한 번에 처리
       const updates = () => {
         setShouldAutoTranslate(true);
         saveTranslation(
-          translations.google,
+          translationContext.google,
           groupedSentences[currentIndex].join(" ")
         );
         setTranslatedIndexes((prev) => new Set([...prev, currentIndex]));
         setCompletedIndexes((prev) => new Set([...prev, currentIndex]));
 
         // 번역 결과를 캐시에 저장
-        setCachedTranslations((prev) => ({
-          ...prev,
-          [currentIndex]: translations
-        }));
+        setCachedTranslations((prev) => {
+          const newCache = {
+            ...prev,
+            [currentIndex]: translationContext
+          };
+          console.log("📦 번역 결과 캐시 저장 (handleTranslationSave):", {
+            index: currentIndex,
+            translations: translationContext,
+            totalCached: Object.keys(newCache).length,
+            isValid: validateCacheData(translationContext)
+          });
+          // localStorage에도 저장
+          saveCachedTranslations(newCache);
+          return newCache;
+        });
 
         // 번역된 블록 업데이트
         setTranslatedBlocks((prev) => {
@@ -225,7 +402,7 @@ export default function Home() {
 
           if (newBlocks[currentPage] && newBlocks[currentPage][currentBlock]) {
             newBlocks[currentPage][currentBlock].translatedText =
-              translations.google;
+              translationContext.google;
           }
 
           return newBlocks;
@@ -268,12 +445,17 @@ export default function Home() {
     if (
       groupedSentences.length > 0 &&
       shouldAutoTranslate &&
-      currentIndex < groupedSentences.length
+      currentIndex < groupedSentences.length &&
+      !checkCache(currentIndex) // 캐시 체크 함수 사용
     ) {
+      console.log("🔄 useEffect에서 번역 시작:", {
+        currentIndex,
+        hasCache: checkCache(currentIndex)
+      });
       handleTranslate(currentIndex);
-      setShouldAutoTranslate(false); // 번역 완료 후 자동 번역 비활성화
+      setShouldAutoTranslate(false);
     }
-  }, [currentIndex, shouldAutoTranslate, groupedSentences]);
+  }, [currentIndex, shouldAutoTranslate, groupedSentences, checkCache, handleTranslate]);
 
   return (
     <div className="min-h-screen flex">
@@ -370,7 +552,7 @@ export default function Home() {
                       originalText={
                         groupedSentences[currentIndex]?.join(" ") || ""
                       }
-                      translations={translations}
+                      translations={translationContext}
                       onSave={handleTranslationSave}
                       onNext={handleNext}
                       onPrevious={handlePrevious}
