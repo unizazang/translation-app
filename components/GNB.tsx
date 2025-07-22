@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function GNB() {
   return (
-    <nav className="w-full bg-blue-600 text-white p-4 shadow-md fixed top-0 left-0">
+    <nav className="w-full bg-blue-600 text-white p-3 shadow-md fixed top-0 left-0 z-50">
       <div className="max-w-4xl mx-auto flex justify-between">
         <Link
           href="/extract-text"

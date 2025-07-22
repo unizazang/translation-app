@@ -9,22 +9,30 @@ export default function ExtractTextPage() {
   const [extractedText, setExtractedText] = useState<string>("");
   const [error, setError] = useState<string>("");
 
-  const handleTextExtracted = (text: PdfPageData[][]) => {
-    try {
-      const extractedString = text
-        .map((page) =>
-          page
-            .map((data) => data.textBlocks.map((block) => block.text).join(" "))
-            .join("\n")
-        )
-        .join("\n\n");
-      setExtractedText(extractedString);
-      setError("");
-    } catch (err) {
-      console.error("텍스트 추출 중 오류 발생:", err);
-      setError("텍스트 추출 중 오류가 발생했습니다.");
-    }
-  };
+const handleTextExtracted = (text: PdfPageData[][]) => {
+  try {
+    const extractedString = text
+      .map((page) =>
+        page
+          .map((data) => data.textBlocks.map((block) => block.text).join(" "))
+          .join("\n")
+      )
+      .join("\n\n");
+
+    const modifiedText = extractedString
+      .replace(/p\.\s*(\d+)/g, "p$1")
+      .replace(/\s([^\w\s])\s/g, '$1')
+      .replace(/\u3000/g, '')
+      .replace(/　/g, '')
+      .replace(/ {2}/g, ' ');                              // 딱 두 개 공백 → 하나로;
+
+    setExtractedText(modifiedText);
+    setError("");
+  } catch (err) {
+    console.error("텍스트 추출 중 오류 발생:", err);
+    setError("텍스트 추출 중 오류가 발생했습니다.");
+  }
+};
 
   return (
     <div className="max-w-3xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">

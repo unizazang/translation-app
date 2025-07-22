@@ -161,8 +161,8 @@ export default function Home() {
   return (
     <div className="flex h-screen overflow-hidden bg-gradient-to-br from-gray-50 to-white">
       {/* 왼쪽: 메인 번역 작업 */}
-      <div className="flex-1 flex flex-col bg-white/80 p-8 overflow-hidden rounded-r-3xl shadow-2xl border-r border-gray-100">
-        <div className="flex justify-center mb-6">
+      <div className="flex-1 flex flex-col bg-white/80 p-4 px-8 overflow-hidden rounded-r-3xl shadow-2xl ">
+        <div className="flex justify-center">
           <LanguageSelector
             onSelectSourceLanguage={setSelectedLanguage}
             onSelectTargetLanguage={(lang) => {
@@ -172,14 +172,14 @@ export default function Home() {
           />
         </div>
 
-        <div className="flex-1 flex flex-col overflow-hidden bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div className="flex-1 flex flex-col overflow-hidden bg-white rounded-2xl p-6">
           {!isPdfUploaded ? (
             <div className="flex-1 flex items-center justify-center">
               <PdfUploader onTextExtracted={handleTextExtracted} />
             </div>
           ) : (
             <>
-              <div className="flex-1 min-h-0">
+              <div className="flex-1 ">
                 <TranslationCard
                   originalText={groupedSentences[currentIndex]?.join(' ') || ''}
                   translations={translationContext}

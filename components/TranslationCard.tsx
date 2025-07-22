@@ -34,8 +34,8 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
   onSkip,
   onTranslate,
 }) => {
-  return (
-    <div className="w-full h-full flex flex-col text-gray-900 font-medium bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+   return (
+    <div className="w-full h-full flex flex-col text-gray-900 font-medium bg-white rounded-2xl p-6 border border-gray-100">
       {/* 원문 */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-3">
@@ -53,7 +53,7 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
             />
           </button>
         </div>
-        <div className="border border-gray-200 bg-gray-50 rounded-xl p-5 h-[180px] overflow-y-auto text-base shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-150">
+        <div className="border border-gray-200 bg-gray-50 rounded-xl p-5 h-[180px] overflow-y-auto text-base shadow-[0_8px_24px_rgba(0,0,0,0.08)] focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-150">
           {originalText}
         </div>
       </div>
@@ -103,12 +103,12 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
           {['google', 'deepL'].map((engine) => (
             <div
               key={engine}
-              className="border border-gray-100 rounded-2xl p-5 bg-white flex flex-col h-full shadow-md flex-1 transition-all duration-150"
+              className="border border-gray-200 bg-gray-50 rounded-xl p-5 shadow-[0_8px_24px_rgba(0,0,0,0.08)] flex flex-col h-full flex-1 transition-all duration-150"
             >
               <strong className="text-gray-700 mb-3 text-base text-center tracking-wide">
                 {engine === 'google' ? 'Google' : 'DeepL'}
               </strong>
-              <div className="flex-1 overflow-y-auto bg-gray-50 rounded-lg p-4 text-base shadow-inner border border-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-150">
+              <div className="flex-1 overflow-y-auto rounded-lg p-4 text-base  focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-150 max-h-[220px]">
                 {translations[engine as keyof typeof translations]}
               </div>
               <button
