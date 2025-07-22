@@ -180,9 +180,9 @@ const [openSection, setOpenSection] = useState<'sentence' | 'saved' | 'dictionar
           ) : (
             <>
               <div className="bg-white p-6 rounded-lg shadow">
-                <p className="text-gray-800 mb-4">
+                {/* <p className="text-gray-800 mb-4">
                   {groupedSentences[currentIndex]?.join(' ') || ''}
-                </p>
+                </p> */}
 
                 <TranslationCard
                   originalText={groupedSentences[currentIndex]?.join(' ') || ''}
@@ -214,53 +214,57 @@ const [openSection, setOpenSection] = useState<'sentence' | 'saved' | 'dictionar
       </div>
 
       {/* 오른쪽: 사이드바 (아코디언 구조) */}
-      <div className="bg-white border-l shadow-lg w-[400px] overflow-hidden">
-        {isPdfUploaded && (
-          <SidebarProgress
-            totalPages={totalPages}
-            currentPage={currentPage}
-            totalSentences={currentPageSentences}
-            currentSentenceInPage={currentSentenceInPage}
-            currentIndex={currentIndex}
-          />
-        )}
+<div className="bg-white border-l shadow-lg w-[400px] h-screen overflow-y-auto flex flex-col">
+  {isPdfUploaded && (
+    <SidebarProgress
+      totalPages={totalPages}
+      currentPage={currentPage}
+      totalSentences={currentPageSentences}
+      currentSentenceInPage={currentSentenceInPage}
+      currentIndex={currentIndex}
+    />
+  )}
 
-        <SidebarSection
-          title="문장 목록"
-          isOpen={openSection === 'sentence'}
-          onToggle={() => toggleSection('sentence')}
-        >
-          <SentenceList
-            currentIndex={currentIndex}
-            onSentenceSelect={handleSentenceSelect}
-            groupedSentences={groupedSentences}
-            skippedIndexes={skippedIndexes}
-            translatedIndexes={translatedIndexes}
-            starredIndexes={starredIndexes}
-            onToggleStar={handleToggleStar}
-          />
-        </SidebarSection>
+  <SidebarSection
+    title="문장 목록"
+    isOpen={openSection === 'sentence'}
+    onToggle={() => toggleSection('sentence')}
+    scrollable  // ✅ 내부 스크롤 허용
+  >
+    <SentenceList
+      currentIndex={currentIndex}
+      onSentenceSelect={handleSentenceSelect}
+      groupedSentences={groupedSentences}
+      skippedIndexes={skippedIndexes}
+      translatedIndexes={translatedIndexes}
+      starredIndexes={starredIndexes}
+      onToggleStar={handleToggleStar}
+    />
+  </SidebarSection>
 
-        <SidebarSection
-          title="저장된 번역"
-          isOpen={openSection === 'saved'}
-          onToggle={() => toggleSection('saved')}
-        >
-          <SavedTranslations
-            savedTranslations={savedTranslations}
-            onCopyAll={copyAllTranslations}
-            updateTranslation={updateTranslation}
-          />
-        </SidebarSection>
+  <SidebarSection
+    title="저장된 번역"
+    isOpen={openSection === 'saved'}
+    onToggle={() => toggleSection('saved')}
+    // ❌ scrollable 생략 → textarea 내부만 스크롤되게
+  >
+    <SavedTranslations
+      savedTranslations={savedTranslations}
+      onCopyAll={copyAllTranslations}
+      updateTranslation={updateTranslation}
+    />
+  </SidebarSection>
 
-        <SidebarSection
-          title="사용자 사전"
-          isOpen={openSection === 'dictionary'}
-          onToggle={() => toggleSection('dictionary')}
-        >
-          <ProperNounManager />
-        </SidebarSection>
-      </div>
+  <SidebarSection
+    title="사용자 사전"
+    isOpen={openSection === 'dictionary'}
+    onToggle={() => toggleSection('dictionary')}
+    // ❌ scrollable 생략 → ProperNounManager 내부 목록만 스크롤되게
+  >
+    <ProperNounManager />
+  </SidebarSection>
+</div>
+
     </div>
   )
 }
