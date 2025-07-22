@@ -161,69 +161,65 @@ const [openSection, setOpenSection] = useState<'sentence' | 'saved' | 'dictionar
   }
 
   return (
-    <div className="flex min-h-screen">
-      {/* 왼쪽: 메인 번역 작업 */}
-      <div className="flex-1 p-6 bg-gray-50">
-        <div className="max-w-5xl mx-auto space-y-6">
-          <div className="flex justify-center">
-            <LanguageSelector
-              onSelectSourceLanguage={setSelectedLanguage}
-              onSelectTargetLanguage={(lang) => {
-                setTargetLanguage(lang)
-                setTranslationTargetLanguage(lang)
-              }}
-            />
-          </div>
-
-          {!isPdfUploaded ? (
-            <PdfUploader onTextExtracted={handleTextExtracted} />
-          ) : (
-            <>
-              <div className="bg-white p-6 rounded-lg shadow">
-                {/* <p className="text-gray-800 mb-4">
-                  {groupedSentences[currentIndex]?.join(' ') || ''}
-                </p> */}
-
-                <TranslationCard
-                  originalText={groupedSentences[currentIndex]?.join(' ') || ''}
-                  translations={translationContext}
-                  onSave={handleTranslationSave}
-                  onNext={handleNext}
-                  onPrevious={handlePrevious}
-                  isTranslating={isTranslating}
-                  isStarred={starredIndexes.has(currentIndex)}
-                  onToggleStar={() => handleToggleStar(currentIndex)}
-                  onSkip={handleSkip}
-                />
-
-                {isTranslateButtonVisible && (
-                  <button
-                    onClick={() => handleTranslate(currentIndex)}
-                    className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                    disabled={isTranslating}
-                  >
-                    {isTranslating ? '번역 중...' : '번역 실행하기'}
-                  </button>
-                )}
-              </div>
-
-              <DownloadButton translatedBlocks={translatedBlocks} />
-            </>
-          )}
+  <div className="flex h-screen overflow-hidden">
+    {/* 왼쪽: 메인 번역 작업 */}
+    <div className="flex-1 flex flex-col p-6 bg-gray-50 overflow-hidden">
+      <div className="max-w-5xl mx-auto flex flex-col h-full">
+        {/* 언어 선택 */}
+        <div className="flex justify-center mb-4">
+          <LanguageSelector
+            onSelectSourceLanguage={setSelectedLanguage}
+            onSelectTargetLanguage={(lang) => {
+              setTargetLanguage(lang)
+              setTranslationTargetLanguage(lang)
+            }}
+          />
         </div>
-      </div>
 
-      {/* 오른쪽: 사이드바 (아코디언 구조) */}
-<div className="bg-white border-l shadow-lg w-[400px] h-screen overflow-y-auto flex flex-col">
-  {isPdfUploaded && (
-    <SidebarProgress
-      totalPages={totalPages}
-      currentPage={currentPage}
-      totalSentences={currentPageSentences}
-      currentSentenceInPage={currentSentenceInPage}
-      currentIndex={currentIndex}
-    />
-  )}
+        {!isPdfUploaded ? (
+          <PdfUploader onTextExtracted={handleTextExtracted} />
+        ) : (
+          <div className="flex-1 overflow-hidden">
+            <div className="bg-white p-6 rounded-lg shadow h-full">
+              <TranslationCard
+                originalText={groupedSentences[currentIndex]?.join(' ') || ''}
+                translations={translationContext}
+                onSave={handleTranslationSave}
+                onNext={handleNext}
+                onPrevious={handlePrevious}
+                isTranslating={isTranslating}
+                isStarred={starredIndexes.has(currentIndex)}
+                onToggleStar={() => handleToggleStar(currentIndex)}
+                onSkip={handleSkip}
+              />
+
+              {isTranslateButtonVisible && (
+                <button
+                  onClick={() => handleTranslate(currentIndex)}
+                  className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                  disabled={isTranslating}
+                >
+                  {isTranslating ? '번역 중...' : '번역 실행하기'}
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+
+    {/* 오른쪽: 사이드바 (아코디언 구조) */}
+    <div className="bg-white border-l shadow-lg w-[400px] h-screen overflow-y-auto flex flex-col">
+      {isPdfUploaded && (
+        <SidebarProgress
+          totalPages={totalPages}
+          currentPage={currentPage}
+          totalSentences={currentPageSentences}
+          currentSentenceInPage={currentSentenceInPage}
+          currentIndex={currentIndex}
+        />
+      )}
+
 
   <SidebarSection
     title="문장 목록"
