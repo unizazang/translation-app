@@ -11,21 +11,21 @@ export async function POST(req: NextRequest) {
     const { text, sourceLang, targetLang, provider } = await req.json();
     let translatedText = "";
 
-    if (provider === "papago") {
-      console.log("🔹 Papago API 요청 시작:", text);
-      const response = await axios.post(
-        "https://naveropenapi.apigw.ntruss.com/nmt/v1/translation",
-        { source: sourceLang || "auto", target: targetLang || "ko", text },
-        {
-          headers: {
-            "X-NCP-APIGW-API-KEY-ID": PAPAGO_API_KEY_ID!,
-            "X-NCP-APIGW-API-KEY": PAPAGO_API_KEY!,
-            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-          },
-        }
-      );
-      translatedText = response.data.message.result.translatedText;
-    }
+    // if (provider === "papago") {
+    //   console.log("🔹 Papago API 요청 시작:", text);
+    //   const response = await axios.post(
+    //     "https://naveropenapi.apigw.ntruss.com/nmt/v1/translation",
+    //     { source: sourceLang || "auto", target: targetLang || "ko", text },
+    //     {
+    //       headers: {
+    //         "X-NCP-APIGW-API-KEY-ID": PAPAGO_API_KEY_ID!,
+    //         "X-NCP-APIGW-API-KEY": PAPAGO_API_KEY!,
+    //         "Content-Type": 'application/x-www-form-urlencoded; charset=UTF-8',
+    //       },
+    //     }
+    //   );
+    //   translatedText = response.data.message.result.translatedText;
+    // }
 
     if (provider === "deepl") {
       console.log("🔹 DeepL API 요청 시작:", text);

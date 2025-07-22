@@ -47,7 +47,7 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
             />
           </button>
         </div>
-        <div className="border bg-gray-50 rounded p-4 h-[160px] overflow-y-auto text-sm">
+        <div className="border bg-gray-50 rounded p-4 h-[250px] overflow-y-auto text-sm">
           {originalText}
         </div>
       </div>
@@ -94,31 +94,32 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
       </div>
 
       {/* 번역 결과 */}
-      <div className="flex-1 flex flex-col">
-        <h3 className="text-lg font-semibold mb-2">번역 결과</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 overflow-hidden">
-          {['google', 'papago', 'deepL'].map((engine) => (
-            <div
-              key={engine}
-              className="border rounded-lg p-4 bg-white flex flex-col h-full shadow"
-            >
-              <strong className="text-gray-700 mb-2 text-lg">
-                {engine === 'google' ? 'Google' : engine === 'papago' ? 'Papago' : 'DeepL'}
-              </strong>
-              <div className="flex-1 overflow-y-auto border bg-gray-50 rounded p-2 text-sm">
-                {translations[engine as keyof typeof translations]}
-              </div>
-              <button
-                className="mt-4 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-                onClick={onSave}
-                disabled={isTranslating}
-              >
-                저장하기
-              </button>
-            </div>
-          ))}
+<div className="flex-1 flex flex-col">
+  <h3 className="text-lg font-semibold mb-2">번역 결과</h3>
+  <div className="flex flex-row justify-between gap-4 flex-1 overflow-hidden">
+    {['google', 'deepL'].map((engine) => (
+      <div
+        key={engine}
+        className="border rounded-lg p-4 bg-white flex flex-col h-full shadow flex-1"
+      >
+        <strong className="text-gray-700 mb-2 text-lg">
+          {engine === 'google' ? 'Google' : 'DeepL'}
+        </strong>
+        <div className="flex-1 overflow-y-auto border bg-gray-50 rounded p-2 text-sm">
+          {translations[engine as keyof typeof translations]}
         </div>
+        <button
+          className="mt-4 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+          onClick={onSave}
+          disabled={isTranslating}
+        >
+          저장하기
+        </button>
       </div>
+    ))}
+  </div>
+</div>
+
     </div>
   )
 }
