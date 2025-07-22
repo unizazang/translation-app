@@ -159,10 +159,10 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-gradient-to-br from-gray-50 to-white">
       {/* 왼쪽: 메인 번역 작업 */}
-      <div className="flex-1 flex flex-col bg-gray-50 p-4 overflow-hidden">
-        <div className="flex justify-center mb-2">
+      <div className="flex-1 flex flex-col bg-white/80 p-8 overflow-hidden rounded-r-3xl shadow-2xl border-r border-gray-100">
+        <div className="flex justify-center mb-6">
           <LanguageSelector
             onSelectSourceLanguage={setSelectedLanguage}
             onSelectTargetLanguage={(lang) => {
@@ -172,7 +172,7 @@ export default function Home() {
           />
         </div>
 
-        <div className="flex-1 flex flex-col overflow-hidden bg-white rounded-lg shadow p-4">
+        <div className="flex-1 flex flex-col overflow-hidden bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
           {!isPdfUploaded ? (
             <div className="flex-1 flex items-center justify-center">
               <PdfUploader onTextExtracted={handleTextExtracted} />
@@ -193,25 +193,13 @@ export default function Home() {
                   onTranslate={() => handleTranslate(currentIndex)} 
                 />
               </div>
-
-              {/* {isTranslateButtonVisible && (
-                <div className="mt-4">
-                  <button
-                    onClick={() => handleTranslate(currentIndex)}
-                    className="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                    disabled={isTranslating}
-                  >
-                    {isTranslating ? '번역 중...' : '번역 실행하기'}
-                  </button>
-                </div>
-              )} */}
             </>
           )}
         </div>
       </div>
 
       {/* 오른쪽: 사이드바 */}
-      <div className="bg-white border-l shadow-lg w-[600px] h-screen overflow-y-auto flex flex-col">
+      <div className="bg-white/90 border-l border-gray-100 shadow-2xl w-[420px] h-screen overflow-y-auto flex flex-col rounded-l-3xl">
         {isPdfUploaded && (
           <SidebarProgress
             totalPages={totalPages}
@@ -228,15 +216,17 @@ export default function Home() {
           onToggle={() => toggleSection('sentence')}
           scrollable
         >
-          <SentenceList
-            currentIndex={currentIndex}
-            onSentenceSelect={handleSentenceSelect}
-            groupedSentences={groupedSentences}
-            skippedIndexes={skippedIndexes}
-            translatedIndexes={translatedIndexes}
-            starredIndexes={starredIndexes}
-            onToggleStar={handleToggleStar}
-          />
+          <div className="pr-2 custom-scrollbar">
+            <SentenceList
+              currentIndex={currentIndex}
+              onSentenceSelect={handleSentenceSelect}
+              groupedSentences={groupedSentences}
+              skippedIndexes={skippedIndexes}
+              translatedIndexes={translatedIndexes}
+              starredIndexes={starredIndexes}
+              onToggleStar={handleToggleStar}
+            />
+          </div>
         </SidebarSection>
 
         <SidebarSection
