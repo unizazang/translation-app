@@ -34,24 +34,24 @@ export default function LanguageSelector({
   }
 
   return (
-    <div className="relative w-full flex justify-center items-center gap-6">
+    <div className="relative w-full flex justify-center items-center gap-6 text-sm font-medium">
       {/* Source Language */}
-      <div className="relative">
+      <div className="relative w-40">
         <button
           onClick={() =>
             setOpenDropdown((prev) => (prev === 'source' ? null : 'source'))
           }
-          className="bg-pink-200 text-black px-6 py-3 rounded-t-md text-lg font-bold w-40"
+          className="w-full bg-white text-gray-900 px-4 py-2 border border-gray-300 rounded-lg shadow-sm hover:border-gray-500 transition"
         >
-          {languages.find((l) => l.code === sourceLanguage)?.label} ▼
+          {languages.find((l) => l.code === sourceLanguage)?.label}
         </button>
         {openDropdown === 'source' && (
-          <ul className="absolute top-full left-0 w-full bg-pink-100 border border-pink-300 z-10 rounded-b-md text-black">
+          <ul className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow z-10">
             {languages.map((lang) => (
               <li
                 key={lang.code}
                 onClick={() => handleSelectLanguage('source', lang.code)}
-                className="px-4 py-2 cursor-pointer hover:bg-pink-300"
+                className="px-4 py-2 hover:bg-gray-100 cursor-pointer rounded"
               >
                 {lang.label}
               </li>
@@ -61,25 +61,25 @@ export default function LanguageSelector({
       </div>
 
       {/* Arrow */}
-      <div className="text-2xl font-bold text-gray-700">→</div>
+      <div className="text-xl text-gray-500">→</div>
 
       {/* Target Language */}
-      <div className="relative">
+      <div className="relative w-40">
         <button
           onClick={() =>
             setOpenDropdown((prev) => (prev === 'target' ? null : 'target'))
           }
-          className="bg-pink-200 text-black px-6 py-3 rounded-t-md text-lg font-bold w-40"
+          className="w-full bg-white text-gray-900 px-4 py-2 border border-gray-300 rounded-lg shadow-sm hover:border-gray-500 transition"
         >
-          {languages.find((l) => l.code === targetLanguage)?.label} ▼
+          {languages.find((l) => l.code === targetLanguage)?.label}
         </button>
         {openDropdown === 'target' && (
-          <ul className="absolute top-full left-0 w-full bg-pink-100 border border-pink-300 z-10 rounded-b-md text-black">
+          <ul className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow z-10">
             {languages.map((lang) => (
               <li
                 key={lang.code}
                 onClick={() => handleSelectLanguage('target', lang.code)}
-                className="px-4 py-2 cursor-pointer hover:bg-pink-300"
+                className="px-4 py-2 hover:bg-gray-100 cursor-pointer rounded"
               >
                 {lang.label}
               </li>

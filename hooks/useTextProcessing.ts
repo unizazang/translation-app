@@ -51,7 +51,7 @@ export function useTextProcessing() {
     console.log("🚀 groupSentences 실행됨! 원본 텍스트:", text);
 
     // ✅ "p. 숫자" 패턴을 예외 처리하여 온점(.)을 문장 끝으로 인식하지 않도록 함
-    const modifiedText = text.replace(/p\.\s*(\d+)/g, "p$1");
+    const modifiedText = text.replace(/p\.\s*(\d+)/g, "p$1").replace(/\s([^\w\s])\s/g, '$1').replace(/\u3000/g, '').replace(/　/g, ''); // ✅ 공백 특수문자 공백, 전각 공백 제거 제거용
 
     console.log("🛠 변환된 텍스트 (p. 예외 처리 적용):", modifiedText);
 
