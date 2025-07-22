@@ -211,7 +211,7 @@ export default function Home() {
       </div>
 
       {/* 오른쪽: 사이드바 */}
-      <div className="bg-white border-l shadow-lg w-[400px] h-screen overflow-y-auto flex flex-col">
+      <div className="bg-white border-l shadow-lg w-[600px] h-screen overflow-y-auto flex flex-col">
         {isPdfUploaded && (
           <SidebarProgress
             totalPages={totalPages}

@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
           headers: {
             "X-NCP-APIGW-API-KEY-ID": PAPAGO_API_KEY_ID!,
             "X-NCP-APIGW-API-KEY": PAPAGO_API_KEY!,
-            "Content-Type": "application/json",
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
           },
         }
       );
