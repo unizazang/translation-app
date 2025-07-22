@@ -19,6 +19,7 @@ interface TranslationCardProps {
   isStarred: boolean
   onToggleStar: () => void
   onSkip: () => void
+  onTranslateClick?: () => void
 }
 
 const TranslationCard: React.FC<TranslationCardProps> = ({
@@ -31,11 +32,12 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
   isStarred,
   onToggleStar,
   onSkip,
+  onTranslateClick,
 }) => {
   return (
     <div className="w-full h-full flex flex-col text-black">
       {/* 원문 */}
-      <div className="mb-4">
+      <div className="mb-2">
         <div className="flex justify-between items-center mb-2">
           <h3 className="text-lg font-semibold">원본 문장</h3>
           <button onClick={onToggleStar} className="text-yellow-400 hover:text-yellow-500">
@@ -48,6 +50,39 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
         <div className="border bg-gray-50 rounded p-4 h-[120px] overflow-y-auto text-sm">
           {originalText}
         </div>
+      </div>
+
+      {/* ✅ 원문 하단 버튼 그룹 */}
+      <div className="mb-6 flex flex-wrap gap-2">
+        <button
+          onClick={onTranslateClick}
+          className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50"
+          disabled={isTranslating}
+        >
+          {isTranslating ? '번역 중...' : '번역 실행하기'}
+        </button>
+
+        <button
+          onClick={onPrevious}
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50"
+          disabled={isTranslating}
+        >
+          이전
+        </button>
+        <button
+          onClick={onSkip}
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50"
+          disabled={isTranslating}
+        >
+          건너뛰기
+        </button>
+        <button
+          onClick={onNext}
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50"
+          disabled={isTranslating}
+        >
+          다음
+        </button>
       </div>
 
       {/* 번역 결과 */}
@@ -74,33 +109,6 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
               </button>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* 하단 버튼 */}
-      <div className="mt-6 flex justify-between">
-        <button
-          onClick={onPrevious}
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50"
-          disabled={isTranslating}
-        >
-          이전
-        </button>
-        <div className="flex gap-2">
-          <button
-            onClick={onSkip}
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50"
-            disabled={isTranslating}
-          >
-            건너뛰기
-          </button>
-          <button
-            onClick={onNext}
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50"
-            disabled={isTranslating}
-          >
-            다음
-          </button>
         </div>
       </div>
     </div>

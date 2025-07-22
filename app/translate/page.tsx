@@ -35,8 +35,7 @@ export default function Home() {
   const [completedIndexes, setCompletedIndexes] = useState<Set<number>>(new Set())
   const [shouldAutoTranslate, setShouldAutoTranslate] = useState(false)
   const [pdfPages, setPdfPages] = useState<PdfPageData[][]>([])
-const [openSection, setOpenSection] = useState<'sentence' | 'saved' | 'dictionary' | null>('sentence')
-
+  const [openSection, setOpenSection] = useState<'sentence' | 'saved' | 'dictionary' | null>('sentence')
 
   const { properNouns } = useProperNoun()
   const { groupedSentences, processText } = useTextProcessing()
@@ -142,7 +141,6 @@ const [openSection, setOpenSection] = useState<'sentence' | 'saved' | 'dictionar
     setOpenSection((prev) => (prev === section ? null : section))
   }
 
-  // ✅ 진행률 계산
   const totalPages = pdfPages.length
   let currentPage = 1
   let totalSentencesBeforeCurrentPage = 0
@@ -161,12 +159,10 @@ const [openSection, setOpenSection] = useState<'sentence' | 'saved' | 'dictionar
   }
 
   return (
-  <div className="flex h-screen overflow-hidden">
-    {/* 왼쪽: 메인 번역 작업 */}
-    <div className="flex-1 flex flex-col p-6 bg-gray-50 overflow-hidden">
-      <div className="max-w-5xl mx-auto flex flex-col h-full">
-        {/* 언어 선택 */}
-        <div className="flex justify-center mb-4">
+    <div className="flex h-screen overflow-hidden">
+      {/* 왼쪽: 메인 번역 작업 */}
+      <div className="flex-1 flex flex-col bg-gray-50 p-4 overflow-hidden">
+        <div className="flex justify-center mb-2">
           <LanguageSelector
             onSelectSourceLanguage={setSelectedLanguage}
             onSelectTargetLanguage={(lang) => {
@@ -176,91 +172,93 @@ const [openSection, setOpenSection] = useState<'sentence' | 'saved' | 'dictionar
           />
         </div>
 
-        {!isPdfUploaded ? (
-          <PdfUploader onTextExtracted={handleTextExtracted} />
-        ) : (
-          <div className="flex-1 overflow-hidden">
-            <div className="bg-white p-6 rounded-lg shadow h-full">
-              <TranslationCard
-                originalText={groupedSentences[currentIndex]?.join(' ') || ''}
-                translations={translationContext}
-                onSave={handleTranslationSave}
-                onNext={handleNext}
-                onPrevious={handlePrevious}
-                isTranslating={isTranslating}
-                isStarred={starredIndexes.has(currentIndex)}
-                onToggleStar={() => handleToggleStar(currentIndex)}
-                onSkip={handleSkip}
-              />
-
-              {isTranslateButtonVisible && (
-                <button
-                  onClick={() => handleTranslate(currentIndex)}
-                  className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                  disabled={isTranslating}
-                >
-                  {isTranslating ? '번역 중...' : '번역 실행하기'}
-                </button>
-              )}
+        <div className="flex-1 flex flex-col overflow-hidden bg-white rounded-lg shadow p-4">
+          {!isPdfUploaded ? (
+            <div className="flex-1 flex items-center justify-center">
+              <PdfUploader onTextExtracted={handleTextExtracted} />
             </div>
-          </div>
-        )}
+          ) : (
+            <>
+              <div className="flex-1 min-h-0">
+                <TranslationCard
+                  originalText={groupedSentences[currentIndex]?.join(' ') || ''}
+                  translations={translationContext}
+                  onSave={handleTranslationSave}
+                  onNext={handleNext}
+                  onPrevious={handlePrevious}
+                  isTranslating={isTranslating}
+                  isStarred={starredIndexes.has(currentIndex)}
+                  onToggleStar={() => handleToggleStar(currentIndex)}
+                  onSkip={handleSkip}
+                  onTranslateClick={() => handleTranslate(currentIndex)}
+                />
+              </div>
+
+              {/* {isTranslateButtonVisible && (
+                <div className="mt-4">
+                  <button
+                    onClick={() => handleTranslate(currentIndex)}
+                    className="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                    disabled={isTranslating}
+                  >
+                    {isTranslating ? '번역 중...' : '번역 실행하기'}
+                  </button>
+                </div>
+              )} */}
+            </>
+          )}
+        </div>
       </div>
-    </div>
 
-    {/* 오른쪽: 사이드바 (아코디언 구조) */}
-    <div className="bg-white border-l shadow-lg w-[400px] h-screen overflow-y-auto flex flex-col">
-      {isPdfUploaded && (
-        <SidebarProgress
-          totalPages={totalPages}
-          currentPage={currentPage}
-          totalSentences={currentPageSentences}
-          currentSentenceInPage={currentSentenceInPage}
-          currentIndex={currentIndex}
-        />
-      )}
+      {/* 오른쪽: 사이드바 */}
+      <div className="bg-white border-l shadow-lg w-[400px] h-screen overflow-y-auto flex flex-col">
+        {isPdfUploaded && (
+          <SidebarProgress
+            totalPages={totalPages}
+            currentPage={currentPage}
+            totalSentences={currentPageSentences}
+            currentSentenceInPage={currentSentenceInPage}
+            currentIndex={currentIndex}
+          />
+        )}
 
+        <SidebarSection
+          title="문장 목록"
+          isOpen={openSection === 'sentence'}
+          onToggle={() => toggleSection('sentence')}
+          scrollable
+        >
+          <SentenceList
+            currentIndex={currentIndex}
+            onSentenceSelect={handleSentenceSelect}
+            groupedSentences={groupedSentences}
+            skippedIndexes={skippedIndexes}
+            translatedIndexes={translatedIndexes}
+            starredIndexes={starredIndexes}
+            onToggleStar={handleToggleStar}
+          />
+        </SidebarSection>
 
-  <SidebarSection
-    title="문장 목록"
-    isOpen={openSection === 'sentence'}
-    onToggle={() => toggleSection('sentence')}
-    scrollable  // ✅ 내부 스크롤 허용
-  >
-    <SentenceList
-      currentIndex={currentIndex}
-      onSentenceSelect={handleSentenceSelect}
-      groupedSentences={groupedSentences}
-      skippedIndexes={skippedIndexes}
-      translatedIndexes={translatedIndexes}
-      starredIndexes={starredIndexes}
-      onToggleStar={handleToggleStar}
-    />
-  </SidebarSection>
+        <SidebarSection
+          title="저장된 번역"
+          isOpen={openSection === 'saved'}
+          onToggle={() => toggleSection('saved')}
+        >
+          <SavedTranslations
+            savedTranslations={savedTranslations}
+            onCopyAll={copyAllTranslations}
+            updateTranslation={updateTranslation}
+          />
+        </SidebarSection>
 
-  <SidebarSection
-    title="저장된 번역"
-    isOpen={openSection === 'saved'}
-    onToggle={() => toggleSection('saved')}
-    // ❌ scrollable 생략 → textarea 내부만 스크롤되게
-  >
-    <SavedTranslations
-      savedTranslations={savedTranslations}
-      onCopyAll={copyAllTranslations}
-      updateTranslation={updateTranslation}
-    />
-  </SidebarSection>
-
-  <SidebarSection
-    title="사용자 사전"
-    isOpen={openSection === 'dictionary'}
-    onToggle={() => toggleSection('dictionary')}
-    // ❌ scrollable 생략 → ProperNounManager 내부 목록만 스크롤되게
-  >
-    <ProperNounManager />
-  </SidebarSection>
-</div>
-
+        <SidebarSection
+          title="사용자 사전"
+          isOpen={openSection === 'dictionary'}
+          onToggle={() => toggleSection('dictionary')}
+        >
+          <ProperNounManager />
+        </SidebarSection>
+      </div>
     </div>
   )
 }
