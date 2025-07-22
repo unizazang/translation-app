@@ -190,7 +190,7 @@ export default function Home() {
                   isStarred={starredIndexes.has(currentIndex)}
                   onToggleStar={() => handleToggleStar(currentIndex)}
                   onSkip={handleSkip}
-                  onTranslateClick={() => handleTranslate(currentIndex)}
+                  onTranslate={() => handleTranslate(currentIndex)} 
                 />
               </div>
 

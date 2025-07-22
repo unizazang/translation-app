@@ -1,65 +1,91 @@
 'use client'
 
-import { useState } from "react"
+import { useState } from 'react'
 
 interface LanguageSelectorProps {
   onSelectSourceLanguage: (language: string) => void
   onSelectTargetLanguage: (language: string) => void
 }
 
+const languages = [
+  { code: 'en', label: '영어' },
+  { code: 'zh', label: '중국어' },
+  { code: 'ja', label: '일본어' },
+  { code: 'ko', label: '한국어' },
+]
+
 export default function LanguageSelector({
   onSelectSourceLanguage,
   onSelectTargetLanguage,
 }: LanguageSelectorProps) {
-  const [sourceLanguage, setSourceLanguage] = useState("en")
-  const [targetLanguage, setTargetLanguage] = useState("ko")
+  const [sourceLanguage, setSourceLanguage] = useState('en')
+  const [targetLanguage, setTargetLanguage] = useState('ko')
+  const [openDropdown, setOpenDropdown] = useState<'source' | 'target' | null>(null)
 
-  const handleSourceLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const language = event.target.value
-    setSourceLanguage(language)
-    onSelectSourceLanguage(language)
-  }
-
-  const handleTargetLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const language = event.target.value
-    setTargetLanguage(language)
-    onSelectTargetLanguage(language)
+  const handleSelectLanguage = (type: 'source' | 'target', code: string) => {
+    if (type === 'source') {
+      setSourceLanguage(code)
+      onSelectSourceLanguage(code)
+    } else {
+      setTargetLanguage(code)
+      onSelectTargetLanguage(code)
+    }
+    setOpenDropdown(null)
   }
 
   return (
-    <div className="flex justify-between items-start gap-8 w-full text-black">
-      {/* 왼쪽: 시작 언어 */}
-      <div className="flex flex-col">
-        <label htmlFor="sourceLanguage" className="mb-1 font-semibold text-sm">
-          번역을 시작할 언어
-        </label>
-        <select
-          id="sourceLanguage"
-          value={sourceLanguage}
-          onChange={handleSourceLanguageChange}
-          className="border border-gray-300 rounded px-3 py-2 text-sm bg-white"
+    <div className="relative w-full flex justify-center items-center gap-6">
+      {/* Source Language */}
+      <div className="relative">
+        <button
+          onClick={() =>
+            setOpenDropdown((prev) => (prev === 'source' ? null : 'source'))
+          }
+          className="bg-pink-200 text-black px-6 py-3 rounded-t-md text-lg font-bold w-40"
         >
-          <option value="en">영어</option>
-          <option value="zh">중국어</option>
-          <option value="ja">일본어</option>
-          <option value="ko">한국어</option>
-        </select>
+          {languages.find((l) => l.code === sourceLanguage)?.label} ▼
+        </button>
+        {openDropdown === 'source' && (
+          <ul className="absolute top-full left-0 w-full bg-pink-100 border border-pink-300 z-10 rounded-b-md text-black">
+            {languages.map((lang) => (
+              <li
+                key={lang.code}
+                onClick={() => handleSelectLanguage('source', lang.code)}
+                className="px-4 py-2 cursor-pointer hover:bg-pink-300"
+              >
+                {lang.label}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
-      {/* 오른쪽: 번역 결과 언어 */}
-      <div className="flex flex-col">
-        <label htmlFor="targetLanguage" className="mb-1 font-semibold text-sm">
-          번역 완료 언어
-        </label>
-        <select
-          id="targetLanguage"
-          value={targetLanguage}
-          onChange={handleTargetLanguageChange}
-          className="border border-gray-300 rounded px-3 py-2 text-sm bg-white"
+      {/* Arrow */}
+      <div className="text-2xl font-bold text-gray-700">→</div>
+
+      {/* Target Language */}
+      <div className="relative">
+        <button
+          onClick={() =>
+            setOpenDropdown((prev) => (prev === 'target' ? null : 'target'))
+          }
+          className="bg-pink-200 text-black px-6 py-3 rounded-t-md text-lg font-bold w-40"
         >
-          <option value="ko">한국어</option>
-          <option value="en">영어</option>
-        </select>
+          {languages.find((l) => l.code === targetLanguage)?.label} ▼
+        </button>
+        {openDropdown === 'target' && (
+          <ul className="absolute top-full left-0 w-full bg-pink-100 border border-pink-300 z-10 rounded-b-md text-black">
+            {languages.map((lang) => (
+              <li
+                key={lang.code}
+                onClick={() => handleSelectLanguage('target', lang.code)}
+                className="px-4 py-2 cursor-pointer hover:bg-pink-300"
+              >
+                {lang.label}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   )

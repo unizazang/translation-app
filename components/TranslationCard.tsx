@@ -19,7 +19,7 @@ interface TranslationCardProps {
   isStarred: boolean
   onToggleStar: () => void
   onSkip: () => void
-  onTranslateClick?: () => void
+  onTranslate?: () => void // 선택적 prop
 }
 
 const TranslationCard: React.FC<TranslationCardProps> = ({
@@ -32,7 +32,7 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
   isStarred,
   onToggleStar,
   onSkip,
-  onTranslateClick,
+  onTranslate,
 }) => {
   return (
     <div className="w-full h-full flex flex-col text-black">
@@ -47,42 +47,50 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
             />
           </button>
         </div>
-        <div className="border bg-gray-50 rounded p-4 h-[120px] overflow-y-auto text-sm">
+        <div className="border bg-gray-50 rounded p-4 h-[160px] overflow-y-auto text-sm">
           {originalText}
         </div>
       </div>
 
-      {/* ✅ 원문 하단 버튼 그룹 */}
-      <div className="mb-6 flex flex-wrap gap-2">
-        <button
-          onClick={onTranslateClick}
-          className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50"
-          disabled={isTranslating}
-        >
-          {isTranslating ? '번역 중...' : '번역 실행하기'}
-        </button>
+      {/* ✅ 번역 실행 / 이전 / 건너뛰기 / 다음 버튼 */}
+      <div className="mb-6 flex justify-between">
+        {/* 번역 실행 버튼 (좌측) */}
+        <div>
+          {onTranslate && (
+            <button
+              onClick={onTranslate}
+              className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50"
+              disabled={isTranslating}
+            >
+              {isTranslating ? '번역 중...' : '번역 실행하기'}
+            </button>
+          )}
+        </div>
 
-        <button
-          onClick={onPrevious}
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50"
-          disabled={isTranslating}
-        >
-          이전
-        </button>
-        <button
-          onClick={onSkip}
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50"
-          disabled={isTranslating}
-        >
-          건너뛰기
-        </button>
-        <button
-          onClick={onNext}
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50"
-          disabled={isTranslating}
-        >
-          다음
-        </button>
+        {/* 이전/건너뛰기/다음 버튼 (우측) */}
+        <div className="flex gap-2">
+          <button
+            onClick={onPrevious}
+            className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50"
+            disabled={isTranslating}
+          >
+            이전
+          </button>
+          <button
+            onClick={onSkip}
+            className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50"
+            disabled={isTranslating}
+          >
+            건너뛰기
+          </button>
+          <button
+            onClick={onNext}
+            className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50"
+            disabled={isTranslating}
+          >
+            다음
+          </button>
+        </div>
       </div>
 
       {/* 번역 결과 */}
