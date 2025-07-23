@@ -36,7 +36,7 @@ export default function SidebarSection({
       {/* 섹션 콘텐츠 */}
       {isOpen && (
         <div
-          className={`px-5 py-4 bg-gray-50 text-sm ${
+          className={`px-5 py-4 bg-white text-sm ${
             scrollable ? 'max-h-[calc(100vh-16rem)] overflow-y-auto custom-scrollbar' : ''
           }`}
         >
