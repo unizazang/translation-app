@@ -35,7 +35,7 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
   onTranslate,
 }) => {
   return (
-    <div className="w-full h-full flex flex-col text-gray-900 font-medium bg-white rounded-2xl p-6 border border-gray-100">
+    <div className="w-full h-full flex flex-col text-gray-900 font-normal bg-white rounded-2xl p-6 border border-gray-100">
       {/* 원문 */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-3">
@@ -108,7 +108,7 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
               <strong className="text-gray-700 mb-3 text-base text-center tracking-wide">
                 {engine === 'google' ? 'Google' : 'DeepL'} 번역
               </strong>
-              <div className="flex-1 overflow-y-auto rounded-lg p-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-150 max-h-[300px]">
+              <div className="flex-1 overflow-y-auto rounded-lg p-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-150 max-h-[300px] ">
                 {translations[engine]}
               </div>
               <button

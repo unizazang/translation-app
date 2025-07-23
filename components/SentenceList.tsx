@@ -31,7 +31,7 @@ type FilterType =
   | "bookmarked";
 
 // 문장을 축약하는 함수
-const truncateText = (text: string, maxLength: number = 20): string => {
+const truncateText = (text: string, maxLength: number = 25): string => {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength) + "...";
 };
