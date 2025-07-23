@@ -192,9 +192,9 @@ const handleTranslationSave = (engine: 'google' | 'deepL') => {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gradient-to-br from-gray-50 to-white">
+    <div className="flex h-screen overflow-auto bg-gradient-to-br from-gray-50 to-white">
       {/* 왼쪽: 메인 번역 작업 */}
-      <div className="flex-1 flex flex-col bg-white/80 p-4 px-8 overflow-hidden rounded-r-3xl shadow-2xl ">
+      <div className="flex-1 flex flex-col bg-white/80 p-4 px-8  ">
         <div className="flex justify-center">
           <LanguageSelector
             onSelectSourceLanguage={setSelectedLanguage}
@@ -205,7 +205,7 @@ const handleTranslationSave = (engine: 'google' | 'deepL') => {
           />
         </div>
 
-        <div className="flex-1 flex flex-col overflow-hidden bg-white rounded-2xl p-6">
+        <div className="flex-1 flex flex-col bg-white rounded-2xl p-6">
           {!isPdfUploaded ? (
             <div className="flex-1 flex items-center justify-center">
               <PdfUploader onTextExtracted={(extractedText, fileName) => {
@@ -236,62 +236,68 @@ const handleTranslationSave = (engine: 'google' | 'deepL') => {
       </div>
 
       {/* 오른쪽: 사이드바 */}
-      <div className="bg-white/90 border-l border-gray-100 shadow-2xl w-[420px] h-screen overflow-y-auto flex flex-col rounded-l-3xl">
-        {isPdfUploaded && (
-          <>
-            {errorMessage && (
-              <div className="bg-red-100 text-red-700 px-4 py-2 text-sm border-b border-red-200">{errorMessage}</div>
-            )}
-            <SidebarFileInfo fileName={fileName} onReplaceFile={handleReplaceFile} />
-            <SidebarProgress
-              totalPages={totalPages}
-              currentPage={currentPage}
-              totalSentences={currentPageSentences}
-              currentSentenceInPage={currentSentenceInPage}
-              currentIndex={currentIndex}
-            />
-          </>
-        )}
+      {/* 오른쪽: 사이드바 */}
+<div className="bg-white/90 border-l border-gray-100 shadow-2xl w-[420px] overflow-y-auto flex flex-col rounded-l-3xl max-h-[calc(100dvh)]">
 
-        <SidebarSection
-          title="문장 목록"
-          isOpen={openSection === 'sentence'}
-          onToggle={() => toggleSection('sentence')}
-          scrollable
-        >
-          <div className="pr-2 custom-scrollbar">
-            <SentenceList
-              currentIndex={currentIndex}
-              onSentenceSelect={handleSentenceSelect}
-              groupedSentences={groupedSentences}
-              skippedIndexes={skippedIndexes}
-              translatedIndexes={translatedIndexes}
-              starredIndexes={starredIndexes}
-              onToggleStar={handleToggleStar}
-            />
+  <div className="flex-1 overflow-y-auto">
+    {isPdfUploaded && (
+      <>
+        {errorMessage && (
+          <div className="bg-red-100 text-red-700 px-4 py-2 text-sm border-b border-red-200">
+            {errorMessage}
           </div>
-        </SidebarSection>
+        )}
+        <SidebarFileInfo fileName={fileName} onReplaceFile={handleReplaceFile} />
+        <SidebarProgress
+          totalPages={totalPages}
+          currentPage={currentPage}
+          totalSentences={currentPageSentences}
+          currentSentenceInPage={currentSentenceInPage}
+          currentIndex={currentIndex}
+        />
+      </>
+    )}
 
-        <SidebarSection
-          title="저장된 번역"
-          isOpen={openSection === 'saved'}
-          onToggle={() => toggleSection('saved')}
-        >
-          <SavedTranslations
-            savedTranslations={savedTranslations}
-            onCopyAll={copyAllTranslations}
-            updateTranslation={updateTranslation}
-          />
-        </SidebarSection>
-
-        <SidebarSection
-          title="사용자 사전"
-          isOpen={openSection === 'dictionary'}
-          onToggle={() => toggleSection('dictionary')}
-        >
-          <ProperNounManager />
-        </SidebarSection>
+    <SidebarSection
+      title="문장 목록"
+      isOpen={openSection === 'sentence'}
+      onToggle={() => toggleSection('sentence')}
+      scrollable
+    >
+      <div className="pr-2">
+        <SentenceList
+          currentIndex={currentIndex}
+          onSentenceSelect={handleSentenceSelect}
+          groupedSentences={groupedSentences}
+          skippedIndexes={skippedIndexes}
+          translatedIndexes={translatedIndexes}
+          starredIndexes={starredIndexes}
+          onToggleStar={handleToggleStar}
+        />
       </div>
+    </SidebarSection>
+
+    <SidebarSection
+      title="저장된 번역"
+      isOpen={openSection === 'saved'}
+      onToggle={() => toggleSection('saved')}
+    >
+      <SavedTranslations
+        savedTranslations={savedTranslations}
+        onCopyAll={copyAllTranslations}
+        updateTranslation={updateTranslation}
+      />
+    </SidebarSection>
+
+    <SidebarSection
+      title="사용자 사전"
+      isOpen={openSection === 'dictionary'}
+      onToggle={() => toggleSection('dictionary')}
+    >
+      <ProperNounManager />
+    </SidebarSection>
+  </div>
+</div>
     </div>
   )
 }

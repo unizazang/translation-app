@@ -35,11 +35,11 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
   onTranslate,
 }) => {
   return (
-    <div className="w-full h-full flex flex-col text-gray-900 font-normal bg-white rounded-2xl px-6 border border-gray-100">
+    <div className="w-full h-full flex flex-col text-gray-900 font-normal bg-white rounded-2xl px-6">
       {/* 원문 */}
       <div className="mb-6">
         
-        <div className="border border-gray-200 bg-gray-50 rounded-xl p-5 h-[180px] overflow-y-auto text-base shadow-[0_8px_24px_rgba(0,0,0,0.08)] focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-150">
+        <div className="border border-gray-200 bg-gray-50 rounded-xl p-5 h-[250px] overflow-y-auto text-base shadow-[0_8px_24px_rgba(0,0,0,0.08)] focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-150">
           <div className="flex justify-between items-center mb-3">
           <h3 className="text-lg font-semibold text-gray-900 tracking-tight">
             원본 문장
@@ -96,13 +96,13 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
       </div>
 
       {/* 번역 결과 */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col border-t-1 pt-8 border-gray-200">
 
         <div className="flex flex-row justify-between gap-6 flex-1 overflow-hidden">
           {(['google', 'deepL'] as const).map((engine) => (
             <div
               key={engine}
-              className="border border-gray-200 bg-gray-50 rounded-xl p-5 shadow-[0_8px_24px_rgba(0,0,0,0.08)] flex flex-col h-[450px] flex-1 transition-all duration-150"
+              className="border border-gray-200 bg-gray-50 rounded-xl p-5 shadow-[0_8px_24px_rgba(0,0,0,0.08)] flex flex-col h-[350px] flex-1 transition-all duration-150"
             >
               <strong className="text-gray-700 mb-3 text-base text-center tracking-wide">
                 {engine === 'google' ? 'Google' : 'DeepL'} 번역
@@ -121,7 +121,7 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
           ))}
         </div>
 
-              <p className="text-sm  text-gray-500 mt-2  pt-2 border-gray-300">
+              <p className="text-sm  text-gray-500 mt-2  border-gray-300">
         사용자가 선택한 번역이 우측 사이드바 <strong>저장된 번역</strong>에 차례대로 저장됩니다. <strong>“저장하기”</strong> 버튼을 눌러 보세요. 
       </p>
       </div>
