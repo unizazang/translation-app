@@ -18,7 +18,7 @@ const SidebarProgress: React.FC<SidebarProgressProps> = ({
   currentSentenceInPage,
 }) => {
   return (
-    <div className="p-4 pb-7 border-b bg-white">
+    <div className="p-4 pb-7 mb-2 border-b border-gray-300 bg-white">
       <div className="flex justify-between items-center mb-2">
         <span className="text-sm font-medium text-gray-700">
           페이지 {currentPage} / {totalPages}

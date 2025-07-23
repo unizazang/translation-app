@@ -123,8 +123,8 @@ export default function ProperNounManager() {
       </div>
 
       {/* 안내 문구 */}
-      <p className="text-sm  text-gray-500 mt-2 border-t pt-2 border-gray-300">
-        단어 추가 시 Ctrl+R로 새로고침 한 뒤 번역해주세요.
+      <p className="text-sm  text-gray-500 mt-2 border-t mb-3 pt-2 border-gray-300">
+        단어 추가 시 <strong>Ctrl+R로 새로고침</strong> 한 뒤 번역해주세요.
       </p>
 
 
@@ -144,13 +144,13 @@ export default function ProperNounManager() {
       </button>
 
       {isOpen && (
-        <div className="mt-4 border rounded p-2 bg-gray-50 max-h-45 overflow-y-auto text-black">
+        <div className="mt-4 rounded p-2 bg-gray-50 max-h-40 overflow-y-auto text-black">
           <ul className="space-y-2">
             {properNouns.length > 0 ? (
               properNouns.map((noun) => (
 <li
   key={noun.original}
-  className="flex justify-between items-start gap-2 p-2 border border-gray-300"
+  className="flex justify-between items-start gap-2 p-2 border border-gray-300 rounded-lg"
 >
   <span className="text-gray-700 italic break-words whitespace-pre-wrap flex-1 min-w-0">
     {`${noun.original} -> ${noun.translation}`}

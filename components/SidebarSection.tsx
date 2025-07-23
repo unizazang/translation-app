@@ -24,7 +24,7 @@ export default function SidebarSection({
       {/* 섹션 헤더 */}
       <button
         onClick={onToggle}
-        className="w-full flex justify-between items-center px-5 py-3 bg-white hover:bg-gray-100 transition"
+        className="w-full flex justify-between items-center px-5 py-2 bg-white hover:bg-gray-100 transition"
       >
         <span className="font-semibold text-base text-gray-800">{title}</span>
         <FontAwesomeIcon
