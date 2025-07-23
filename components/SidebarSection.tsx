@@ -9,7 +9,7 @@ interface SidebarSectionProps {
   isOpen: boolean
   onToggle: () => void
   children: ReactNode
-  scrollable?: boolean  // ✅ 추가: 내부 스크롤 여부
+  scrollable?: boolean
 }
 
 export default function SidebarSection({
@@ -20,22 +20,24 @@ export default function SidebarSection({
   scrollable = false,
 }: SidebarSectionProps) {
   return (
-    <div className="border-b last:border-b-0 flex-shrink-0">
+    <div className="mb-3 rounded-xl overflow-hidden shadow-sm bg-white">
+      {/* 섹션 헤더 */}
       <button
         onClick={onToggle}
-        className="w-full flex justify-between items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 transition"
+        className="w-full flex justify-between items-center px-5 py-3 bg-white hover:bg-gray-100 transition"
       >
-        <span className="font-semibold text-gray-800">{title}</span>
+        <span className="font-semibold text-base text-gray-800">{title}</span>
         <FontAwesomeIcon
           icon={isOpen ? faChevronUp : faChevronDown}
-          className="text-gray-600"
+          className="text-gray-500"
         />
       </button>
 
+      {/* 섹션 콘텐츠 */}
       {isOpen && (
         <div
-          className={`p-4 bg-white ${
-            scrollable ? 'max-h-[calc(100vh-16rem)] overflow-y-auto' : ''
+          className={`px-5 py-4 bg-gray-50 text-sm ${
+            scrollable ? 'max-h-[calc(100vh-16rem)] overflow-y-auto custom-scrollbar' : ''
           }`}
         >
           {children}

@@ -12,14 +12,14 @@ interface TranslationCardProps {
     papago: string
     deepL: string
   }
-  onSave: () => void
+  onSave: (engine: 'google' | 'deepL') => void
   onNext: () => void
   onPrevious: () => void
   isTranslating: boolean
   isStarred: boolean
   onToggleStar: () => void
   onSkip: () => void
-  onTranslate?: () => void // 선택적 prop
+  onTranslate?: () => void
 }
 
 const TranslationCard: React.FC<TranslationCardProps> = ({
@@ -34,7 +34,7 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
   onSkip,
   onTranslate,
 }) => {
-   return (
+  return (
     <div className="w-full h-full flex flex-col text-gray-900 font-medium bg-white rounded-2xl p-6 border border-gray-100">
       {/* 원문 */}
       <div className="mb-6">
@@ -100,7 +100,7 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
           번역 결과
         </h3>
         <div className="flex flex-row justify-between gap-6 flex-1 overflow-hidden">
-          {['google', 'deepL'].map((engine) => (
+          {(['google', 'deepL'] as const).map((engine) => (
             <div
               key={engine}
               className="border border-gray-200 bg-gray-50 rounded-xl p-5 shadow-[0_8px_24px_rgba(0,0,0,0.08)] flex flex-col h-full flex-1 transition-all duration-150"
@@ -108,12 +108,12 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
               <strong className="text-gray-700 mb-3 text-base text-center tracking-wide">
                 {engine === 'google' ? 'Google' : 'DeepL'}
               </strong>
-              <div className="flex-1 overflow-y-auto rounded-lg p-4 text-base  focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-150 max-h-[220px]">
-                {translations[engine as keyof typeof translations]}
+              <div className="flex-1 overflow-y-auto rounded-lg p-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-150 max-h-[220px]">
+                {translations[engine]}
               </div>
               <button
                 className="mt-5 px-4 py-2 bg-blue-500 text-white rounded-xl font-semibold shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all duration-150 disabled:opacity-50"
-                onClick={onSave}
+                onClick={() => onSave(engine)}
                 disabled={isTranslating}
               >
                 저장하기

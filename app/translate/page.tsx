@@ -122,13 +122,15 @@ export default function Home() {
     }
   }
 
-  const handleTranslationSave = () => {
-    if (translationContext.google) {
-      saveTranslation(translationContext.google, groupedSentences[currentIndex].join(' '))
-      setTranslatedIndexes((prev) => new Set([...prev, currentIndex]))
-      setCompletedIndexes((prev) => new Set([...prev, currentIndex]))
-    }
+const handleTranslationSave = (engine: 'google' | 'deepL') => {
+  const translatedText = translationContext[engine]
+  if (translatedText) {
+    saveTranslation(translatedText, groupedSentences[currentIndex].join(' '))
+    setTranslatedIndexes((prev) => new Set([...prev, currentIndex]))
+    setCompletedIndexes((prev) => new Set([...prev, currentIndex]))
   }
+}
+
 
   useEffect(() => {
     if (groupedSentences.length > 0 && shouldAutoTranslate && currentIndex < groupedSentences.length) {
