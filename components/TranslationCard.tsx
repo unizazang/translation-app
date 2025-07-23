@@ -103,16 +103,16 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
           {(['google', 'deepL'] as const).map((engine) => (
             <div
               key={engine}
-              className="border border-gray-200 bg-gray-50 rounded-xl p-5 shadow-[0_8px_24px_rgba(0,0,0,0.08)] flex flex-col h-full flex-1 transition-all duration-150"
+              className="border border-gray-200 bg-gray-50 rounded-xl p-5 shadow-[0_8px_24px_rgba(0,0,0,0.08)] flex flex-col h-[450px] flex-1 transition-all duration-150"
             >
               <strong className="text-gray-700 mb-3 text-base text-center tracking-wide">
-                {engine === 'google' ? 'Google' : 'DeepL'}
+                {engine === 'google' ? 'Google' : 'DeepL'} 번역
               </strong>
-              <div className="flex-1 overflow-y-auto rounded-lg p-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-150 max-h-[220px]">
+              <div className="flex-1 overflow-y-auto rounded-lg p-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-150 max-h-[300px]">
                 {translations[engine]}
               </div>
               <button
-                className="mt-5 px-4 py-2 bg-blue-500 text-white rounded-xl font-semibold shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all duration-150 disabled:opacity-50"
+                className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-xl font-semibold shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all duration-150 disabled:opacity-50"
                 onClick={() => onSave(engine)}
                 disabled={isTranslating}
               >
