@@ -20,12 +20,14 @@ const SavedTranslations: React.FC<SavedTranslationsProps> = ({
   onCopyAll,
   updateTranslation,
 }) => {
-  // 화면에 표시할 번호 포함 텍스트
-  const numberedText = savedTranslations
-    .map((t, i) => `#${i + 1}_ ${t.translated}`)
-    .join("\n");
+const [editText, setEditText] = useState(""); // 초기값을 빈 문자열로 설정
 
-  const [editText, setEditText] = useState(numberedText);
+useEffect(() => {
+  setEditText(
+    savedTranslations.map((t, i) => `#${i + 1}_ ${t.translated}`).join("\n")
+  );
+}, [savedTranslations]);
+
   const [showToast, setShowToast] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [toastMessage, setToastMessage] = useState("");
@@ -94,14 +96,15 @@ const SavedTranslations: React.FC<SavedTranslationsProps> = ({
     showToastMessage("번역이 저장되었습니다.");
   };
 
-  const handleResetTranslations = () => {
-    const isConfirmed = window.confirm("정말 초기화할까요?");
-    if (!isConfirmed) return;
+    const handleResetTranslations = () => {
+      const isConfirmed = window.confirm("정말 초기화할까요?");
+      if (!isConfirmed) return;
 
-    resetAllTranslations();
-    setTimeout(() => setEditText(""), 0);
-    showToastMessage("번역이 초기화되었습니다.");
-  };
+      resetAllTranslations();
+      setEditText(""); // ✅ setTimeout 제거 후 즉시 상태 업데이트
+      showToastMessage("번역이 초기화되었습니다.");
+    };
+
 
   const handleCopyAll = () => {
     const rawText = extractCleanText(editText);

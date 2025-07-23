@@ -49,12 +49,19 @@ export function useTranslation() {
     };
   }>({});
 
+  // ✅ 최초 로딩 보호 플래그 추가
+  const [isInitialLoaded, setIsInitialLoaded] = useState(false);
+
+  // ✅ 최초 로딩 로직 (보호 플래그 적용)
   useEffect(() => {
-    const storedTranslations = localStorage.getItem(STORAGE_KEY);
-    if (storedTranslations) {
-      setSavedTranslations(JSON.parse(storedTranslations));
+    if (!isInitialLoaded) {
+      const storedTranslations = localStorage.getItem(STORAGE_KEY);
+      if (storedTranslations) {
+        setSavedTranslations(JSON.parse(storedTranslations));
+      }
+      setIsInitialLoaded(true);
     }
-  }, []);
+  }, [isInitialLoaded]);
 
   useEffect(() => {
     const storedAutoMove = localStorage.getItem("autoMove");
@@ -78,7 +85,11 @@ export function useTranslation() {
   const resetAllTranslations = () => {
     localStorage.removeItem(STORAGE_KEY);
     setSavedTranslations([]);
-    console.log("🔄 모든 번역이 완전히 삭제되었습니다.");
+    // console.log("🔄 모든 번역이 완전히 삭제되었습니다.");
+
+     const emptyArray: [] = [];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(emptyArray)); // ✅ 빈 배열 명시적 저장
+    setSavedTranslations(emptyArray); // ✅ 상태도 즉시 빈 배열로 설정
     setTimeout(() => {
       setSavedTranslations([]);
     }, 0);
