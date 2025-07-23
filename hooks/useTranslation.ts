@@ -31,11 +31,9 @@ export function useTranslation() {
     deepL: "",
   });
 
-  // 자동 이동 설정 상태 추가
   const [autoMove, setAutoMove] = useState<boolean>(false);
   const [targetLanguage, setTargetLanguage] = useState<string>("ko");
 
-  // ✅ 저장된 번역 목록을 관리하는 상태
   const [savedTranslations, setSavedTranslations] = useState<
     {
       original: string;
@@ -43,7 +41,6 @@ export function useTranslation() {
     }[]
   >([]);
 
-  // ✅ 번역 결과를 캐싱하는 상태 추가
   const [cachedTranslations, setCachedTranslations] = useState<{
     [key: number]: {
       google: string;
@@ -52,7 +49,6 @@ export function useTranslation() {
     };
   }>({});
 
-  // ✅ 로컬 스토리지에서 번역 불러오기
   useEffect(() => {
     const storedTranslations = localStorage.getItem(STORAGE_KEY);
     if (storedTranslations) {
@@ -60,7 +56,6 @@ export function useTranslation() {
     }
   }, []);
 
-  // 자동 이동 설정 불러오기
   useEffect(() => {
     const storedAutoMove = localStorage.getItem("autoMove");
     if (storedAutoMove !== null) {
@@ -68,37 +63,27 @@ export function useTranslation() {
     }
   }, []);
 
-  // 자동 이동 설정 저장
   useEffect(() => {
     localStorage.setItem("autoMove", autoMove.toString());
   }, [autoMove]);
 
-  // ✅ localStorage가 변경될 때 자동 저장
   useEffect(() => {
     if (savedTranslations.length === 0) {
-      localStorage.removeItem(STORAGE_KEY); // ✅ 데이터가 없으면 완전히 삭제
+      localStorage.removeItem(STORAGE_KEY);
     } else {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(savedTranslations));
     }
   }, [savedTranslations]);
 
-  /**
-   * ✅ 번역 목록 초기화 함수 (전체 삭제)
-   */
   const resetAllTranslations = () => {
-    localStorage.removeItem(STORAGE_KEY); // ✅ 로컬 스토리지에서 삭제
-    setSavedTranslations([]); // ✅ 상태 업데이트 요청
+    localStorage.removeItem(STORAGE_KEY);
+    setSavedTranslations([]);
     console.log("🔄 모든 번역이 완전히 삭제되었습니다.");
-
-    // ✅ 상태 동기화를 강제 적용하여 즉시 업데이트
     setTimeout(() => {
       setSavedTranslations([]);
     }, 0);
   };
 
-  /**
-   * ✅ 입력된 텍스트를 번역하는 함수
-   */
   const translateText = async (
     text: string,
     sourceLang: string,
@@ -147,9 +132,6 @@ export function useTranslation() {
     }
   };
 
-  /**
-   * ✅ 번역 결과 저장 함수
-   */
   const saveTranslation = (translation: string, original: string) => {
     setSavedTranslations((prev) => {
       const storedTranslations = localStorage.getItem(STORAGE_KEY);
@@ -165,14 +147,13 @@ export function useTranslation() {
         ...existingTranslations,
         { original, translated: translation },
       ];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
+
+      // 🔴 이 부분(localStorage 직접 저장)을 삭제했습니다.
+
       return updatedList;
     });
   };
 
-  /**
-   * ✅ 번역 수정 함수 (사용자가 직접 수정 가능)
-   */
   const updateTranslation = (index: number, newText: string) => {
     setSavedTranslations((prev) => {
       const updatedList = [...prev];
@@ -185,9 +166,6 @@ export function useTranslation() {
     });
   };
 
-  /**
-   * ✅ 모든 번역을 클립보드에 복사하는 함수
-   */
   const copyAllTranslations = () => {
     const allTranslations = savedTranslations
       .map((t) => t.translated)

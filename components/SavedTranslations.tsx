@@ -148,7 +148,7 @@ const SavedTranslations: React.FC<SavedTranslationsProps> = ({
       <div className="border border-gray-300 bg-white p-4 rounded-xl shadow-inner text-black">
         <textarea
           ref={textareaRef}
-          className="w-full h-96 text-black p-2 rounded resize-none overflow-y-auto "
+          className="w-full h-96 text-black p-2 rounded resize-none leading-6 overflow-y-auto "
           value={editText} 
           onChange={(e) => setEditText(e.target.value)}
           onBlur={handleSave}
