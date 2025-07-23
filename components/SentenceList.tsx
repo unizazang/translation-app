@@ -175,12 +175,12 @@ export default function SentenceList({
           placeholder="문장 검색..."
           value={searchQuery}
           onChange={handleSearchChange}
-          className="flex-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 px-4 py-1.5 bg-white border border-gray-300 rounded-lg text-gray-800 font-medium shadow-none hover:bg-gray-100 focus:bg-gray-100 transition focus:outline-none focus:ring-2 focus:ring-gray-300"
         />
         <select
           value={filter}
           onChange={handleFilterChange}
-          className="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-4 py-1.5 bg-white border border-gray-300 rounded-lg text-gray-800 font-medium shadow-none hover:bg-gray-100 focus:bg-gray-100 transition focus:outline-none focus:ring-2 focus:ring-gray-300"
         >
           <option value="all">전체</option>
           <option value="translated">번역됨</option>

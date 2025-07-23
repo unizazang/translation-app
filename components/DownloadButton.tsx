@@ -29,7 +29,7 @@ export default function DownloadButton({
   return (
     <button
       onClick={handleDownload}
-      className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+      className="mt-4 px-4 py-1.5 bg-white border border-gray-300 rounded-lg text-gray-800 font-medium shadow-none hover:bg-gray-100 transition"
     >
       번역된 PDF 다운로드
     </button>

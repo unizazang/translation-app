@@ -25,14 +25,14 @@ export default function SidebarFileInfo({
   };
 
   return (
-    <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200 text-sm bg-white">
-      <span className="truncate text-gray-700 font-medium">
-        파일명: [{fileName}]
-      </span>
-      <div>
+    <div className="flex flex-col px-4 py-2 border-b border-gray-200 text-sm bg-white">
+      <div className="flex justify-between items-start">
+        <span className="break-all text-gray-700 font-medium w-4/5">
+          파일명: [{fileName}]
+        </span>
         <button
           onClick={triggerFileInput}
-          className="text-sm px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-300"
+          className="text-sm px-4 py-1.5 bg-white border border-gray-300 rounded-lg text-gray-800 font-medium shadow-none hover:bg-gray-100 transition ml-2 whitespace-nowrap"
         >
           파일 교체
         </button>

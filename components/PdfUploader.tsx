@@ -6,7 +6,7 @@ import FileDropzone from "./FileDropzone";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface PdfUploaderProps {
-  onTextExtracted: (text: PdfPageData[][]) => void;
+  onTextExtracted: (text: PdfPageData[][], fileName: string) => void;
 }
 
 export default function PdfUploader({ onTextExtracted }: PdfUploaderProps) {
@@ -16,13 +16,20 @@ export default function PdfUploader({ onTextExtracted }: PdfUploaderProps) {
    * ✅ PDF 업로드 및 텍스트 추출 핸들러
    */
   const handleFileUpload = async (file: File) => {
+    // PDF 확장자 체크
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      alert('PDF파일만 업로드 가능합니다.');
+      return;
+    }
     setIsLoading(true);
     try {
       const pdfBuffer: ArrayBuffer = await loadPdf(file);
       const extractedText: PdfPageData[][] = await extractTextFromPdf(
         pdfBuffer
       );
-      onTextExtracted(extractedText);
+      // 확장자 제거한 파일명 전달
+      const nameWithoutExt = file.name.replace(/\.pdf$/i, '');
+      onTextExtracted(extractedText, nameWithoutExt);
     } catch (error) {
       console.error("❌ PDF 처리 중 오류 발생:", error);
     } finally {

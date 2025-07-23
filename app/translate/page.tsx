@@ -10,6 +10,7 @@ import ProperNounManager from '@/components/ProperNounManager'
 import SavedTranslations from '@/components/SavedTranslations'
 import SidebarSection from '@/components/SidebarSection'
 import SidebarProgress from '@/components/SidebarProgress'
+import SidebarFileInfo from '@/components/SidebarFileInfo'
 
 import { useTextProcessing } from '@/hooks/useTextProcessing'
 import { useTranslation } from '@/hooks/useTranslation'
@@ -17,6 +18,7 @@ import { useProperNoun } from '@/hooks/useProperNoun'
 
 import { PdfPageData } from '@/lib/pdfProcessor'
 import { TranslatedTextBlock } from '@/lib/pdfLayout'
+import { loadPdf, extractTextFromPdf } from '@/lib/pdfProcessor'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,6 +38,8 @@ export default function Home() {
   const [shouldAutoTranslate, setShouldAutoTranslate] = useState(false)
   const [pdfPages, setPdfPages] = useState<PdfPageData[][]>([])
   const [openSection, setOpenSection] = useState<'sentence' | 'saved' | 'dictionary' | null>('sentence')
+  const [fileName, setFileName] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
 
   const { properNouns } = useProperNoun()
   const { groupedSentences, processText } = useTextProcessing()
@@ -64,7 +68,7 @@ export default function Home() {
     })
   }, [])
 
-  const handleTextExtracted = (extractedText: PdfPageData[][]) => {
+  const handleTextExtracted = (extractedText: PdfPageData[][], fileNameArg: string) => {
     setPdfPages(extractedText)
     const extractedString = extractedText
       .map((page) => page.map((block) => block.text).join(' '))
@@ -73,7 +77,8 @@ export default function Home() {
     processText(extractedString)
     setCurrentIndex(0)
     setIsPdfUploaded(true)
-
+    setErrorMessage('')
+    setFileName(fileNameArg)
     const initialTranslatedBlocks = extractedText.map((page) =>
       page.map((block) => ({
         text: block.text,
@@ -131,6 +136,32 @@ const handleTranslationSave = (engine: 'google' | 'deepL') => {
   }
 }
 
+  // PDF 교체 및 업로드 핸들러
+  const handleReplaceFile = async (file: File) => {
+    setFileName(file.name)
+    setIsPdfUploaded(false)
+    setErrorMessage('')
+    // 상태 초기화
+    setPdfPages([])
+    setPdfText('')
+    setCurrentIndex(0)
+    setTranslatedBlocks([])
+    setSkippedIndexes(new Set())
+    setTranslatedIndexes(new Set())
+    setStarredIndexes(new Set())
+    setCompletedIndexes(new Set())
+    // PDF 추출
+    try {
+      const pdfBuffer = await loadPdf(file)
+      const extractedText = await extractTextFromPdf(pdfBuffer)
+      handleTextExtracted(extractedText, file.name)
+      setIsPdfUploaded(true)
+    } catch (error) {
+      setErrorMessage('PDF 처리 중 오류가 발생했습니다. 올바른 PDF 파일인지 확인해 주세요.')
+      setIsPdfUploaded(false)
+    }
+  }
+
 
   useEffect(() => {
     if (groupedSentences.length > 0 && shouldAutoTranslate && currentIndex < groupedSentences.length) {
@@ -177,7 +208,11 @@ const handleTranslationSave = (engine: 'google' | 'deepL') => {
         <div className="flex-1 flex flex-col overflow-hidden bg-white rounded-2xl p-6">
           {!isPdfUploaded ? (
             <div className="flex-1 flex items-center justify-center">
-              <PdfUploader onTextExtracted={handleTextExtracted} />
+              <PdfUploader onTextExtracted={(extractedText, fileName) => {
+                if (extractedText && fileName) {
+                  handleTextExtracted(extractedText, fileName)
+                }
+              }} />
             </div>
           ) : (
             <>
@@ -203,13 +238,19 @@ const handleTranslationSave = (engine: 'google' | 'deepL') => {
       {/* 오른쪽: 사이드바 */}
       <div className="bg-white/90 border-l border-gray-100 shadow-2xl w-[420px] h-screen overflow-y-auto flex flex-col rounded-l-3xl">
         {isPdfUploaded && (
-          <SidebarProgress
-            totalPages={totalPages}
-            currentPage={currentPage}
-            totalSentences={currentPageSentences}
-            currentSentenceInPage={currentSentenceInPage}
-            currentIndex={currentIndex}
-          />
+          <>
+            {errorMessage && (
+              <div className="bg-red-100 text-red-700 px-4 py-2 text-sm border-b border-red-200">{errorMessage}</div>
+            )}
+            <SidebarFileInfo fileName={fileName} onReplaceFile={handleReplaceFile} />
+            <SidebarProgress
+              totalPages={totalPages}
+              currentPage={currentPage}
+              totalSentences={currentPageSentences}
+              currentSentenceInPage={currentSentenceInPage}
+              currentIndex={currentIndex}
+            />
+          </>
         )}
 
         <SidebarSection

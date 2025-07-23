@@ -29,7 +29,7 @@ const SavedTranslations: React.FC<SavedTranslationsProps> = ({
   const [showToast, setShowToast] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [toastMessage, setToastMessage] = useState("");
-  const { resetAllTranslations } = useTranslation();
+  const { resetAllTranslations, setSavedTranslations } = useTranslation();
 
   useEffect(() => {
     setEditText(
@@ -75,14 +75,22 @@ const SavedTranslations: React.FC<SavedTranslationsProps> = ({
       return;
     }
 
+    // 1. textarea에서 번역만 추출
     const updatedTranslations = extractCleanText(editText)
       .split("\n")
       .filter((text) => text.trim() !== "");
 
-    updatedTranslations.forEach((text, index) => {
-      updateTranslation(index, text);
-    });
+    // 2. 기존 savedTranslations의 original과 매칭하여, 남은 번역만 배열로 재구성
+    //    (순서가 바뀌지 않는다는 전제)
+    //    줄이 줄어들면 해당 번역 삭제, 줄이 늘어나도 추가하지 않음
+    const newSavedTranslations = savedTranslations
+      .slice(0, updatedTranslations.length)
+      .map((item, idx) => ({
+        original: item.original,
+        translated: updatedTranslations[idx],
+      }));
 
+    setSavedTranslations(newSavedTranslations);
     showToastMessage("번역이 저장되었습니다.");
   };
 
@@ -117,19 +125,19 @@ const SavedTranslations: React.FC<SavedTranslationsProps> = ({
       {/* 버튼 줄 */}
       <div className="flex gap-2 mb-2">
         <button
-          className="px-3 py-1 bg-blue-600 text-white rounded"
+          className="px-4 py-1.5 bg-white border border-gray-300 rounded-lg text-gray-800 font-medium shadow-none hover:bg-gray-100 transition"
           onClick={handleCopyAll}
         >
           전체 복사
         </button>
         <button
-          className="px-3 py-1 bg-red-500 text-white rounded"
+          className="px-4 py-1.5 bg-white border border-gray-300 rounded-lg text-gray-800 font-medium shadow-none hover:bg-gray-100 transition"
           onClick={handleResetTranslations}
         >
           초기화
         </button>
         <button
-          className="px-3 py-1 bg-gray-700 text-white rounded"
+          className="px-4 py-1.5 bg-white border border-gray-300 rounded-lg text-gray-800 font-medium shadow-none hover:bg-gray-100 transition"
           onClick={handleDownloadTxt}
         >
           다운로드

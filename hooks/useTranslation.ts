@@ -210,5 +210,6 @@ export function useTranslation() {
     targetLanguage,
     setTargetLanguage,
     setTranslations,
+    setSavedTranslations,
   };
 }
