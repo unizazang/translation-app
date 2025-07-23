@@ -35,7 +35,7 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
   onTranslate,
 }) => {
   return (
-    <div className="w-full h-full flex flex-col text-gray-900 font-normal bg-white rounded-2xl p-6 border border-gray-100">
+    <div className="w-full h-full flex flex-col text-gray-900 font-normal bg-white rounded-2xl px-6 border border-gray-100">
       {/* 원문 */}
       <div className="mb-6">
         

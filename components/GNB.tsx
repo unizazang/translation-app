@@ -19,6 +19,7 @@ export default function GNB() {
           >
             PDF 글자 추출
           </Link>
+          <a href="">사용법 안내</a>
           <a
             href="https://mail.google.com/mail/u/0/?fs=1&tf=cm&source=mailto&to=zifnffk32123@gmail.com&subject=%5BPDF%20번역기%5D%20버그%20제보&body=다음과%20같은%20버그가%20있습니다%3A%0A%0A1.%20발생%20위치%20(예%3A%20PDF%20업로드)%0A2.%20버그%20설명%0A3.%20스크린샷%20또는%20상세%20설명"
             target="_blank"
