@@ -20,16 +20,21 @@ const SavedTranslations: React.FC<SavedTranslationsProps> = ({
   onCopyAll,
   updateTranslation,
 }) => {
-  const [editText, setEditText] = useState(
-    savedTranslations.map((t) => t.translated).join("\n")
-  );
+  // 화면에 표시할 번호 포함 텍스트
+  const numberedText = savedTranslations
+    .map((t, i) => `#${i + 1}_ ${t.translated}`)
+    .join("\n");
+
+  const [editText, setEditText] = useState(numberedText);
   const [showToast, setShowToast] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [toastMessage, setToastMessage] = useState("");
   const { resetAllTranslations } = useTranslation();
 
   useEffect(() => {
-    setEditText(savedTranslations.map((t) => t.translated).join("\n"));
+    setEditText(
+      savedTranslations.map((t, i) => `#${i + 1}_ ${t.translated}`).join("\n")
+    );
   }, [savedTranslations]);
 
   useEffect(() => {
@@ -39,7 +44,8 @@ const SavedTranslations: React.FC<SavedTranslationsProps> = ({
   }, [editText]);
 
   const handleDownloadTxt = () => {
-    const blob = new Blob([editText], { type: "text/plain;charset=utf-8" });
+    const rawText = extractCleanText(editText);
+    const blob = new Blob([rawText], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -56,18 +62,27 @@ const SavedTranslations: React.FC<SavedTranslationsProps> = ({
     setTimeout(() => setShowToast(false), 2000);
   };
 
+  const extractCleanText = (text: string) => {
+    return text
+      .split("\n")
+      .map((line) => line.replace(/^#\d+_ /, "").trim())
+      .join("\n");
+  };
+
   const handleSave = () => {
     if (savedTranslations.length === 0) {
       setEditText("");
       return;
     }
 
-    const updatedTranslations = editText
+    const updatedTranslations = extractCleanText(editText)
       .split("\n")
       .filter((text) => text.trim() !== "");
+
     updatedTranslations.forEach((text, index) => {
       updateTranslation(index, text);
     });
+
     showToastMessage("번역이 저장되었습니다.");
   };
 
@@ -81,7 +96,8 @@ const SavedTranslations: React.FC<SavedTranslationsProps> = ({
   };
 
   const handleCopyAll = () => {
-    navigator.clipboard.writeText(editText).then(() => {
+    const rawText = extractCleanText(editText);
+    navigator.clipboard.writeText(rawText).then(() => {
       showToastMessage("클립보드에 복사되었습니다.");
     });
   };
@@ -98,7 +114,7 @@ const SavedTranslations: React.FC<SavedTranslationsProps> = ({
         캐시/쿠키 삭제 시 내용이 지워지니 필요시 백업해주세요.
       </p>
 
-      {/* 버튼 줄: 텍스트박스 바로 위 */}
+      {/* 버튼 줄 */}
       <div className="flex gap-2 mb-2">
         <button
           className="px-3 py-1 bg-blue-600 text-white rounded"
@@ -124,8 +140,8 @@ const SavedTranslations: React.FC<SavedTranslationsProps> = ({
       <div className="border border-gray-300 bg-white p-4 rounded-xl shadow-inner text-black">
         <textarea
           ref={textareaRef}
-          className="w-full h-96 text-black p-2 rounded resize-none overflow-y-auto"
-          value={editText}
+          className="w-full h-96 text-black p-2 rounded resize-none overflow-y-auto "
+          value={editText} 
           onChange={(e) => setEditText(e.target.value)}
           onBlur={handleSave}
           onKeyDown={(e) => {
@@ -137,7 +153,7 @@ const SavedTranslations: React.FC<SavedTranslationsProps> = ({
         />
       </div>
 
-      {/* 토스트 메시지 */}
+      {/* Toast 메시지 */}
       {showToast && (
         <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-600 text-white px-6 py-3 rounded-full shadow-lg animate-bounce">
           {toastMessage}
