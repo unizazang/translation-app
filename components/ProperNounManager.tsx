@@ -61,11 +61,11 @@ export default function ProperNounManager() {
           placeholder="번역되지 않도록 할 단어"
           value={original}
           onChange={(e) => setOriginal(e.target.value)}
-          className="flex-1 border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 rounded-xl border border-gray-300 bg-white px-4 py-2 shadow-none placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
         />
         <button
           onClick={handleAdd}
-          className="px-3 py-2 bg-blue-400 text-white rounded hover:bg-blue-600 transition whitespace-nowrap"
+          className="px-4 py-2 rounded-xl bg-blue-500 text-white font-normal shadow-none hover:bg-blue-600 transition whitespace-nowrap"
         >
           <FontAwesomeIcon icon={faPlus} /> 단어 추가
         </button>
@@ -77,7 +77,7 @@ export default function ProperNounManager() {
         placeholder="원하는 번역"
         value={translation}
         onChange={(e) => setTranslation(e.target.value)}
-        className="border p-2 rounded w-full mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="rounded-xl border border-gray-300 bg-white px-4 py-2 w-full mb-4 shadow-none placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
       />
 
       {/* ✅ 파일 업로드 영역 */}
@@ -105,13 +105,13 @@ export default function ProperNounManager() {
             a.click();
             URL.revokeObjectURL(url);
           }}
-          className="flex-1 p-2 bg-gray-300 rounded hover:bg-gray-400 transition"
+          className="flex-1 px-4 py-2 rounded-xl bg-gray-200 text-gray-800 font-normal shadow-none hover:bg-gray-300 transition"
         >
           단어 목록 다운로드
         </button>
         <button
           onClick={handleResetProperNouns}
-          className="flex-1 p-2 bg-red-400 text-white rounded hover:bg-red-600 transition cursor-pointer"
+          className="flex-1 px-4 py-2 rounded-xl bg-red-500 text-white font-normal shadow-none hover:bg-red-600 transition cursor-pointer"
         >
           <FontAwesomeIcon icon={faEraser} /> 단어 목록 초기화
         </button>

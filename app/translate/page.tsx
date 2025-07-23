@@ -192,7 +192,7 @@ const handleTranslationSave = (engine: 'google' | 'deepL') => {
   }
 
   return (
-    <div className="flex h-screen overflow-auto bg-gradient-to-br from-gray-50 to-white">
+    <div className="flex h-screen bg-gradient-to-br from-gray-50 to-white">
       {/* 왼쪽: 메인 번역 작업 */}
       <div className="flex-1 flex flex-col bg-white/80 p-4 px-8  ">
         <div className="flex justify-center">
@@ -237,9 +237,9 @@ const handleTranslationSave = (engine: 'google' | 'deepL') => {
 
       {/* 오른쪽: 사이드바 */}
       {/* 오른쪽: 사이드바 */}
-<div className="bg-white/90 border-l border-gray-100 shadow-2xl w-[420px] overflow-y-auto flex flex-col rounded-l-3xl max-h-[calc(100dvh)]">
+<div className="bg-white/90 border-l border-gray-100 shadow-2xl w-[420px] flex flex-col rounded-l-3xl">
 
-  <div className="flex-1 overflow-y-auto">
+  <div className="flex-1 min-h-0 overflow-y-auto">
     {isPdfUploaded && (
       <>
         {errorMessage && (
