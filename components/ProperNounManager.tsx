@@ -148,20 +148,20 @@ export default function ProperNounManager() {
           <ul className="space-y-2">
             {properNouns.length > 0 ? (
               properNouns.map((noun) => (
-<li
-  key={noun.original}
-  className="flex justify-between items-start gap-2 p-2 border border-gray-300 rounded-lg"
->
-  <span className="text-gray-700 italic break-words whitespace-pre-wrap flex-1 min-w-0">
-    {`${noun.original} -> ${noun.translation}`}
-  </span>
-  <button
-    onClick={() => removeProperNoun(noun.original)}
-    className="text-red-500 hover:text-red-700 transition flex-shrink-0"
-  >
-    <FontAwesomeIcon icon={faTrash} className="cursor-pointer" /> 삭제
-  </button>
-</li>
+              <li
+                key={noun.original}
+                className="flex justify-between items-start gap-2 p-2 border border-gray-300 rounded-lg"
+              >
+                <span className="text-gray-700 italic break-words whitespace-pre-wrap flex-1 min-w-0">
+                  {`${noun.original} -> ${noun.translation}`}
+                </span>
+                <button
+                  onClick={() => removeProperNoun(noun.original)}
+                  className="text-red-500 hover:text-red-700 transition flex-shrink-0"
+                >
+                  <FontAwesomeIcon icon={faTrash} className="cursor-pointer px-1" />
+                </button>
+              </li>
 
               ))
             ) : (
