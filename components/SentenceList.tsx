@@ -1,40 +1,30 @@
-"use client";
+"use client"
 
-import { useState, useMemo, useCallback, useEffect } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState, useMemo, useCallback, useEffect } from "react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faCheck,
   faForward,
   faClock,
-  faStar as faStarSolid,
-  faStar as faStarRegular,
   faStar,
-} from "@fortawesome/free-solid-svg-icons";
-import ContextMenu from "./ContextMenu";
+} from "@fortawesome/free-solid-svg-icons"
+import ContextMenu from "./ContextMenu"
 
 interface SentenceListProps {
-  currentIndex: number;
-  onSentenceSelect: (index: number) => void;
-  groupedSentences: string[][];
-  skippedIndexes: Set<number>;
-  translatedIndexes: Set<number>;
-  starredIndexes: Set<number>;
-  onToggleStar: (index: number) => void;
+  currentIndex: number
+  onSentenceSelect: (index: number) => void
+  groupedSentences: string[][]
+  skippedIndexes: Set<number>
+  translatedIndexes: Set<number>
+  starredIndexes: Set<number>
+  onToggleStar: (index: number) => void
 }
-
-type FilterType =
-  | "all"
-  | "translated"
-  | "skipped"
-  | "starred"
-  | "pending"
-  | "bookmarked";
 
 // 문장을 축약하는 함수
 const truncateText = (text: string, maxLength: number = 25): string => {
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength) + "...";
-};
+  if (text.length <= maxLength) return text
+  return text.slice(0, maxLength) + "..."
+}
 
 export default function SentenceList({
   currentIndex,
@@ -45,42 +35,30 @@ export default function SentenceList({
   starredIndexes,
   onToggleStar,
 }: SentenceListProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filter, setFilter] = useState<FilterType>("all");
+  const [searchQuery, setSearchQuery] = useState("")
   const [contextMenu, setContextMenu] = useState<{
-    x: number;
-    y: number;
-    index: number;
-  } | null>(null);
+    x: number
+    y: number
+    index: number
+  } | null>(null)
 
-  // 검색어 변경 핸들러
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setSearchQuery(e.target.value);
+      setSearchQuery(e.target.value)
     },
     []
-  );
+  )
 
-  // 필터 변경 핸들러
-  const handleFilterChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setFilter(e.target.value as FilterType);
-    },
-    []
-  );
-
-  // 우클릭 핸들러
   const handleContextMenu = useCallback(
     (e: React.MouseEvent, index: number) => {
-      e.preventDefault();
+      e.preventDefault()
       if (skippedIndexes.has(index)) {
-        setContextMenu({ x: e.clientX, y: e.clientY, index });
+        setContextMenu({ x: e.clientX, y: e.clientY, index })
       }
     },
     [skippedIndexes]
-  );
+  )
 
-  // 필터링된 문장 목록 계산
   const filteredSentences = useMemo(() => {
     return groupedSentences
       .map((sentence, index) => ({
@@ -90,82 +68,54 @@ export default function SentenceList({
         isSkipped: skippedIndexes.has(index),
         isStarred: starredIndexes.has(index),
       }))
-      .filter((sentence) => {
-        // 검색어 필터링
-        const matchesSearch = sentence.text
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase());
+      .filter((sentence) =>
+        sentence.text.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+  }, [groupedSentences, searchQuery, translatedIndexes, skippedIndexes, starredIndexes])
 
-        // 상태 필터링
-        let matchesFilter = true;
-        switch (filter) {
-          case "translated":
-            matchesFilter = sentence.isTranslated;
-            break;
-          case "skipped":
-            matchesFilter = sentence.isSkipped;
-            break;
-          case "starred":
-            matchesFilter = sentence.isStarred;
-            break;
-          case "bookmarked":
-            matchesFilter = sentence.isStarred;
-            break;
-        }
-
-        return matchesSearch && matchesFilter;
-      });
-  }, [groupedSentences, searchQuery, filter, translatedIndexes, skippedIndexes, starredIndexes]);
-
-  // 문장 선택 핸들러
   const handleSentenceClick = useCallback(
     (index: number) => {
-      onSentenceSelect(index);
+      onSentenceSelect(index)
     },
     [onSentenceSelect]
-  );
+  )
 
-  // 중요 표시 토글 핸들러
   const handleStarClick = useCallback(
     (e: React.MouseEvent, index: number) => {
-      e.stopPropagation();
-      onToggleStar(index);
+      e.stopPropagation()
+      onToggleStar(index)
     },
     [onToggleStar]
-  );
+  )
 
   const getSentenceStatus = (index: number) => {
-    if (translatedIndexes.has(index)) return "translated";
-    if (skippedIndexes.has(index)) return "skipped";
-    if (index === currentIndex) return "pending";
-    return "none";
-  };
+    if (translatedIndexes.has(index)) return "translated"
+    if (skippedIndexes.has(index)) return "skipped"
+    if (index === currentIndex) return "pending"
+    return "none"
+  }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "translated":
-        return <FontAwesomeIcon icon={faCheck} className="text-green-500" />;
+        return <FontAwesomeIcon icon={faCheck} className="text-green-500" />
       case "skipped":
-        return <FontAwesomeIcon icon={faForward} className="text-gray-500" />;
+        return <FontAwesomeIcon icon={faForward} className="text-gray-500" />
       case "pending":
-        return <FontAwesomeIcon icon={faClock} className="text-yellow-500" />;
+        return <FontAwesomeIcon icon={faClock} className="text-yellow-500" />
       default:
-        return null;
+        return null
     }
-  };
+  }
 
-  // 현재 문장으로 자동 스크롤
   useEffect(() => {
     const currentSentence = document.querySelector(
       `[data-index="${currentIndex}"]`
-    );
+    )
     if (currentSentence) {
-      currentSentence.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
+      currentSentence.scrollIntoView({ behavior: "smooth", block: "center" })
     }
-  }, [currentIndex]);
+  }, [currentIndex])
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -177,23 +127,12 @@ export default function SentenceList({
           onChange={handleSearchChange}
           className="flex-1 px-4 py-1.5 bg-white border border-gray-300 rounded-lg text-gray-800 font-medium shadow-none hover:bg-gray-100 focus:bg-gray-100 transition focus:outline-none focus:ring-2 focus:ring-gray-300"
         />
-        <select
-          value={filter}
-          onChange={handleFilterChange}
-          className="px-4 py-1.5 bg-white border border-gray-300 rounded-lg text-gray-800 font-medium shadow-none hover:bg-gray-100 focus:bg-gray-100 transition focus:outline-none focus:ring-2 focus:ring-gray-300"
-        >
-          <option value="all">전체</option>
-          <option value="translated">번역됨</option>
-          <option value="skipped">건너뜀</option>
-          <option value="pending">대기중</option>
-          <option value="bookmarked">북마크</option>
-        </select>
       </div>
 
       <div className="flex-1 overflow-y-auto pr-2 h-[calc(100vh-12rem)]">
         <ul className="space-y-2">
           {filteredSentences.map((sentence, index) => {
-            const status = getSentenceStatus(index);
+            const status = getSentenceStatus(index)
             return (
               <li
                 key={index}
@@ -229,7 +168,7 @@ export default function SentenceList({
                   </button>
                 </div>
               </li>
-            );
+            )
           })}
         </ul>
       </div>
@@ -242,5 +181,5 @@ export default function SentenceList({
         />
       )}
     </div>
-  );
+  )
 }
