@@ -6,9 +6,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlus,
   faTrash,
-  faFileUpload,
-  faChevronDown,
-  faChevronUp,
   faEraser,
 } from "@fortawesome/free-solid-svg-icons";
 import FileDropzone from "./FileDropzone";
@@ -21,9 +18,9 @@ export default function ProperNounManager() {
     addProperNounsFromFile,
     resetAllProperNouns,
   } = useProperNoun();
+
   const [original, setOriginal] = useState("");
   const [translation, setTranslation] = useState("");
-  const [isOpen, setIsOpen] = useState<boolean>(true);
 
   const handleAdd = () => {
     addProperNoun(original, translation);
@@ -51,14 +48,12 @@ export default function ProperNounManager() {
 
   return (
     <div className="px-6 rounded-lg bg-white text-black">
-      <h2 className="text-lg font-semibold mb-4">🔹 번역 예외 단어 설정</h2>
+      {/* <h2 className="text-lg font-semibold mb-4">🔹 번역 예외 단어 설정</h2> */}
 
-      <p className="text-gray-600 mb-2">
-        번역되지 않도록 할 단어나, 특정 방식으로 번역하고 싶은 단어를 설정할 수
-        있습니다.
-      </p>
+      {/* <p className="text-gray-600 mb-2">
+        번역되지 않도록 할 단어나, 특정 방식으로 번역하고 싶은 단어를 설정할 수 있습니다.
+      </p> */}
 
-      
       {/* ✅ 첫 줄: 입력 + 버튼을 가로로 정렬 */}
       <div className="flex gap-2 mb-2">
         <input
@@ -123,31 +118,15 @@ export default function ProperNounManager() {
       </div>
 
       {/* 안내 문구 */}
-      <p className="text-sm  text-gray-500 mt-2 border-t mb-3 pt-2 border-gray-300">
+      <p className="text-sm text-gray-500 mt-2 border-t mb-3 pt-2 border-gray-300">
         단어 추가 시 <strong>Ctrl+R로 새로고침</strong> 한 뒤 번역해주세요.
       </p>
 
-
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full mt-2 px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition"
-      >
-        {isOpen ? (
-          <>
-            <FontAwesomeIcon icon={faChevronUp} /> 목록 접기
-          </>
-        ) : (
-          <>
-            <FontAwesomeIcon icon={faChevronDown} /> 목록 펼치기
-          </>
-        )}
-      </button>
-
-      {isOpen && (
-        <div className="mt-4 rounded p-2 bg-gray-50 max-h-40 overflow-y-auto text-black">
-          <ul className="space-y-2">
-            {properNouns.length > 0 ? (
-              properNouns.map((noun) => (
+      {/* ✅ 목록은 항상 펼쳐진 상태 */}
+      <div className="mt-4 rounded p-2 bg-gray-50 max-h-80 overflow-y-auto text-black">
+        <ul className="space-y-2">
+          {properNouns.length > 0 ? (
+            properNouns.map((noun) => (
               <li
                 key={noun.original}
                 className="flex justify-between items-start gap-2 p-2 border border-gray-300 rounded-lg"
@@ -162,14 +141,12 @@ export default function ProperNounManager() {
                   <FontAwesomeIcon icon={faTrash} className="cursor-pointer px-1" />
                 </button>
               </li>
-
-              ))
-            ) : (
-              <p className="text-black">번역하지 않을 단어를 등록해 보세요.</p>
-            )}
-          </ul>
-        </div>
-      )}
+            ))
+          ) : (
+            <p className="text-black">번역하지 않을 단어를 등록해 보세요.</p>
+          )}
+        </ul>
+      </div>
     </div>
   );
 }
