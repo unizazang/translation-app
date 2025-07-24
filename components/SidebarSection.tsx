@@ -20,7 +20,7 @@ export default function SidebarSection({
   scrollable = false,
 }: SidebarSectionProps) {
   return (
-    <div className="mb-3 rounded-xl overflow-hidden shadow-sm bg-white">
+    <div className="mb-3 overflow-hidden bg-white">
       {/* 섹션 헤더 */}
       <button
         onClick={onToggle}

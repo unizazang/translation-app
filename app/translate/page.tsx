@@ -192,7 +192,7 @@ const handleTranslationSave = (engine: 'google' | 'deepL') => {
   }
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-50 to-white">
+    <div className="flex h-full bg-gradient-to-br from-gray-50 to-white">
       {/* 왼쪽: 메인 번역 작업 */}
       <div className="flex-1 flex flex-col bg-white/80 p-4 px-8  ">
         <div className="flex justify-center">

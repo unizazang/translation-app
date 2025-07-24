@@ -123,7 +123,7 @@ export default function ProperNounManager() {
       </p>
 
       {/* ✅ 목록은 항상 펼쳐진 상태 */}
-      <div className="mt-4 rounded p-2 bg-white max-h-40 overflow-y-auto text-black">
+      <div className="mt-4 rounded p-2 bg-white max-h-55 overflow-y-auto text-black">
         <ul className="space-y-2">
           {properNouns.length > 0 ? (
             properNouns.map((noun) => (
