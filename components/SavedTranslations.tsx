@@ -1,52 +1,49 @@
 "use client";
 
-import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 
 interface SavedTranslationsProps {
   savedTranslations: {
+    idx: number;
     original: string;
     translated: string;
   }[];
+  groupedSentences: string[][];
+  currentIndex: number;
   onCopyAll: () => void;
-  updateTranslation: (index: number, newTranslation: string) => void;
+  updateTranslation: (idx: number, newTranslation: string) => void;
+  onSentenceSelect: (index: number) => void;
 }
 
 const SavedTranslations: React.FC<SavedTranslationsProps> = ({
   savedTranslations,
+  groupedSentences,
+  currentIndex,
   onCopyAll,
   updateTranslation,
+  onSentenceSelect,
 }) => {
-const [editText, setEditText] = useState(""); // 초기값을 빈 문자열로 설정
-
-useEffect(() => {
-  setEditText(
-    savedTranslations.map((t, i) => `#${i + 1}_ ${t.translated}`).join("\n")
-  );
-}, [savedTranslations]);
-
   const [showToast, setShowToast] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [toastMessage, setToastMessage] = useState("");
-  const { resetAllTranslations, setSavedTranslations } = useTranslation();
+  const { resetAllTranslations } = useTranslation();
 
-  useEffect(() => {
-    setEditText(
-      savedTranslations.map((t, i) => `#${i + 1}_ ${t.translated}`).join("\n")
-    );
-  }, [savedTranslations]);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingValue, setEditingValue] = useState("");
+  const [expandedIndexes, setExpandedIndexes] = useState<Set<number>>(
+    new Set()
+  );
 
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
-    }
-  }, [editText]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const showToastMessage = (message: string) => {
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 2000);
+  };
 
   const handleDownloadTxt = () => {
-    const rawText = extractCleanText(editText);
+    const rawText = savedTranslations.map((t) => t.translated).join("\n");
     const blob = new Blob([rawText], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -58,67 +55,45 @@ useEffect(() => {
     URL.revokeObjectURL(url);
   };
 
-  const showToastMessage = (message: string) => {
-    setToastMessage(message);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 2000);
+  const handleResetTranslations = () => {
+    const isConfirmed = window.confirm("정말 초기화할까요?");
+    if (!isConfirmed) return;
+    resetAllTranslations();
+    showToastMessage("번역이 초기화되었습니다.");
   };
-
-  const extractCleanText = (text: string) => {
-    return text
-      .split("\n")
-      .map((line) => line.replace(/^#\d+_ /, "").trim())
-      .join("\n");
-  };
-
-  const handleSave = () => {
-    if (savedTranslations.length === 0) {
-      setEditText("");
-      return;
-    }
-
-    // 1. textarea에서 번역만 추출
-    const updatedTranslations = extractCleanText(editText)
-      .split("\n")
-      .filter((text) => text.trim() !== "");
-
-    // 2. 기존 savedTranslations의 original과 매칭하여, 남은 번역만 배열로 재구성
-    //    (순서가 바뀌지 않는다는 전제)
-    //    줄이 줄어들면 해당 번역 삭제, 줄이 늘어나도 추가하지 않음
-    const newSavedTranslations = savedTranslations
-      .slice(0, updatedTranslations.length)
-      .map((item, idx) => ({
-        original: item.original,
-        translated: updatedTranslations[idx],
-      }));
-
-    setSavedTranslations(newSavedTranslations);
-    showToastMessage("번역이 저장되었습니다.");
-  };
-
-    const handleResetTranslations = () => {
-      const isConfirmed = window.confirm("정말 초기화할까요?");
-      if (!isConfirmed) return;
-
-      resetAllTranslations();
-      setEditText(""); // ✅ setTimeout 제거 후 즉시 상태 업데이트
-      showToastMessage("번역이 초기화되었습니다.");
-    };
-
 
   const handleCopyAll = () => {
-    const rawText = extractCleanText(editText);
+    const rawText = savedTranslations.map((t) => t.translated).join("\n");
     navigator.clipboard.writeText(rawText).then(() => {
       showToastMessage("클립보드에 복사되었습니다.");
     });
   };
 
+  const handleSaveEdit = () => {
+    if (editingIndex !== null) {
+      const target = savedTranslations[editingIndex];
+      updateTranslation(target.idx, editingValue.trim());
+      setEditingIndex(null);
+      setEditingValue("");
+    }
+  };
+
+  const toggleExpand = (index: number) => {
+    setExpandedIndexes((prev) => {
+      const next = new Set(prev);
+      next.has(index) ? next.delete(index) : next.add(index);
+      return next;
+    });
+  };
+
+  const truncateText = (text: string, length = 100) => {
+    if (text.length <= length) return text;
+    return text.slice(0, length) + " ...";
+  };
+
   return (
     <div className="w-full rounded-lg mt-4 text-black">
-      {/* 제목 */}
       <h2 className="text-lg font-semibold mb-1">저장된 번역</h2>
-
-      {/* 안내 문구 */}
       <p className="text-sm text-red-500 mb-2">
         주의: 번역 결과는 브라우저에 임시 저장됩니다.
         <br />
@@ -127,44 +102,92 @@ useEffect(() => {
 
       {/* 버튼 줄 */}
       <div className="flex gap-2 mb-2">
-        <button
-          className="px-4 py-1.5 bg-white border border-gray-300 rounded-lg text-gray-800 font-medium shadow-none hover:bg-gray-100 transition"
-          onClick={handleCopyAll}
-        >
+        <button className="px-4 py-1.5 border rounded" onClick={onCopyAll}>
           전체 복사
         </button>
         <button
-          className="px-4 py-1.5 bg-white border border-gray-300 rounded-lg text-gray-800 font-medium shadow-none hover:bg-gray-100 transition"
+          className="px-4 py-1.5 border rounded"
           onClick={handleResetTranslations}
         >
           초기화
         </button>
         <button
-          className="px-4 py-1.5 bg-white border border-gray-300 rounded-lg text-gray-800 font-medium shadow-none hover:bg-gray-100 transition"
+          className="px-4 py-1.5 border rounded"
           onClick={handleDownloadTxt}
         >
           다운로드
         </button>
       </div>
 
-      {/* 텍스트 박스 */}
-      <div className="border border-gray-300 bg-white p-4 rounded-xl shadow-inner text-black">
-        <textarea
-          ref={textareaRef}
-          className="w-full h-96 text-black p-2 rounded resize-none leading-6 overflow-y-auto "
-          value={editText} 
-          onChange={(e) => setEditText(e.target.value)}
-          onBlur={handleSave}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              handleSave();
-            }
-          }}
-        />
-      </div>
+      {/* 안내 문구 또는 번역 리스트 */}
+      {savedTranslations === null ? (
+        <p className="text-gray-400 text-sm text-center mt-4">
+          저장된 번역을 불러오는 중입니다...
+        </p>
+      ) : savedTranslations.length === 0 ? (
+        <p className="text-gray-400 text-sm text-center mt-4">
+          저장된 번역이 없습니다.
+        </p>
+      ) : (
+        <div className="space-y-3">
+          {savedTranslations.map((item, index) => {
+            const isExpanded = expandedIndexes.has(index);
+            const isEditing = editingIndex === index;
+            const isActive = currentIndex === item.idx;
 
-      {/* Toast 메시지 */}
+            return (
+              <div
+                key={index}
+                className={`border rounded-xl p-4 transition cursor-pointer ${
+                  isActive
+                    ? "bg-blue-50 border-blue-300"
+                    : "bg-white border-gray-300 hover:shadow"
+                }`}
+                onClick={() => {
+                  toggleExpand(index);
+                  onSentenceSelect(item.idx);
+                }}
+              >
+                <div className="text-xs text-gray-400 mb-1">#{index + 1}</div>
+
+                {isExpanded && isEditing ? (
+                  <textarea
+                    ref={textareaRef}
+                    value={editingValue}
+                    onChange={(e) => setEditingValue(e.target.value)}
+                    onBlur={handleSaveEdit}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSaveEdit();
+                      }
+                    }}
+                    className="w-full text-sm text-gray-800 p-2 border border-gray-300 rounded-md resize-none leading-6"
+                    rows={4}
+                  />
+                ) : isExpanded ? (
+                  <div
+                    className="text-sm text-gray-800 whitespace-pre-line"
+                    onDoubleClick={(e) => {
+                      e.stopPropagation();
+                      setEditingIndex(index);
+                      setEditingValue(item.translated);
+                    }}
+                  >
+                    {item.translated}
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-600 line-clamp-1">
+                    {truncateText(item.translated)}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* 토스트 메시지 */}
       {showToast && (
         <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-600 text-white px-6 py-3 rounded-full shadow-lg animate-bounce">
           {toastMessage}
