@@ -1,30 +1,30 @@
-"use client"
+"use client";
 
-import { useState, useMemo, useCallback, useEffect } from "react"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useState, useMemo, useCallback, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
   faForward,
   faClock,
   faStar,
-} from "@fortawesome/free-solid-svg-icons"
-import ContextMenu from "./ContextMenu"
+} from "@fortawesome/free-solid-svg-icons";
+import ContextMenu from "./ContextMenu";
 
 interface SentenceListProps {
-  currentIndex: number
-  onSentenceSelect: (index: number) => void
-  groupedSentences: string[][]
-  skippedIndexes: Set<number>
-  translatedIndexes: Set<number>
-  starredIndexes: Set<number>
-  onToggleStar: (index: number) => void
+  currentIndex: number;
+  onSentenceSelect: (index: number) => void;
+  groupedSentences: string[][];
+  skippedIndexes: Set<number>;
+  translatedIndexes: Set<number>;
+  starredIndexes: Set<number>;
+  onToggleStar: (index: number) => void;
 }
 
 // 문장을 축약하는 함수
-const truncateText = (text: string, maxLength: number = 25): string => {
-  if (text.length <= maxLength) return text
-  return text.slice(0, maxLength) + "..."
-}
+const truncateText = (text: string, maxLength: number = 13): string => {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + "...";
+};
 
 export default function SentenceList({
   currentIndex,
@@ -35,29 +35,29 @@ export default function SentenceList({
   starredIndexes,
   onToggleStar,
 }: SentenceListProps) {
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState("");
   const [contextMenu, setContextMenu] = useState<{
-    x: number
-    y: number
-    index: number
-  } | null>(null)
+    x: number;
+    y: number;
+    index: number;
+  } | null>(null);
 
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setSearchQuery(e.target.value)
+      setSearchQuery(e.target.value);
     },
     []
-  )
+  );
 
   const handleContextMenu = useCallback(
     (e: React.MouseEvent, index: number) => {
-      e.preventDefault()
+      e.preventDefault();
       if (skippedIndexes.has(index)) {
-        setContextMenu({ x: e.clientX, y: e.clientY, index })
+        setContextMenu({ x: e.clientX, y: e.clientY, index });
       }
     },
     [skippedIndexes]
-  )
+  );
 
   const filteredSentences = useMemo(() => {
     return groupedSentences
@@ -70,52 +70,58 @@ export default function SentenceList({
       }))
       .filter((sentence) =>
         sentence.text.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-  }, [groupedSentences, searchQuery, translatedIndexes, skippedIndexes, starredIndexes])
+      );
+  }, [
+    groupedSentences,
+    searchQuery,
+    translatedIndexes,
+    skippedIndexes,
+    starredIndexes,
+  ]);
 
   const handleSentenceClick = useCallback(
     (index: number) => {
-      onSentenceSelect(index)
+      onSentenceSelect(index);
     },
     [onSentenceSelect]
-  )
+  );
 
   const handleStarClick = useCallback(
     (e: React.MouseEvent, index: number) => {
-      e.stopPropagation()
-      onToggleStar(index)
+      e.stopPropagation();
+      onToggleStar(index);
     },
     [onToggleStar]
-  )
+  );
 
   const getSentenceStatus = (index: number) => {
-    if (translatedIndexes.has(index)) return "translated"
-    if (skippedIndexes.has(index)) return "skipped"
-    if (index === currentIndex) return "pending"
-    return "none"
-  }
+    if (translatedIndexes.has(index)) return "translated";
+    if (skippedIndexes.has(index)) return "skipped";
+    if (index === currentIndex) return "pending";
+    return "none";
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "translated":
-        return <FontAwesomeIcon icon={faCheck} className="text-green-500" />
+        return <FontAwesomeIcon icon={faCheck} className="text-green-500" />;
       case "skipped":
-        return <FontAwesomeIcon icon={faForward} className="text-gray-500" />
+        return <FontAwesomeIcon icon={faForward} className="text-gray-500" />;
       case "pending":
-        return <FontAwesomeIcon icon={faClock} className="text-yellow-500" />
+        return <FontAwesomeIcon icon={faClock} className="text-yellow-500" />;
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   useEffect(() => {
     const currentSentence = document.querySelector(
       `[data-index="${currentIndex}"]`
-    )
+    );
     if (currentSentence) {
-      currentSentence.scrollIntoView({ behavior: "smooth", block: "center" })
+      currentSentence.scrollIntoView({ behavior: "smooth", block: "center" });
     }
-  }, [currentIndex])
+  }, [currentIndex]);
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -129,10 +135,10 @@ export default function SentenceList({
         />
       </div>
 
-      <div className="flex-1 overflow-y-auto pr-2 h-[calc(100vh-12rem)]">
+      <div className="flex-1 overflow-y-auto h-[calc(100vh-12rem)]">
         <ul className="space-y-2">
           {filteredSentences.map((sentence, index) => {
-            const status = getSentenceStatus(index)
+            const status = getSentenceStatus(index);
             return (
               <li
                 key={index}
@@ -168,7 +174,7 @@ export default function SentenceList({
                   </button>
                 </div>
               </li>
-            )
+            );
           })}
         </ul>
       </div>
@@ -181,5 +187,5 @@ export default function SentenceList({
         />
       )}
     </div>
-  )
+  );
 }
