@@ -9,42 +9,71 @@ export async function getOrCreateHistory(
   fileHash: string,
   fileName: string
 ): Promise<string | null> {
-  // 먼저 기존 히스토리 검색
-  const { data, error } = await supabase
-    .from("translation_histories")
-    .select("id")
-    .eq("user_id", userId)
-    .eq("file_hash", fileHash)
-    .maybeSingle();
+  console.log("🚩 진입: getOrCreateHistory()");
+  console.log("userId:", userId);
+  console.log("fileHash:", fileHash);
+  console.log("fileName:", fileName);
 
-  if (error) {
-    console.error("❌ 히스토리 조회 실패:", error.message);
+  if (!supabase) {
+    console.error("❌ supabase 클라이언트가 null입니다.");
     return null;
   }
 
-  if (data) {
-    return data.id;
-  }
+  try {
+    // 1. 기존 히스토리 검색
+    const {
+      data: existing,
+      error: selectError,
+    }: { data: { id: string } | null; error: PostgrestError | null } =
+      await supabase
+        .from("translation_histories")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("file_hash", fileHash)
+        .maybeSingle();
 
-  // 없다면 생성
-  const { data: inserted, error: insertError } = await supabase
-    .from("translation_histories")
-    .insert([
-      {
+    if (selectError) {
+      console.error("❌ select 에러:", selectError.message);
+    }
+
+    if (existing) {
+      console.log("✅ 기존 히스토리 존재:", existing.id);
+      return existing.id;
+    }
+
+    // 2. 없으면 새로 insert
+    const {
+      data: inserted,
+      error: insertError,
+    }: {
+      data: { id: string } | null;
+      error: PostgrestError | null;
+    } = await supabase
+      .from("translation_histories")
+      .insert({
         user_id: userId,
         file_hash: fileHash,
         file_name: fileName,
-      } as TablesInsert<"translation_histories">,
-    ])
-    .select("id")
-    .single();
+      })
+      .select()
+      .maybeSingle();
 
-  if (insertError) {
-    console.error("❌ 히스토리 생성 실패:", insertError.message);
+    if (insertError) {
+      console.error("❌ insert 에러:", insertError.message);
+      return null;
+    }
+
+    if (!inserted) {
+      console.warn("⚠️ insert 성공했지만 반환된 데이터 없음");
+      return null;
+    }
+
+    console.log("✅ 히스토리 insert 성공:", inserted.id);
+    return inserted.id;
+  } catch (e) {
+    console.error("❌ getOrCreateHistory 전체 실패:", e);
     return null;
   }
-
-  return inserted.id;
 }
 
 /**

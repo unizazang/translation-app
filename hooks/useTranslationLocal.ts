@@ -19,7 +19,7 @@ const normalizeLanguageForPapago = (lang: string) => {
 };
 const STORAGE_KEY = "savedTranslations";
 
-export function useTranslationLocal() {
+export function useTranslationLocal(fileHash?: string) {
   const { properNouns } = useProperNoun();
   const [translations, setTranslations] = useState<{
     google: string;

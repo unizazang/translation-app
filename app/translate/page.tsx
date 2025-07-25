@@ -28,7 +28,13 @@ import SavedTranslationsLocal from "@/components/SavedTranslationsLocal";
 export const dynamic = "force-dynamic";
 
 export default function Home() {
-  const user = useUser(); // ✅ 여기에 추가!
+  console.log("✅ [page.tsx] 페이지 컴포넌트 렌더 시작");
+
+  const user = useUser();
+  useEffect(() => {
+    console.log("👁️ user 상태 확인:", user);
+  }, [user]);
+  console.log("✅ [page.tsx] 현재 user:", user);
   const [fileHash, setFileHash] = useState("");
 
   const [showDictionaryModal, setShowDictionaryModal] = useState(false);
@@ -76,6 +82,12 @@ export default function Home() {
     autoMove,
     setAutoMove,
   } = useTranslation(selectedHistory?.fileHash, selectedHistory?.fileName); // ✅ 반드시 전달
+
+  console.log(
+    "✅ [page.tsx] useTranslation 호출됨:",
+    selectedHistory?.fileHash,
+    selectedHistory?.fileName
+  );
 
   const handleSentenceSelect = useCallback((index: number) => {
     setCurrentIndex(index);
