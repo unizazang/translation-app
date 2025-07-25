@@ -48,9 +48,17 @@ export function useTranslation() {
     };
   }>({});
 
+  const [currentFileName, setCurrentFileName] = useState<string | null>(null);
+  // 현재 파일 이름 저장
+  const getStorageKey = (fileName: string) => `savedTranslations_${fileName}`;
+
   // ✅ 로컬 스토리지에서 번역 불러오기
   useEffect(() => {
-    const storedTranslations = localStorage.getItem(STORAGE_KEY);
+    if (!currentFileName) return;
+
+    const storedTranslations = localStorage.getItem(
+      getStorageKey(currentFileName)
+    );
     if (storedTranslations) {
       try {
         const parsed = JSON.parse(storedTranslations);
@@ -62,12 +70,12 @@ export function useTranslation() {
         setSavedTranslations(migrated);
       } catch (e) {
         console.error("🚨 저장된 번역 데이터를 불러오는 중 오류 발생:", e);
-        setSavedTranslations([]); // ❗ 파싱 실패 시에도 상태를 비워서 렌더링 되도록
+        setSavedTranslations([]);
       }
     } else {
-      setSavedTranslations([]); // ❗ localStorage가 아예 없을 때도 빈 배열로
+      setSavedTranslations([]);
     }
-  }, []);
+  }, [currentFileName]);
 
   // 자동 이동 설정 불러오기
   useEffect(() => {
@@ -166,23 +174,28 @@ export function useTranslation() {
     original: string,
     idx: number
   ) => {
+    if (!currentFileName) return;
+
     setSavedTranslations((prev) => {
       const newEntry = { original, translated: translation, idx };
-      const storedTranslations = localStorage.getItem(STORAGE_KEY);
-      const existingTranslations: {
-        original: string;
-        translated: string;
-        idx?: number;
-      }[] = storedTranslations ? JSON.parse(storedTranslations) : [];
 
-      // 🛠 idx 없는 오래된 데이터가 있을 경우 기본값 -1을 추가하여 일관성 유지
-      const migrated = existingTranslations.map((item, i) => ({
-        ...item,
-        idx: item.idx ?? -1, // fallback idx
-      }));
+      // 중복 저장 방지
+      if (
+        prev &&
+        prev.some((item) => item.idx === idx && item.translated === translation)
+      ) {
+        return prev;
+      }
 
-      const updatedList = [...migrated, newEntry];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
+      const updatedList = [...(prev || []), newEntry];
+
+      const key = getStorageKey(currentFileName);
+      localStorage.setItem(key, JSON.stringify(updatedList));
+
+      // ✅ 타임스탬프 저장
+      const timestamp = new Date().toISOString();
+      localStorage.setItem(`${key}:timestamp`, timestamp);
+
       return updatedList;
     });
   };
@@ -191,13 +204,18 @@ export function useTranslation() {
    * ✅ 번역 수정 함수 (사용자가 직접 수정 가능)
    */
   const updateTranslation = (idx: number, newText: string) => {
-    setSavedTranslations((prev) => {
-      if (!prev) return []; // prev가 null이면 빈 배열 반환하여 문제 방지
+    if (!currentFileName) return;
 
-      const updatedList = prev.map((item) =>
+    setSavedTranslations((prev) => {
+      const safePrev = prev ?? []; // ✅ prev가 null이면 빈 배열로 대체
+
+      const updatedList = safePrev.map((item) =>
         item.idx === idx ? { ...item, translated: newText } : item
       );
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
+      localStorage.setItem(
+        getStorageKey(currentFileName),
+        JSON.stringify(updatedList)
+      );
       return updatedList;
     });
   };
@@ -225,6 +243,7 @@ export function useTranslation() {
     resetAllTranslations,
     autoMove,
     setAutoMove,
-    setSavedTranslations,
+    currentFileName,
+    setCurrentFileName, // 📤 page.tsx에서 호출 가능해야 함
   };
 }

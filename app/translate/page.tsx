@@ -25,7 +25,6 @@ export const dynamic = "force-dynamic";
 
 export default function Home() {
   const [showDictionaryModal, setShowDictionaryModal] = useState(false);
-
   const [pdfText, setPdfText] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [targetLanguage, setTargetLanguage] = useState("ko");
@@ -64,6 +63,7 @@ export default function Home() {
     copyAllTranslations,
     autoMove,
     setAutoMove,
+    setCurrentFileName,
   } = useTranslation();
 
   const handleSentenceSelect = useCallback((index: number) => {
@@ -92,6 +92,7 @@ export default function Home() {
     setIsPdfUploaded(true);
     setErrorMessage("");
     setFileName(fileNameArg);
+    setCurrentFileName(fileNameArg);
     const initialTranslatedBlocks = extractedText.map((page) =>
       page.map((block) => ({
         text: block.text,
@@ -167,6 +168,7 @@ export default function Home() {
     setTranslatedIndexes(new Set());
     setStarredIndexes(new Set());
     setCompletedIndexes(new Set());
+    setCurrentFileName(file.name);
     // PDF 추출
     try {
       const pdfBuffer = await loadPdf(file);
