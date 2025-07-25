@@ -1,65 +1,83 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getUserHistories } from "@/lib/supabase/translation";
-import { supabase } from "@/lib/supabase-browser";
+import { useUser } from "@/app/auth/client";
+import { getTranslationHistories } from "@/lib/supabase/translation";
 
-type History = {
-  id: string;
-  file_name: string;
+interface HistoryItem {
   file_hash: string;
-  created_at: string;
-};
+  file_name: string;
+  created_at: string | null; // ← 여기만 수정
+}
 
 interface Props {
   onSelect: (fileHash: string, fileName: string) => void;
 }
 
 export default function TranslationHistoryList({ onSelect }: Props) {
-  const [histories, setHistories] = useState<History[]>([]);
+  const user = useUser();
+  const [histories, setHistories] = useState<HistoryItem[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchHistories = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
+    if (!user) return;
 
-      const list = await getUserHistories(user.id);
-      setHistories(list);
+    const fetchHistories = async () => {
+      setLoading(true);
+      const result = await getTranslationHistories(user.id);
+
+      if (!result || result.length === 0) {
+        console.log("📂 번역 히스토리가 없습니다.");
+      }
+
+      setHistories(result ?? []);
       setLoading(false);
     };
 
     fetchHistories();
-  }, []);
+  }, [user]);
 
-  if (loading) {
+  if (!user) {
     return (
-      <div className="text-sm text-gray-500">히스토리를 불러오는 중...</div>
+      <p className="text-sm text-red-500 text-center">
+        로그인한 사용자만 히스토리를 조회할 수 있습니다.
+      </p>
     );
   }
 
-  if (histories.length === 0) {
+  if (loading) {
     return (
-      <div className="text-sm text-gray-500">저장된 번역 기록이 없습니다.</div>
+      <p className="text-sm text-gray-400 text-center">
+        히스토리를 불러오는 중입니다...
+      </p>
+    );
+  }
+
+  if (histories && histories.length === 0) {
+    return (
+      <p className="text-sm text-gray-400 text-center">
+        아직 저장된 번역 히스토리가 없습니다.
+      </p>
     );
   }
 
   return (
     <div className="space-y-2">
-      <h2 className="text-lg font-semibold">📂 번역 기록</h2>
-      <ul className="space-y-1">
-        {histories.map((item) => (
-          <li
-            key={item.id}
-            className="cursor-pointer hover:underline text-blue-600"
-            onClick={() => onSelect(item.file_hash, item.file_name)}
-          >
-            {item.file_name} ({new Date(item.created_at).toLocaleDateString()})
-          </li>
-        ))}
-      </ul>
+      {histories?.map((item, index) => (
+        <button
+          key={index}
+          onClick={() => onSelect(item.file_hash, item.file_name)}
+          className="..."
+        >
+          <div className="text-sm font-medium">{item.file_name}</div>
+          <div className="text-xs text-gray-400">
+            저장일시:{" "}
+            {item.created_at
+              ? new Date(item.created_at).toLocaleString()
+              : "날짜 없음"}
+          </div>
+        </button>
+      ))}
     </div>
   );
 }

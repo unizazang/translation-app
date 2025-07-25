@@ -11,6 +11,7 @@ import SavedTranslations from "@/components/SavedTranslations";
 import SidebarSection from "@/components/SidebarSection";
 import SidebarProgress from "@/components/SidebarProgress";
 import SidebarFileInfo from "@/components/SidebarFileInfo";
+import { useUser } from "@/app/auth/client";
 
 import { useTextProcessing } from "@/hooks/useTextProcessing";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -22,10 +23,12 @@ import { TranslatedTextBlock } from "@/lib/pdfLayout";
 import { generateFileHash } from "@/lib/fileHash";
 import { loadPdf, extractTextFromPdf } from "@/lib/pdfProcessor";
 import TranslationHistoryList from "@/components/TranslationHistoryList";
+import SavedTranslationsLocal from "@/components/SavedTranslationsLocal";
 
 export const dynamic = "force-dynamic";
 
 export default function Home() {
+  const user = useUser(); // ✅ 여기에 추가!
   const [fileHash, setFileHash] = useState("");
 
   const [showDictionaryModal, setShowDictionaryModal] = useState(false);
@@ -327,14 +330,23 @@ export default function Home() {
       {isPdfUploaded && (
         <div className="w-[600px] bg-white/90 border-l border-gray-100 shadow-inner flex flex-col rounded-l-3xl">
           <div className="flex-1 min-h-0 overflow-y-auto px-4 py-6">
-            <SavedTranslations
-              savedTranslations={savedTranslations ?? []}
-              groupedSentences={groupedSentences}
-              currentIndex={currentIndex}
-              onCopyAll={copyAllTranslations}
-              updateTranslation={updateTranslation}
-              onSentenceSelect={handleSentenceSelect}
-            />
+            {user ? (
+              <SavedTranslations
+                fileHash={selectedHistory?.fileHash ?? ""}
+                fileName={selectedHistory?.fileName ?? ""}
+                currentIndex={currentIndex}
+                onSentenceSelect={handleSentenceSelect}
+              />
+            ) : (
+              <SavedTranslationsLocal
+                savedTranslations={savedTranslations ?? []}
+                groupedSentences={groupedSentences}
+                currentIndex={currentIndex}
+                onCopyAll={copyAllTranslations}
+                updateTranslation={updateTranslation}
+                onSentenceSelect={handleSentenceSelect}
+              />
+            )}
           </div>
         </div>
       )}

@@ -1,37 +1,24 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useUser } from "@/app/auth/client";
 import {
   getOrCreateHistory,
   getSavedTranslations,
-  saveTranslationToSupabase,
-  updateTranslationInSupabase,
+  upsertSavedTranslation,
 } from "@/lib/supabase/translation";
-import { useProperNoun } from "@/hooks/useProperNoun";
-import { cleanExtractedText } from "@/lib/pdfProcessor";
-import {
-  replaceProperNounsWithTokens,
-  restoreProperNounsFromTokens,
-} from "@/lib/properNounHandler";
-import {
-  translateWithGoogle,
-  translateWithPapago,
-  translateWithDeepL,
-} from "@/lib/translationApi";
-
-const normalizeLanguageForPapago = (lang: string) => {
-  if (lang === "zh") return "zh-TW";
-  return lang;
-};
 
 export function useTranslationSupabase(
   userId: string,
   fileHash: string,
   fileName: string
 ) {
-  const { properNouns } = useProperNoun();
-
-  const [translations, setTranslations] = useState({
+  const user = useUser();
+  const [translations, setTranslations] = useState<{
+    google: string;
+    papago: string;
+    deepL: string;
+  }>({
     google: "",
     papago: "",
     deepL: "",
@@ -41,122 +28,94 @@ export function useTranslationSupabase(
   const [savedTranslations, setSavedTranslations] = useState<
     { original: string; translated: string; idx: number }[] | null
   >(null);
-  const [cachedTranslations, setCachedTranslations] = useState<{
-    [key: number]: {
-      google: string;
-      papago: string;
-      deepL: string;
-    };
-  }>({});
+
   const [historyId, setHistoryId] = useState<string | null>(null);
 
+  // ✅ 히스토리 ID를 가져오고 저장된 번역 불러오기
   const loadSavedTranslations = useCallback(async () => {
-    if (!userId || !fileHash || !fileName) return;
-    const id = await getOrCreateHistory(userId, fileHash, fileName);
+    if (!user || !fileHash || !fileName) return;
+    if (historyId) {
+      // 이미 존재하는 경우 바로 사용
+      const existing = await getSavedTranslations(historyId);
+      setSavedTranslations(existing);
+      return;
+    }
+
+    const id = await getOrCreateHistory(user.id, fileHash, fileName);
     if (!id) return;
+
     setHistoryId(id);
     const existing = await getSavedTranslations(id);
     setSavedTranslations(existing);
-  }, [userId, fileHash, fileName]);
+  }, [user, fileHash, fileName, historyId]);
 
   useEffect(() => {
     loadSavedTranslations();
   }, [loadSavedTranslations]);
 
-  useEffect(() => {
-    const stored = localStorage.getItem("autoMove");
-    if (stored !== null) setAutoMove(stored === "true");
-  }, []);
-  useEffect(() => {
-    localStorage.setItem("autoMove", autoMove.toString());
-  }, [autoMove]);
-
-  const resetAllTranslations = () => {
-    setSavedTranslations([]);
-    console.log("🔄 모든 번역이 완전히 삭제되었습니다.");
-    setTimeout(() => {
-      setSavedTranslations([]);
-    }, 0);
-  };
-
-  const translateText = async (
-    text: string,
-    sourceLang: string,
-    index: number,
-    properNounsOverride?: { original: string; translation: string }[]
-  ) => {
-    if (cachedTranslations[index]) {
-      setTranslations(cachedTranslations[index]);
-      return;
-    }
-
-    const papagoLang = normalizeLanguageForPapago(sourceLang);
-    const cleanedText = cleanExtractedText(text);
-    const { transformedText, tokenMap } = replaceProperNounsWithTokens(
-      cleanedText,
-      properNounsOverride || properNouns
-    );
-
-    const [google, papago, deepL] = await Promise.all([
-      translateWithGoogle(transformedText, sourceLang),
-      translateWithPapago(transformedText, papagoLang),
-      translateWithDeepL(transformedText, sourceLang),
-    ]);
-
-    const newTranslations = {
-      google: restoreProperNounsFromTokens(google || "", tokenMap),
-      papago: restoreProperNounsFromTokens(
-        papago?.replace(/PPER_NUN_(\d+)/g, "PPER_NOUN_$1") || "",
-        tokenMap
-      ),
-      deepL: restoreProperNounsFromTokens(deepL || "", tokenMap),
-    };
-
-    setTranslations(newTranslations);
-  };
-
+  // ✅ Supabase 저장
   const saveTranslation = async (
     translation: string,
     original: string,
     idx: number
   ) => {
-    if (!historyId) return;
-    await saveTranslationToSupabase(historyId, idx, original, translation);
+    if (!user || !fileHash || !fileName) return;
 
-    setSavedTranslations((prev) => {
-      const updated = [...(prev || [])];
-      const i = updated.findIndex((t) => t.idx === idx);
-      if (i !== -1) {
-        updated[i] = { idx, original, translated: translation };
-      } else {
-        updated.push({ idx, original, translated: translation });
-      }
-      return updated;
+    let id = historyId;
+    if (!id) {
+      id = await getOrCreateHistory(user.id, fileHash, fileName);
+      if (!id) return;
+      setHistoryId(id);
+    }
+
+    await upsertSavedTranslation(id, {
+      idx,
+      original,
+      translated: translation,
     });
+
+    const updated = await getSavedTranslations(id);
+    setSavedTranslations(updated); // 최신 상태 갱신
   };
 
+  // ✅ Supabase 수정
   const updateTranslation = async (idx: number, newText: string) => {
-    if (!historyId) return;
-    await updateTranslationInSupabase(historyId, idx, newText);
+    if (!historyId || !savedTranslations) return;
 
-    setSavedTranslations((prev) =>
-      (prev ?? []).map((item) =>
-        item.idx === idx ? { ...item, translated: newText } : item
-      )
-    );
+    const target = savedTranslations.find((item) => item.idx === idx);
+    if (!target) return;
+
+    await upsertSavedTranslation(historyId, {
+      idx,
+      original: target.original,
+      translated: newText,
+    });
+
+    const updated = await getSavedTranslations(historyId);
+    setSavedTranslations(updated); // 최신 반영
   };
 
   const copyAllTranslations = () => {
-    const all = (savedTranslations ?? []).map((t) => t.translated).join("\n");
-    navigator.clipboard.writeText(all);
+    const allTranslations = (savedTranslations ?? [])
+      .map((t) => t.translated)
+      .join("\n");
+
+    navigator.clipboard.writeText(allTranslations).then(() => {
+      console.log("📌 모든 번역이 클립보드에 복사되었습니다.");
+    });
+  };
+
+  const resetAllTranslations = () => {
+    // 아직 Supabase 전체 삭제 기능 없음
+    alert("Supabase에서는 전체 삭제 기능이 아직 구현되지 않았습니다.");
   };
 
   return {
     translations,
-    translateText,
+    savedTranslations,
+    translateText: () => {}, // 추후 추가
     saveTranslation,
     updateTranslation,
-    savedTranslations,
     copyAllTranslations,
     resetAllTranslations,
     autoMove,

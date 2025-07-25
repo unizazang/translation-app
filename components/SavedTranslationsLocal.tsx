@@ -1,31 +1,28 @@
-// components/SavedTranslations.tsx
 "use client";
 
 import React, { useState, useRef } from "react";
-import { useUser } from "@/app/auth/client";
-import { useTranslationSupabase } from "@/hooks/useTranslationSupabase";
 
-interface Props {
-  fileHash: string;
-  fileName: string;
+interface SavedTranslationsProps {
+  savedTranslations: {
+    idx: number;
+    original: string;
+    translated: string;
+  }[];
+  groupedSentences: string[][];
   currentIndex: number;
+  onCopyAll: () => void;
+  updateTranslation: (idx: number, newTranslation: string) => void;
   onSentenceSelect: (index: number) => void;
 }
 
-const SavedTranslations: React.FC<Props> = ({
-  fileHash,
-  fileName,
+const SavedTranslationsLocal: React.FC<SavedTranslationsProps> = ({
+  savedTranslations,
+  groupedSentences,
   currentIndex,
+  onCopyAll,
+  updateTranslation,
   onSentenceSelect,
 }) => {
-  const user = useUser();
-  const {
-    savedTranslations,
-    updateTranslation,
-    copyAllTranslations,
-    resetAllTranslations,
-  } = useTranslationSupabase(user?.id ?? "", fileHash, fileName);
-
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -43,9 +40,7 @@ const SavedTranslations: React.FC<Props> = ({
   };
 
   const handleDownloadTxt = () => {
-    const rawText = (savedTranslations ?? [])
-      .map((t) => t.translated)
-      .join("\n");
+    const rawText = savedTranslations.map((t) => t.translated).join("\n");
     const blob = new Blob([rawText], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -60,17 +55,17 @@ const SavedTranslations: React.FC<Props> = ({
   const handleResetTranslations = () => {
     const isConfirmed = window.confirm("정말 초기화할까요?");
     if (!isConfirmed) return;
-    resetAllTranslations(); // 현재는 기능 미구현
+    localStorage.removeItem("savedTranslations");
     showToastMessage("번역이 초기화되었습니다.");
   };
 
   const handleCopyAll = () => {
-    copyAllTranslations();
+    onCopyAll();
     showToastMessage("클립보드에 복사되었습니다.");
   };
 
   const handleSaveEdit = () => {
-    if (editingIndex !== null && savedTranslations) {
+    if (editingIndex !== null) {
       const target = savedTranslations[editingIndex];
       updateTranslation(target.idx, editingValue.trim());
       setEditingIndex(null);
@@ -95,7 +90,9 @@ const SavedTranslations: React.FC<Props> = ({
     <div className="w-full rounded-lg mt-4 text-black">
       <h2 className="text-lg font-semibold mb-1">저장된 번역</h2>
       <p className="text-sm text-red-500 mb-2">
-        주의: 번역 결과는 로그인된 계정 기준으로 서버에 저장됩니다.
+        주의: 번역 결과는 브라우저에 임시 저장됩니다.
+        <br />
+        캐시/쿠키 삭제 시 내용이 지워지니 필요시 백업해주세요.
       </p>
 
       {/* 버튼 줄 */}
@@ -118,11 +115,7 @@ const SavedTranslations: React.FC<Props> = ({
       </div>
 
       {/* 안내 문구 또는 번역 리스트 */}
-      {savedTranslations === null ? (
-        <p className="text-gray-400 text-sm text-center mt-4">
-          저장된 번역을 불러오는 중입니다...
-        </p>
-      ) : savedTranslations.length === 0 ? (
+      {savedTranslations.length === 0 ? (
         <p className="text-gray-400 text-sm text-center mt-4">
           저장된 번역이 없습니다.
         </p>
@@ -195,4 +188,4 @@ const SavedTranslations: React.FC<Props> = ({
   );
 };
 
-export default SavedTranslations;
+export default SavedTranslationsLocal;
