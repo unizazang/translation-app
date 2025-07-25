@@ -140,3 +140,18 @@ export async function updateTranslationInSupabase(
     console.error("📛 번역 수정 오류:", error);
   }
 }
+
+export async function getUserHistories(userId: string) {
+  const { data, error } = await supabaseAdmin
+    .from("translation_histories")
+    .select("id, file_name, file_hash, created_at")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("📛 히스토리 조회 오류:", error);
+    return [];
+  }
+
+  return data;
+}

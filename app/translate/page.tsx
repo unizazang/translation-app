@@ -21,6 +21,7 @@ import { PdfPageData } from "@/lib/pdfProcessor";
 import { TranslatedTextBlock } from "@/lib/pdfLayout";
 import { generateFileHash } from "@/lib/fileHash";
 import { loadPdf, extractTextFromPdf } from "@/lib/pdfProcessor";
+import TranslationHistoryList from "@/components/TranslationHistoryList";
 
 export const dynamic = "force-dynamic";
 
@@ -55,6 +56,11 @@ export default function Home() {
   const [fileName, setFileName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  const [selectedHistory, setSelectedHistory] = useState<{
+    fileHash: string;
+    fileName: string;
+  } | null>(null);
+
   const { properNouns } = useProperNoun();
   const { groupedSentences, processText } = useTextProcessing();
   const {
@@ -66,7 +72,7 @@ export default function Home() {
     copyAllTranslations,
     autoMove,
     setAutoMove,
-  } = useTranslation(fileHash, fileName); // ✅ 반드시 전달
+  } = useTranslation(selectedHistory?.fileHash, selectedHistory?.fileName); // ✅ 반드시 전달
 
   const handleSentenceSelect = useCallback((index: number) => {
     setCurrentIndex(index);
@@ -221,41 +227,60 @@ export default function Home() {
 
   return (
     <div className="flex h-full bg-gradient-to-br from-gray-50 to-white">
-      {/* 왼쪽 사이드바 */}
-      {isPdfUploaded && (
-        <div className="w-[320px] bg-white/90 border-r border-gray-100 shadow-inner flex flex-col rounded-r-3xl">
-          <div className="flex-1 min-h-0 overflow-y-auto">
-            <AuthButton />
-            <SidebarFileInfo
-              fileName={fileName}
-              onReplaceFile={handleReplaceFile}
-            />
-            <SidebarProgress
-              totalPages={totalPages}
-              currentPage={currentPage}
-              totalSentences={currentPageSentences}
-              currentSentenceInPage={currentSentenceInPage}
-              currentIndex={currentIndex}
-            />
-            <SidebarSection
-              title="문장 목록"
-              isOpen={openSection === "sentence"}
-              onToggle={() => toggleSection("sentence")}
-              scrollable
-            >
-              <SentenceList
-                currentIndex={currentIndex}
-                onSentenceSelect={handleSentenceSelect}
-                groupedSentences={groupedSentences}
-                skippedIndexes={skippedIndexes}
-                translatedIndexes={translatedIndexes}
-                starredIndexes={starredIndexes}
-                onToggleStar={handleToggleStar}
+      {/* 로그인 버튼 (항상 상단 우측) */}
+      <div className="absolute top-4 right-6 z-50">
+        <AuthButton />
+      </div>
+      {/* 왼쪽 사이드바 (항상 렌더링됨) */}
+      <div className="w-[320px] bg-white/90 border-r border-gray-100 shadow-inner flex flex-col rounded-r-3xl">
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 py-6">
+          <AuthButton />
+
+          {/* ✅ PDF 업로드 전일 때만 히스토리 표시 */}
+          {!isPdfUploaded && (
+            <div className="mt-4">
+              <TranslationHistoryList
+                onSelect={(hash, name) =>
+                  setSelectedHistory({ fileHash: hash, fileName: name })
+                }
               />
-            </SidebarSection>
-          </div>
+            </div>
+          )}
+
+          {/* ✅ PDF 업로드 후에만 나머지 UI 렌더 */}
+          {isPdfUploaded && (
+            <>
+              <SidebarFileInfo
+                fileName={fileName}
+                onReplaceFile={handleReplaceFile}
+              />
+              <SidebarProgress
+                totalPages={totalPages}
+                currentPage={currentPage}
+                totalSentences={currentPageSentences}
+                currentSentenceInPage={currentSentenceInPage}
+                currentIndex={currentIndex}
+              />
+              <SidebarSection
+                title="문장 목록"
+                isOpen={openSection === "sentence"}
+                onToggle={() => toggleSection("sentence")}
+                scrollable
+              >
+                <SentenceList
+                  currentIndex={currentIndex}
+                  onSentenceSelect={handleSentenceSelect}
+                  groupedSentences={groupedSentences}
+                  skippedIndexes={skippedIndexes}
+                  translatedIndexes={translatedIndexes}
+                  starredIndexes={starredIndexes}
+                  onToggleStar={handleToggleStar}
+                />
+              </SidebarSection>
+            </>
+          )}
         </div>
-      )}
+      </div>
 
       {/* 중앙 번역 카드 */}
       <div className="flex-1 flex flex-col bg-white/80 p-4 px-8">
