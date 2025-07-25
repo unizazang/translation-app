@@ -217,59 +217,59 @@ export default function Home() {
   return (
     <div className="flex h-full bg-gradient-to-br from-gray-50 to-white">
       {/* 왼쪽 사이드바 */}
-      <div className="w-[320px] bg-white/90 border-r border-gray-100 shadow-inner flex flex-col rounded-r-3xl">
-        <div className="flex-1 min-h-0 overflow-y-auto">
-          {isPdfUploaded && (
-            <>
-              <SidebarFileInfo
-                fileName={fileName}
-                onReplaceFile={handleReplaceFile}
-              />
-              <SidebarProgress
-                totalPages={totalPages}
-                currentPage={currentPage}
-                totalSentences={currentPageSentences}
-                currentSentenceInPage={currentSentenceInPage}
-                currentIndex={currentIndex}
-              />
-            </>
-          )}
-          <SidebarSection
-            title="문장 목록"
-            isOpen={openSection === "sentence"}
-            onToggle={() => toggleSection("sentence")}
-            scrollable
-          >
-            <SentenceList
-              currentIndex={currentIndex}
-              onSentenceSelect={handleSentenceSelect}
-              groupedSentences={groupedSentences}
-              skippedIndexes={skippedIndexes}
-              translatedIndexes={translatedIndexes}
-              starredIndexes={starredIndexes}
-              onToggleStar={handleToggleStar}
+      {isPdfUploaded && (
+        <div className="w-[320px] bg-white/90 border-r border-gray-100 shadow-inner flex flex-col rounded-r-3xl">
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            <SidebarFileInfo
+              fileName={fileName}
+              onReplaceFile={handleReplaceFile}
             />
-          </SidebarSection>
+            <SidebarProgress
+              totalPages={totalPages}
+              currentPage={currentPage}
+              totalSentences={currentPageSentences}
+              currentSentenceInPage={currentSentenceInPage}
+              currentIndex={currentIndex}
+            />
+            <SidebarSection
+              title="문장 목록"
+              isOpen={openSection === "sentence"}
+              onToggle={() => toggleSection("sentence")}
+              scrollable
+            >
+              <SentenceList
+                currentIndex={currentIndex}
+                onSentenceSelect={handleSentenceSelect}
+                groupedSentences={groupedSentences}
+                skippedIndexes={skippedIndexes}
+                translatedIndexes={translatedIndexes}
+                starredIndexes={starredIndexes}
+                onToggleStar={handleToggleStar}
+              />
+            </SidebarSection>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 중앙 번역 카드 */}
       <div className="flex-1 flex flex-col bg-white/80 p-4 px-8">
-        <div className="flex justify-center">
-          <LanguageSelector
-            onSelectSourceLanguage={setSelectedLanguage}
-            onSelectTargetLanguage={setTargetLanguage}
-          />
+        {isPdfUploaded && (
+          <div className="flex justify-center">
+            <LanguageSelector
+              onSelectSourceLanguage={setSelectedLanguage}
+              onSelectTargetLanguage={setTargetLanguage}
+            />
 
-          <div className="flex justify-center mt-2">
-            <button
-              onClick={() => setShowDictionaryModal(true)}
-              className="text-sm text-blue-600 underline hover:text-blue-800 transition"
-            >
-              사용자 사전 열기
-            </button>
+            <div className="flex justify-center mt-2">
+              <button
+                onClick={() => setShowDictionaryModal(true)}
+                className="text-sm text-blue-600 underline hover:text-blue-800 transition"
+              >
+                사용자 사전 열기
+              </button>
+            </div>
           </div>
-        </div>
+        )}
         <div className="flex-1 flex flex-col bg-white rounded-2xl p-6">
           {!isPdfUploaded ? (
             <div className="flex-1 flex items-center justify-center">
@@ -293,18 +293,21 @@ export default function Home() {
       </div>
 
       {/* 오른쪽 사이드바 */}
-      <div className="w-[600px] bg-white/90 border-l border-gray-100 shadow-inner flex flex-col rounded-l-3xl">
-        <div className="flex-1 min-h-0 overflow-y-auto px-4 py-6">
-          <SavedTranslations
-            savedTranslations={savedTranslations ?? []}
-            groupedSentences={groupedSentences}
-            currentIndex={currentIndex}
-            onCopyAll={copyAllTranslations}
-            updateTranslation={updateTranslation}
-            onSentenceSelect={handleSentenceSelect}
-          />
+      {isPdfUploaded && (
+        <div className="w-[600px] bg-white/90 border-l border-gray-100 shadow-inner flex flex-col rounded-l-3xl">
+          <div className="flex-1 min-h-0 overflow-y-auto px-4 py-6">
+            <SavedTranslations
+              savedTranslations={savedTranslations ?? []}
+              groupedSentences={groupedSentences}
+              currentIndex={currentIndex}
+              onCopyAll={copyAllTranslations}
+              updateTranslation={updateTranslation}
+              onSentenceSelect={handleSentenceSelect}
+            />
+          </div>
         </div>
-      </div>
+      )}
+
       {showDictionaryModal && (
         <Modal onClose={() => setShowDictionaryModal(false)}>
           <ProperNounManager />
