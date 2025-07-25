@@ -1,5 +1,5 @@
 "use client";
-
+import AuthButton from "@/components/AuthButton";
 import { useState, useEffect, useCallback } from "react";
 import PdfUploader from "@/components/PdfUploader";
 import LanguageSelector from "@/components/LanguageSelector";
@@ -19,11 +19,14 @@ import Modal from "@/components/Modal";
 
 import { PdfPageData } from "@/lib/pdfProcessor";
 import { TranslatedTextBlock } from "@/lib/pdfLayout";
+import { generateFileHash } from "@/lib/fileHash";
 import { loadPdf, extractTextFromPdf } from "@/lib/pdfProcessor";
 
 export const dynamic = "force-dynamic";
 
 export default function Home() {
+  const [fileHash, setFileHash] = useState("");
+
   const [showDictionaryModal, setShowDictionaryModal] = useState(false);
   const [pdfText, setPdfText] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState("en");
@@ -63,8 +66,7 @@ export default function Home() {
     copyAllTranslations,
     autoMove,
     setAutoMove,
-    setCurrentFileName,
-  } = useTranslation();
+  } = useTranslation(fileHash, fileName); // ✅ 반드시 전달
 
   const handleSentenceSelect = useCallback((index: number) => {
     setCurrentIndex(index);
@@ -92,7 +94,7 @@ export default function Home() {
     setIsPdfUploaded(true);
     setErrorMessage("");
     setFileName(fileNameArg);
-    setCurrentFileName(fileNameArg);
+
     const initialTranslatedBlocks = extractedText.map((page) =>
       page.map((block) => ({
         text: block.text,
@@ -168,9 +170,10 @@ export default function Home() {
     setTranslatedIndexes(new Set());
     setStarredIndexes(new Set());
     setCompletedIndexes(new Set());
-    setCurrentFileName(file.name);
     // PDF 추출
     try {
+      const hash = await generateFileHash(file); // ✅ 해시 생성
+      setFileHash(hash); // ✅ 상태 저장
       const pdfBuffer = await loadPdf(file);
       const extractedText = await extractTextFromPdf(pdfBuffer);
       handleTextExtracted(extractedText, file.name);
@@ -222,6 +225,7 @@ export default function Home() {
       {isPdfUploaded && (
         <div className="w-[320px] bg-white/90 border-r border-gray-100 shadow-inner flex flex-col rounded-r-3xl">
           <div className="flex-1 min-h-0 overflow-y-auto">
+            <AuthButton />
             <SidebarFileInfo
               fileName={fileName}
               onReplaceFile={handleReplaceFile}
