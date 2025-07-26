@@ -66,11 +66,6 @@ export default function Home() {
   const [fileName, setFileName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const [selectedHistory, setSelectedHistory] = useState<{
-    fileHash: string;
-    fileName: string;
-  } | null>(null);
-
   const { properNouns } = useProperNoun();
   const { groupedSentences, processText } = useTextProcessing();
 
@@ -121,22 +116,13 @@ export default function Home() {
     autoMove,
     setAutoMove,
     setGroupedSentences,
-  } = useTranslation(
-    selectedHistory?.fileHash ?? "",
-    selectedHistory?.fileName ?? ""
-  );
+  } = useTranslation();
 
   const updateTranslationRefTyped = updateTranslationRef as (
     translated: string,
     original: string,
     idx: number
   ) => void;
-
-  console.log(
-    "✅ [page.tsx] useTranslation 호출됨:",
-    selectedHistory?.fileHash,
-    selectedHistory?.fileName
-  );
 
   const handleSentenceSelect = useCallback((index: number) => {
     setCurrentIndex(index);
@@ -170,8 +156,6 @@ export default function Home() {
     setIsPdfUploaded(true);
     setErrorMessage("");
     setFileName(fileNameArg);
-    console.log("✅ setting selectedHistory:", { fileNameArg, fileHashArg }); // 추가
-    setSelectedHistory({ fileHash: fileHashArg, fileName: fileNameArg });
 
     const initialTranslatedBlocks = extractedText.map((page) =>
       page.map((block) => ({
@@ -189,18 +173,8 @@ export default function Home() {
   // ✅ properNouns 타입 단언
   const handleTranslate = useCallback(
     async (index: number) => {
-      if (
-        !selectedHistory?.fileHash ||
-        !selectedHistory?.fileName ||
-        typeof translateText !== "function"
-      ) {
-        console.warn(
-          "⚠️ handleTranslate 실행 불가: translateText 또는 selectedHistory 없음",
-          {
-            translateText,
-            selectedHistory,
-          }
-        );
+      if (typeof translateText !== "function") {
+        console.warn("⚠️ handleTranslate 실행 불가: translateText 없음");
         return;
       }
 
@@ -233,8 +207,8 @@ export default function Home() {
       properNouns,
       selectedLanguage,
       translateText,
-      selectedHistory?.fileHash, // ← 객체 내부 분해해서 의존성 명시
-      selectedHistory?.fileName,
+      fileHash,
+      fileName,
     ]
   );
 
@@ -376,9 +350,30 @@ export default function Home() {
           {!isPdfUploaded && (
             <div className="mt-4">
               <TranslationHistoryList
-                onSelect={(hash, name) =>
-                  setSelectedHistory({ fileHash: hash, fileName: name })
-                }
+                onSelect={async (hash, name) => {
+                  setIsPdfUploaded(false); // ✅ 기존 상태 초기화
+                  setFileHash(hash);
+                  setFileName(name);
+
+                  const historyId = await getOrCreateHistory(
+                    hash,
+                    name,
+                    user?.id
+                  );
+                  console.log("📚 히스토리 클릭됨 → historyId:", historyId);
+
+                  // TODO: 여기에 파일 불러오기 + 텍스트 추출 구현 예정
+                  // const pdfBuffer = await loadPdfByHash(hash);
+                  // const extractedText = await extractTextFromPdf(pdfBuffer);
+                  // setPdfPages(extractedText);
+                  // const extractedString = extractedText
+                  //   .map((page) => page.map((block) => block.text).join(" "))
+                  //   .join("\n\n");
+                  // processText(extractedString);
+                  // setCurrentIndex(0);
+
+                  setIsPdfUploaded(true); // ✅ UI 다시 띄우기
+                }}
               />
             </div>
           )}
@@ -454,52 +449,7 @@ export default function Home() {
               isStarred={starredIndexes.has(currentIndex)}
               onToggleStar={() => handleToggleStar(currentIndex)}
               onSkip={handleSkip}
-              onTranslate={async () => {
-                if (
-                  !selectedHistory?.fileHash ||
-                  !selectedHistory?.fileName ||
-                  typeof translateText !== "function"
-                ) {
-                  console.warn(
-                    "⚠️ 번역 실행 불가: translateText 또는 selectedHistory 없음",
-                    {
-                      translateText,
-                      selectedHistory,
-                    }
-                  );
-                  return;
-                }
-
-                const textToTranslate =
-                  groupedSentences[currentIndex]?.join(" ") ?? "";
-                console.log("🟡 [inline handleTranslate] 호출됨");
-                console.log("🔹 index:", currentIndex);
-                console.log("🔹 번역할 문장:", textToTranslate);
-                console.log("🔹 selectedLanguage:", selectedLanguage);
-                console.log("🔹 properNouns:", properNouns);
-
-                setIsTranslating(true);
-
-                try {
-                  await translateText(
-                    textToTranslate,
-                    selectedLanguage,
-                    currentIndex,
-                    properNouns
-                  );
-                  console.log("✅ [inline handleTranslate] translateText 완료");
-                } catch (e) {
-                  console.error(
-                    "❌ [inline handleTranslate] translateText 실패:",
-                    e
-                  );
-                }
-
-                setIsTranslating(false);
-                console.log(
-                  "🟢 [inline handleTranslate] isTranslating → false"
-                );
-              }}
+              onTranslate={() => handleTranslate(currentIndex)}
             />
           )}
         </div>
@@ -511,8 +461,8 @@ export default function Home() {
           <div className="flex-1 min-h-0 overflow-y-auto px-4 py-6">
             {user ? (
               <SavedTranslations
-                fileHash={selectedHistory?.fileHash ?? ""}
-                fileName={selectedHistory?.fileName ?? ""}
+                fileHash={fileHash}
+                fileName={fileName}
                 currentIndex={currentIndex}
                 onSentenceSelect={handleSentenceSelect}
               />
