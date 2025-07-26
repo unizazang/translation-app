@@ -1,43 +1,41 @@
-// auth/client.ts (수정)
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase-browser";
+import { useSupabase } from "./provider"; // ✅ SupabaseProvider 기반
 
+/**
+ * 클라이언트에서 사용자 세션 및 user를 가져오는 커스텀 훅
+ */
 export function useUser() {
+  const { session } = useSupabase();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUser = async () => {
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
-
-    if (error) {
-      console.error("❌ 유저 가져오기 실패:", error.message);
+  useEffect(() => {
+    if (session?.user) {
+      setUser(session.user);
     } else {
-      console.log("✅ Supabase 유저 가져오기 성공:", user);
-      setUser(user);
+      setUser(null);
     }
-
     setLoading(false);
-  };
+  }, [session]);
+
+  return user;
+}
+
+export function useUserWithLoading() {
+  const { session } = useSupabase();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchUser();
+    if (session?.user) {
+      setUser(session.user);
+    } else {
+      setUser(null);
+    }
+    setLoading(false);
+  }, [session]);
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("🔄 auth state changed:", event);
-        await fetchUser();
-      }
-    );
-
-    return () => {
-      listener.subscription.unsubscribe();
-    };
-  }, []);
-
-  return loading ? null : user;
+  return { user, loading };
 }

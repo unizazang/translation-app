@@ -1,6 +1,6 @@
 // lib/supabase-browser.ts
 import { createBrowserClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
+// import { createClient } from "@supabase/supabase-js";
 
 // 이 줄 추가 (SSR 환경에서 fetch 문제 해결)
 if (!globalThis.fetch) {

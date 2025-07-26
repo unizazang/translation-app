@@ -32,15 +32,20 @@ export type UseTranslationResult = {
   setAutoMove: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export function useTranslation(fileHash: string, fileName: string) {
+export function useTranslation(fileHash?: string, fileName?: string) {
+  const user = useUser();
+  // ✅ 항상 호출하되, user?.id로 방어
+  const local = useTranslationLocal();
+  const supabase = useTranslationSupabase(
+    user?.id ?? "", // <-- null 방지 처리
+    fileHash ?? "",
+    fileName ?? ""
+  );
+
   const [groupedSentences, setGroupedSentences] = useState<string[][]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const user = useUser();
-
-  const methods = user
-    ? useTranslationSupabase(user.id, fileHash, fileName)
-    : useTranslationLocal(fileHash);
+  const methods = user ? supabase : local;
 
   return {
     groupedSentences,

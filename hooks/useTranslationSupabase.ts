@@ -1,125 +1,140 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useUser } from "@/app/auth/client";
+import { useEffect, useState } from "react";
 import {
-  getOrCreateHistory,
-  getSavedTranslations,
   upsertSavedTranslation,
+  getSavedTranslations,
+  getOrCreateHistory,
 } from "@/lib/supabase/translation";
-import { TranslatedTextBlock } from "@/lib/pdfLayout";
-import type { PostgrestError } from "@supabase/supabase-js";
+
+type UseTranslationSupabaseReturn = {
+  translations: {
+    google: string;
+    deepL: string;
+  }[];
+  savedTranslations:
+    | {
+        original: string;
+        translated: string;
+        idx: number;
+      }[]
+    | null;
+  translateText: (
+    text: string,
+    sourceLang: string,
+    idx: number,
+    properNouns: string[]
+  ) => Promise<void>;
+  saveTranslation: (
+    translated: string,
+    original: string,
+    idx: number
+  ) => Promise<void>;
+  updateTranslation: (
+    translated: string,
+    original: string,
+    idx: number
+  ) => Promise<void>;
+  copyAllTranslations: () => void;
+  setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
+  autoMove: boolean;
+  setAutoMove: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 export function useTranslationSupabase(
   userId: string,
   fileHash: string,
   fileName: string
-) {
+): UseTranslationSupabaseReturn {
+  const [translations, setTranslations] = useState<
+    { google: string; deepL: string }[]
+  >([]);
   const [savedTranslations, setSavedTranslations] = useState<
-    { idx: number; original: string; translated: string }[] | null
+    { original: string; translated: string; idx: number }[] | null
   >(null);
-
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [autoMove, setAutoMove] = useState(false);
   const [historyId, setHistoryId] = useState<string | null>(null);
 
-  // ✅ 히스토리 ID를 얻고 기존 저장된 번역을 불러옴
   const loadSavedTranslations = async () => {
     if (!userId || !fileHash || !fileName) return;
-
-    try {
-      const id = await getOrCreateHistory(userId, fileHash, fileName);
-      if (!id) return;
-
-      setHistoryId(id);
+    const id = await getOrCreateHistory(userId, fileHash, fileName);
+    setHistoryId(id);
+    // ✅ 타입 오류 방지
+    if (id) {
       const data = await getSavedTranslations(id);
-      setSavedTranslations(data ?? []);
-    } catch (error) {
-      console.error("❌ 번역 히스토리 불러오기 실패:", error);
+      setSavedTranslations(data);
     }
   };
 
   useEffect(() => {
     loadSavedTranslations();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, fileHash]);
+  }, [userId, fileHash, fileName]);
 
-  // ✅ Supabase 저장
+  const translateText = async (
+    text: string,
+    sourceLang: string,
+    idx: number,
+    properNouns: string[]
+  ) => {
+    try {
+      const res = await fetch("/api/translate", {
+        method: "POST",
+        body: JSON.stringify({ text, sourceLang, properNouns }),
+      });
+      const data = await res.json();
+
+      const newTranslations = [...translations];
+      newTranslations[idx] = {
+        google: data.result.google,
+        deepL: data.result.deepL,
+      };
+      setTranslations(newTranslations);
+    } catch (error) {
+      console.error("❌ 번역 오류:", error);
+    }
+  };
+
   const saveTranslation = async (
-    translation: string,
+    translated: string,
     original: string,
     idx: number
   ) => {
-    if (!userId || !fileHash || !fileName) return;
-
-    let id = historyId;
-    if (!id) {
-      const generatedId = await getOrCreateHistory(userId, fileHash, fileName);
-      if (!generatedId) return;
-      setHistoryId(generatedId);
-      id = generatedId;
-    }
-
-    if (!id || idx === undefined || !original?.trim() || !translation?.trim()) {
-      console.warn("⚠️ 저장 생략: 필드 누락");
-      return;
-    }
-
-    const { error }: { error: PostgrestError | null } =
-      await upsertSavedTranslation(id, {
-        idx,
-        original: original.trim(),
-        translated: translation.trim(),
-      });
-
-    if (error) {
-      console.error("❌ Supabase 저장 실패:", error.message);
+    if (!historyId) return;
+    await upsertSavedTranslation(historyId, { original, translated, idx });
+    const updatedList = [...(savedTranslations ?? [])];
+    const existingIndex = updatedList.findIndex((item) => item.idx === idx);
+    if (existingIndex !== -1) {
+      updatedList[existingIndex] = { original, translated, idx };
     } else {
-      const updated = await getSavedTranslations(id);
-      setSavedTranslations(updated ?? []);
+      updatedList.push({ original, translated, idx });
     }
+    setSavedTranslations(updatedList);
   };
 
-  // ✅ 수정 (UI에서 호출됨)
-  const updateTranslation = async (idx: number, newText: string) => {
-    if (!historyId || !savedTranslations) return;
-
-    const target = savedTranslations.find((item) => item.idx === idx);
-    if (!target) return;
-
-    const { error }: { error: PostgrestError | null } =
-      await upsertSavedTranslation(historyId, {
-        idx,
-        original: target.original,
-        translated: newText.trim(),
-      });
-
-    if (error) {
-      console.error("❌ 번역 수정 실패:", error.message);
-    } else {
-      const updated = await getSavedTranslations(historyId);
-      setSavedTranslations(updated ?? []);
-    }
+  const updateTranslation = async (
+    translated: string,
+    original: string,
+    idx: number
+  ) => {
+    await saveTranslation(translated, original, idx);
   };
 
   const copyAllTranslations = () => {
-    const all = (savedTranslations ?? [])
-      .map((item) => item.translated)
-      .join("\n");
-
-    navigator.clipboard.writeText(all).then(() => {
-      console.log("✅ 번역 복사 완료");
-    });
-  };
-
-  const resetAllTranslations = () => {
-    alert("Supabase에서는 전체 삭제 기능이 아직 구현되지 않았습니다.");
+    const all = (savedTranslations ?? []).sort((a, b) => a.idx - b.idx);
+    const text = all.map((item) => item.translated).join("\n\n");
+    navigator.clipboard.writeText(text);
   };
 
   return {
+    translations,
     savedTranslations,
+    translateText,
     saveTranslation,
     updateTranslation,
-    loadSavedTranslations,
     copyAllTranslations,
-    resetAllTranslations,
+    setCurrentIndex,
+    autoMove,
+    setAutoMove,
   };
 }
