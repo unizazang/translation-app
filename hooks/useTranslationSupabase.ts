@@ -75,6 +75,7 @@ export function useTranslationSupabase(
   }, [userId, fileHash, fileName]);
 
   // ✅ 번역 및 저장
+  // ✅ 번역 및 저장
   const translateText = async (
     text: string,
     sourceLang: string,
@@ -122,6 +123,7 @@ export function useTranslationSupabase(
 
       const best = result.google || result.deepL;
       await saveTranslation(best, text, idx);
+
       console.log("✅ [translateText] 저장까지 완료");
     } catch (e) {
       console.error("❌ [translateText] 오류:", e);

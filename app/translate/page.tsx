@@ -189,8 +189,18 @@ export default function Home() {
   // ✅ properNouns 타입 단언
   const handleTranslate = useCallback(
     async (index: number) => {
-      if (!selectedHistory?.fileHash || !selectedHistory?.fileName) {
-        console.warn("⚠️ selectedHistory 없음. 번역 실행 스킵됨");
+      if (
+        !selectedHistory?.fileHash ||
+        !selectedHistory?.fileName ||
+        typeof translateText !== "function"
+      ) {
+        console.warn(
+          "⚠️ handleTranslate 실행 불가: translateText 또는 selectedHistory 없음",
+          {
+            translateText,
+            selectedHistory,
+          }
+        );
         return;
       }
 
@@ -223,7 +233,8 @@ export default function Home() {
       properNouns,
       selectedLanguage,
       translateText,
-      selectedHistory,
+      selectedHistory?.fileHash, // ← 객체 내부 분해해서 의존성 명시
+      selectedHistory?.fileName,
     ]
   );
 
@@ -322,6 +333,11 @@ export default function Home() {
   useEffect(() => {
     console.log("🔄 [page.tsx] isTranslating:", isTranslating);
   }, [isTranslating]);
+
+  useEffect(() => {
+    console.log("🧪 강제 실행 테스트");
+    handleTranslate(currentIndex);
+  }, []);
 
   const toggleSection = (section: typeof openSection) => {
     setOpenSection((prev) => (prev === section ? null : section));

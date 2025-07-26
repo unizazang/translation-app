@@ -21,6 +21,7 @@ interface TranslationCardProps {
   onSkip: () => void;
   onTranslate?: () => void;
 }
+console.log("🔍 TranslationCard 렌더됨 - onTranslate:");
 
 const TranslationCard: React.FC<TranslationCardProps> = ({
   originalText,
