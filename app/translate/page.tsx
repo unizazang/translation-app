@@ -72,6 +72,18 @@ export default function Home() {
 
   const { properNouns } = useProperNoun();
   const { groupedSentences, processText } = useTextProcessing();
+
+  const translationProps = selectedHistory
+    ? useTranslation(selectedHistory.fileHash, selectedHistory.fileName)
+    : {
+        translations: {},
+        translateText: async () => {},
+        saveTranslation: async () => {},
+        updateTranslation: async () => {},
+        savedTranslations: [],
+        copyAllTranslations: () => {},
+      };
+
   const {
     translations: translationContext,
     translateText,
@@ -196,7 +208,17 @@ export default function Home() {
 
   const handleTranslationSave = (engine: "google" | "deepL") => {
     const translatedText = translationContext[engine];
+
+    console.log("💾 [handleTranslationSave] 저장 시도", {
+      engine,
+      translatedText,
+      currentIndex,
+      original: groupedSentences[currentIndex]?.join(" "),
+    });
+
     if (translatedText) {
+      console.log("✅ [handleTranslationSave] 저장 실행");
+
       saveTranslation(
         translatedText,
         groupedSentences[currentIndex].join(" "),
@@ -204,6 +226,11 @@ export default function Home() {
       );
       setTranslatedIndexes((prev) => new Set([...prev, currentIndex]));
       setCompletedIndexes((prev) => new Set([...prev, currentIndex]));
+    } else {
+      console.warn("⚠️ [handleTranslationSave] 저장 생략: 번역 결과 없음", {
+        engine,
+        translatedText,
+      });
     }
   };
 
@@ -247,6 +274,10 @@ export default function Home() {
       setShouldAutoTranslate(false);
     }
   }, [currentIndex, shouldAutoTranslate, groupedSentences, handleTranslate]);
+
+  useEffect(() => {
+    console.log("🔄 [page.tsx] isTranslating:", isTranslating);
+  }, [isTranslating]);
 
   const toggleSection = (section: typeof openSection) => {
     setOpenSection((prev) => (prev === section ? null : section));

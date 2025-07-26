@@ -1,25 +1,25 @@
-'use client'
+"use client";
 
-import React from "react"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons"
-import { faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons"
+import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
+import { faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons";
 
 interface TranslationCardProps {
-  originalText: string
+  originalText: string;
   translations: {
-    google: string
-    papago: string
-    deepL: string
-  }
-  onSave: (engine: 'google' | 'deepL') => void
-  onNext: () => void
-  onPrevious: () => void
-  isTranslating: boolean
-  isStarred: boolean
-  onToggleStar: () => void
-  onSkip: () => void
-  onTranslate?: () => void
+    google: string;
+    papago: string;
+    deepL: string;
+  };
+  onSave: (engine: "google" | "deepL") => void;
+  onNext: () => void;
+  onPrevious: () => void;
+  isTranslating: boolean;
+  isStarred: boolean;
+  onToggleStar: () => void;
+  onSkip: () => void;
+  onTranslate?: () => void;
 }
 
 const TranslationCard: React.FC<TranslationCardProps> = ({
@@ -38,23 +38,22 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
     <div className="w-full h-full flex flex-col text-gray-900 font-normal bg-white rounded-2xl px-6">
       {/* 원문 */}
       <div className="mb-6">
-        
         <div className="border border-gray-200 bg-gray-50 rounded-xl p-5 h-[250px] overflow-y-auto text-base shadow-[0_8px_24px_rgba(0,0,0,0.08)] focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-150">
           <div className="flex justify-between items-center mb-3">
-          <h3 className="text-lg font-semibold text-gray-900 tracking-tight">
-            원본 문장
-          </h3>
-          <button
-            onClick={onToggleStar}
-            className="text-yellow-400 hover:text-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200 rounded-full p-1 transition-all duration-150"
-            aria-label="즐겨찾기"
-          >
-            <FontAwesomeIcon
-              icon={isStarred ? faStarSolid : faStarRegular}
-              className="text-2xl drop-shadow-sm"
-            />
-          </button>
-        </div>
+            <h3 className="text-lg font-semibold text-gray-900 tracking-tight">
+              원본 문장
+            </h3>
+            <button
+              onClick={onToggleStar}
+              className="text-yellow-400 hover:text-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200 rounded-full p-1 transition-all duration-150"
+              aria-label="즐겨찾기"
+            >
+              <FontAwesomeIcon
+                icon={isStarred ? faStarSolid : faStarRegular}
+                className="text-2xl drop-shadow-sm"
+              />
+            </button>
+          </div>
           {originalText}
         </div>
       </div>
@@ -67,7 +66,7 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
             className="px-6 py-2 rounded-xl border border-blue-500 bg-blue-500 text-white font-semibold shadow hover:bg-blue-600 hover:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all duration-150 disabled:opacity-50"
             disabled={isTranslating}
           >
-            {isTranslating ? '번역 중...' : '번역 실행하기'}
+            {isTranslating ? "번역 중..." : "번역 실행하기"}
           </button>
         )}
         <div className="flex gap-2">
@@ -97,23 +96,25 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
 
       {/* 번역 결과 */}
       <div className="flex-1 flex flex-col border-t-1 pt-8 border-gray-200">
-
         <div className="flex flex-row justify-between gap-6 flex-1 overflow-hidden">
-          {(['google', 'deepL'] as const).map((engine) => (
+          {(["google", "deepL"] as const).map((engine) => (
             <div
               key={engine}
               className="border border-gray-200 bg-gray-50 rounded-xl p-5 shadow-[0_8px_24px_rgba(0,0,0,0.08)] flex flex-col h-[350px] flex-1 transition-all duration-150"
             >
               <strong className="text-gray-700 mb-3 text-base text-center tracking-wide">
-                {engine === 'google' ? 'Google' : 'DeepL'} 번역
+                {engine === "google" ? "Google" : "DeepL"} 번역
               </strong>
               <div className="flex-1 overflow-y-auto rounded-lg p-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-150 max-h-[300px] ">
                 {translations[engine]}
               </div>
               <button
                 className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-xl font-semibold shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all duration-150 disabled:opacity-50"
-                onClick={() => onSave(engine)}
-                disabled={isTranslating}
+                onClick={() => {
+                  console.log("🟦 [TranslationCard] 저장 버튼 클릭됨", engine);
+                  onSave(engine);
+                }}
+                disabled={isTranslating || !translations[engine]} // ✅ 번역이 비어 있으면 저장 불가
               >
                 저장하기
               </button>
@@ -121,12 +122,13 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
           ))}
         </div>
 
-              <p className="text-sm  text-gray-500 mt-2  border-gray-300">
-        사용자가 선택한 번역이 우측 사이드바 <strong>저장된 번역</strong>에 차례대로 저장됩니다. <strong>“저장하기”</strong> 버튼을 눌러 보세요. 
-      </p>
+        <p className="text-sm  text-gray-500 mt-2  border-gray-300">
+          사용자가 선택한 번역이 우측 사이드바 <strong>저장된 번역</strong>에
+          차례대로 저장됩니다. <strong>“저장하기”</strong> 버튼을 눌러 보세요.
+        </p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default TranslationCard
+export default TranslationCard;
