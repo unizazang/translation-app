@@ -1,7 +1,7 @@
 "use client";
 
 import { createBrowserClient } from "@supabase/ssr";
-import type { Session } from "@supabase/auth-js";
+import type { Session } from "@supabase/supabase-js"; // ✅ 올바른 Session 타입 import
 import { createContext, useContext, useEffect, useState } from "react";
 
 const SupabaseContext = createContext<{
@@ -28,12 +28,11 @@ export default function SupabaseProvider({
 
   const [session, setSession] = useState<Session | null>(serverSession);
 
-  // ✅ auth state가 변할 때마다 session 갱신
   useEffect(() => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+      setSession(session); // ✅ 상태 동기화
     });
 
     return () => {
@@ -48,5 +47,5 @@ export default function SupabaseProvider({
   );
 }
 
-// ✅ 외부에서 session.user 접근 가능하도록
+// ✅ 외부에서 supabase와 session 모두 접근 가능
 export const useSupabase = () => useContext(SupabaseContext);
