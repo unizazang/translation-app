@@ -19,12 +19,8 @@ const SavedTranslations: React.FC<Props> = ({
   onSentenceSelect,
 }) => {
   const user = useUser();
-  const {
-    savedTranslations,
-    updateTranslation,
-    copyAllTranslations,
-    resetAllTranslations,
-  } = useTranslationSupabase(user?.id ?? "", fileHash, fileName);
+  const { savedTranslations, updateTranslation, copyAllTranslations } =
+    useTranslationSupabase(user?.id ?? "", fileHash, fileName);
 
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -60,7 +56,7 @@ const SavedTranslations: React.FC<Props> = ({
   const handleResetTranslations = () => {
     const isConfirmed = window.confirm("정말 초기화할까요?");
     if (!isConfirmed) return;
-    resetAllTranslations(); // 현재는 기능 미구현
+    // 현재는 기능 미구현
     showToastMessage("번역이 초기화되었습니다.");
   };
 

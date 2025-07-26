@@ -53,14 +53,19 @@ export function useTranslationSupabase(
       return;
     }
 
+    console.log("🚀 useTranslationSupabase 시작", {
+      userId,
+      fileHash,
+      fileName,
+    });
     const load = async () => {
-      const id = await getOrCreateHistory(userId, fileHash, fileName);
+      const id = await getOrCreateHistory(fileHash, fileName, userId);
       if (!id) {
-        console.warn("⚠️ getOrCreateHistory 실패");
+        console.warn("⛔️ getOrCreateHistory 실패 → historyId null");
         return;
+      } else {
+        setHistoryId(id);
       }
-
-      setHistoryId(id);
 
       const saved = await getSavedTranslations(id);
       setSavedTranslations(saved);

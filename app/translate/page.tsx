@@ -24,6 +24,7 @@ import { generateFileHash } from "@/lib/fileHash";
 import { loadPdf, extractTextFromPdf } from "@/lib/pdfProcessor";
 import TranslationHistoryList from "@/components/TranslationHistoryList";
 import SavedTranslationsLocal from "@/components/SavedTranslationsLocal";
+import { getOrCreateHistory } from "@/lib/supabase/translation";
 
 export const dynamic = "force-dynamic";
 
@@ -293,6 +294,8 @@ export default function Home() {
     try {
       const hash = await generateFileHash(file);
       setFileHash(hash);
+      const historyId = await getOrCreateHistory(hash, file.name, user?.id); // ✅ 올바른 순서
+      console.log("✅ 강제 생성된 히스토리 ID:", historyId);
       const pdfBuffer = await loadPdf(file);
       const extractedText = await extractTextFromPdf(pdfBuffer);
       handleTextExtracted(extractedText, file.name, hash); // ✅ hash 전달
