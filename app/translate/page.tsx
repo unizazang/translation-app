@@ -79,9 +79,10 @@ export default function Home() {
     updateTranslation,
     savedTranslations,
     copyAllTranslations,
-    autoMove,
-    setAutoMove,
-  } = useTranslation(selectedHistory?.fileHash, selectedHistory?.fileName); // ✅ 반드시 전달
+  } = useTranslation(
+    selectedHistory?.fileHash ?? "",
+    selectedHistory?.fileName ?? ""
+  ); // ✅ 반드시 전달
 
   console.log(
     "✅ [page.tsx] useTranslation 호출됨:",
