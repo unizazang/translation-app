@@ -2,75 +2,53 @@
 
 import { useEffect, useState } from "react";
 import {
-  upsertSavedTranslation,
-  getSavedTranslations,
   getOrCreateHistory,
+  getSavedTranslations,
+  upsertSavedTranslation,
 } from "@/lib/supabase/translation";
 
-type UseTranslationSupabaseReturn = {
-  translations: {
-    google: string;
-    deepL: string;
-  }[];
-  savedTranslations:
-    | {
-        original: string;
-        translated: string;
-        idx: number;
-      }[]
-    | null;
-  translateText: (
-    text: string,
-    sourceLang: string,
-    idx: number,
-    properNouns: string[]
-  ) => Promise<void>;
-  saveTranslation: (
-    translated: string,
-    original: string,
-    idx: number
-  ) => Promise<void>;
-  updateTranslation: (
-    translated: string,
-    original: string,
-    idx: number
-  ) => Promise<void>;
-  copyAllTranslations: () => void;
-  setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
-  autoMove: boolean;
-  setAutoMove: React.Dispatch<React.SetStateAction<boolean>>;
+type TranslationResult = {
+  google: string;
+  deepL: string;
+};
+
+type SavedTranslation = {
+  idx: number;
+  original: string;
+  translated: string;
 };
 
 export function useTranslationSupabase(
-  userId: string,
+  userId: string | null,
   fileHash: string,
   fileName: string
-): UseTranslationSupabaseReturn {
-  const [translations, setTranslations] = useState<
-    { google: string; deepL: string }[]
-  >([]);
+) {
+  const [translations, setTranslations] = useState<TranslationResult[]>([]);
   const [savedTranslations, setSavedTranslations] = useState<
-    { original: string; translated: string; idx: number }[] | null
+    SavedTranslation[] | null
   >(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [autoMove, setAutoMove] = useState(false);
   const [historyId, setHistoryId] = useState<string | null>(null);
 
-  const loadSavedTranslations = async () => {
-    if (!userId || !fileHash || !fileName) return;
-    const id = await getOrCreateHistory(userId, fileHash, fileName);
-    setHistoryId(id);
-    // ✅ 타입 오류 방지
-    if (id) {
-      const data = await getSavedTranslations(id);
-      setSavedTranslations(data);
-    }
-  };
-
+  // ✅ 히스토리 로딩
   useEffect(() => {
-    loadSavedTranslations();
+    const load = async () => {
+      if (!userId || !fileHash || !fileName) return;
+
+      const id = await getOrCreateHistory(userId, fileHash, fileName);
+      if (!id) return;
+
+      setHistoryId(id);
+
+      const saved = await getSavedTranslations(id);
+      setSavedTranslations(saved);
+    };
+
+    load();
   }, [userId, fileHash, fileName]);
 
+  // ✅ 번역 및 저장
   const translateText = async (
     text: string,
     sourceLang: string,
@@ -82,16 +60,22 @@ export function useTranslationSupabase(
         method: "POST",
         body: JSON.stringify({ text, sourceLang, properNouns }),
       });
-      const data = await res.json();
 
-      const newTranslations = [...translations];
-      newTranslations[idx] = {
-        google: data.result.google,
-        deepL: data.result.deepL,
+      const data = await res.json();
+      const result: TranslationResult = {
+        google: data.result.google || "",
+        deepL: data.result.deepL || "",
       };
-      setTranslations(newTranslations);
-    } catch (error) {
-      console.error("❌ 번역 오류:", error);
+
+      const updated = [...translations];
+      updated[idx] = result;
+      setTranslations(updated);
+
+      // 저장도 함께 수행
+      const best = result.google || result.deepL;
+      await saveTranslation(best, text, idx);
+    } catch (e) {
+      console.error("❌ 번역 오류:", e);
     }
   };
 
@@ -101,7 +85,9 @@ export function useTranslationSupabase(
     idx: number
   ) => {
     if (!historyId) return;
+
     await upsertSavedTranslation(historyId, { original, translated, idx });
+
     const updatedList = [...(savedTranslations ?? [])];
     const existingIndex = updatedList.findIndex((item) => item.idx === idx);
     if (existingIndex !== -1) {
@@ -109,6 +95,7 @@ export function useTranslationSupabase(
     } else {
       updatedList.push({ original, translated, idx });
     }
+
     setSavedTranslations(updatedList);
   };
 
@@ -121,8 +108,8 @@ export function useTranslationSupabase(
   };
 
   const copyAllTranslations = () => {
-    const all = (savedTranslations ?? []).sort((a, b) => a.idx - b.idx);
-    const text = all.map((item) => item.translated).join("\n\n");
+    const sorted = [...(savedTranslations ?? [])].sort((a, b) => a.idx - b.idx);
+    const text = sorted.map((item) => item.translated).join("\n\n");
     navigator.clipboard.writeText(text);
   };
 

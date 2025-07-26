@@ -25,7 +25,11 @@ export type UseTranslationResult = {
     original: string,
     idx: number
   ) => Promise<void>;
-  updateTranslation: (idx: number, newText: string) => void;
+  updateTranslation: (
+    translated: string,
+    original: string,
+    idx: number
+  ) => Promise<void>;
   savedTranslations: SavedTranslation[] | null;
   copyAllTranslations: () => void;
   autoMove: boolean;
