@@ -14,31 +14,11 @@ export const supabase = createBrowserClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+// ✅ provider.tsx에서 SupabaseContext 가져옴
+
 export function useUser() {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
-
-      if (error) {
-        console.warn("🔐 Supabase getUser error:", error.message);
-        setUser(null);
-      } else {
-        setUser(user);
-      }
-
-      setLoading(false);
-    };
-
-    getUser();
-  }, []);
-
-  return user;
+  const { session } = useSupabase();
+  return session?.user ?? null;
 }
 
 export function useUserWithLoading() {

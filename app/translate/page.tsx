@@ -146,14 +146,29 @@ export default function Home() {
   // ✅ properNouns 타입 단언
   const handleTranslate = useCallback(
     async (index: number) => {
+      const textToTranslate = groupedSentences[index]?.join(" ") ?? "";
+      console.log("🟡 [handleTranslate] 호출됨");
+      console.log("🔹 index:", index);
+      console.log("🔹 번역할 문장:", textToTranslate);
+      console.log("🔹 selectedLanguage:", selectedLanguage);
+      console.log("🔹 properNouns:", properNouns);
+
       setIsTranslating(true);
-      await translateText(
-        groupedSentences[index].join(" "),
-        selectedLanguage,
-        index,
-        properNouns // ✅ 오류 없음
-      );
+
+      try {
+        await translateText(
+          textToTranslate,
+          selectedLanguage,
+          index,
+          properNouns
+        );
+        console.log("✅ [handleTranslate] translateText 완료");
+      } catch (e) {
+        console.error("❌ [handleTranslate] translateText 실패:", e);
+      }
+
       setIsTranslating(false);
+      console.log("🟢 [handleTranslate] isTranslating → false");
     },
     [groupedSentences, properNouns, selectedLanguage, translateText]
   );

@@ -187,6 +187,10 @@ export function useTranslationLocal(fileHash?: string) {
         return prev;
       }
 
+      console.log("📦 저장 시작", {
+        idx,
+        original,
+      });
       const updatedList = [...(prev || []), newEntry];
 
       const key = getStorageKey(currentFileName);
