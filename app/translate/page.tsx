@@ -169,6 +169,7 @@ export default function Home() {
     setIsPdfUploaded(true);
     setErrorMessage("");
     setFileName(fileNameArg);
+    console.log("✅ setting selectedHistory:", { fileNameArg, fileHashArg }); // 추가
     setSelectedHistory({ fileHash: fileHashArg, fileName: fileNameArg });
 
     const initialTranslatedBlocks = extractedText.map((page) =>
@@ -187,6 +188,11 @@ export default function Home() {
   // ✅ properNouns 타입 단언
   const handleTranslate = useCallback(
     async (index: number) => {
+      if (!selectedHistory?.fileHash || !selectedHistory?.fileName) {
+        console.warn("⚠️ selectedHistory 없음. 번역 실행 스킵됨");
+        return;
+      }
+
       const textToTranslate = groupedSentences[index]?.join(" ") ?? "";
       console.log("🟡 [handleTranslate] 호출됨");
       console.log("🔹 index:", index);
@@ -211,7 +217,13 @@ export default function Home() {
       setIsTranslating(false);
       console.log("🟢 [handleTranslate] isTranslating → false");
     },
-    [groupedSentences, properNouns, selectedLanguage, translateText]
+    [
+      groupedSentences,
+      properNouns,
+      selectedLanguage,
+      translateText,
+      selectedHistory,
+    ]
   );
 
   const handleSkip = () => {

@@ -171,10 +171,10 @@ export function useTranslationSupabase(
 
   return {
     translations,
-    savedTranslations,
     translateText,
     saveTranslation,
     updateTranslation,
+    savedTranslations,
     copyAllTranslations,
     setCurrentIndex,
     autoMove,
