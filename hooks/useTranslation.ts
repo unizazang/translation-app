@@ -6,6 +6,12 @@ import { useTranslationLocal } from "./useTranslationLocal";
 import { useTranslationSupabase } from "./useTranslationSupabase";
 import type { TranslatedTextBlock } from "@/lib/pdfLayout";
 // /types/translation.ts (또는 useTranslation.ts 내부에도 가능)
+
+type UpdateTranslationFn = (
+  translated: string,
+  original: string,
+  idx: number
+) => Promise<void>;
 export type SavedTranslation = {
   idx: number;
   original: string;
@@ -18,7 +24,7 @@ export type UseTranslationResult = {
     text: string,
     sourceLang: string,
     idx: number,
-    properNouns: string[]
+    properNouns: { original: string; translation: string }[]
   ) => Promise<void>;
   saveTranslation: (
     translation: string,

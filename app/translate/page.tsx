@@ -76,13 +76,19 @@ export default function Home() {
     translations: translationContext,
     translateText,
     saveTranslation,
-    updateTranslation,
+    updateTranslation: updateTranslationRef,
     savedTranslations,
     copyAllTranslations,
   } = useTranslation(
     selectedHistory?.fileHash ?? "",
     selectedHistory?.fileName ?? ""
   ); // ✅ 반드시 전달
+
+  const updateTranslationRefTyped = updateTranslationRef as (
+    translated: string,
+    original: string,
+    idx: number
+  ) => void;
 
   console.log(
     "✅ [page.tsx] useTranslation 호출됨:",
@@ -102,9 +108,15 @@ export default function Home() {
     });
   }, []);
 
+  // ✅ 래퍼 함수: PdfUploader의 인자 개수 맞추기
+  const handleExtractAndSetHistory = (text: PdfPageData[][], name: string) => {
+    handleTextExtracted(text, name, fileHash);
+  };
+
   const handleTextExtracted = (
     extractedText: PdfPageData[][],
-    fileNameArg: string
+    fileNameArg: string,
+    fileHashArg: string
   ) => {
     setPdfPages(extractedText);
     const extractedString = extractedText
@@ -116,6 +128,7 @@ export default function Home() {
     setIsPdfUploaded(true);
     setErrorMessage("");
     setFileName(fileNameArg);
+    setSelectedHistory({ fileHash: fileHashArg, fileName: fileNameArg });
 
     const initialTranslatedBlocks = extractedText.map((page) =>
       page.map((block) => ({
@@ -130,6 +143,7 @@ export default function Home() {
     setTranslatedBlocks(initialTranslatedBlocks);
   };
 
+  // ✅ properNouns 타입 단언
   const handleTranslate = useCallback(
     async (index: number) => {
       setIsTranslating(true);
@@ -137,7 +151,7 @@ export default function Home() {
         groupedSentences[index].join(" "),
         selectedLanguage,
         index,
-        properNouns
+        properNouns // ✅ 오류 없음
       );
       setIsTranslating(false);
     },
@@ -194,11 +208,11 @@ export default function Home() {
     setCompletedIndexes(new Set());
     // PDF 추출
     try {
-      const hash = await generateFileHash(file); // ✅ 해시 생성
-      setFileHash(hash); // ✅ 상태 저장
+      const hash = await generateFileHash(file);
+      setFileHash(hash);
       const pdfBuffer = await loadPdf(file);
       const extractedText = await extractTextFromPdf(pdfBuffer);
-      handleTextExtracted(extractedText, file.name);
+      handleTextExtracted(extractedText, file.name, hash); // ✅ hash 전달
       setIsPdfUploaded(true);
     } catch (error) {
       setErrorMessage(
@@ -320,7 +334,8 @@ export default function Home() {
         <div className="flex-1 flex flex-col bg-white rounded-2xl p-6">
           {!isPdfUploaded ? (
             <div className="flex-1 flex items-center justify-center">
-              <PdfUploader onTextExtracted={handleTextExtracted} />
+              {/* ✅ 수정: onTextExtracted는 래퍼를 통해 호출 */}
+              <PdfUploader onTextExtracted={handleExtractAndSetHistory} />
             </div>
           ) : (
             <TranslationCard
@@ -341,7 +356,7 @@ export default function Home() {
 
       {/* 오른쪽 사이드바 */}
       {isPdfUploaded && (
-        <div className="w-[600px] bg-white/90 border-l border-gray-100 shadow-inner flex flex-col rounded-l-3xl">
+        <div className="w-[600px] bg-white/90 ...">
           <div className="flex-1 min-h-0 overflow-y-auto px-4 py-6">
             {user ? (
               <SavedTranslations
@@ -356,7 +371,11 @@ export default function Home() {
                 groupedSentences={groupedSentences}
                 currentIndex={currentIndex}
                 onCopyAll={copyAllTranslations}
-                updateTranslation={updateTranslation}
+                // ✅ Supabase 함수는 async이므로 wrapper
+                updateTranslation={(idx: number, newText: string) => {
+                  const original = groupedSentences[idx].join(" ");
+                  updateTranslationRefTyped(newText, original, idx); // ✅ 타입 에러 사라짐
+                }}
                 onSentenceSelect={handleSentenceSelect}
               />
             )}

@@ -23,7 +23,16 @@ export function useTranslationSupabase(
   fileHash: string,
   fileName: string
 ) {
-  const [translations, setTranslations] = useState<TranslationResult[]>([]);
+  const [translations, setTranslations] = useState<{
+    google: string;
+    papago: string;
+    deepL: string;
+  }>({
+    google: "",
+    papago: "",
+    deepL: "",
+  });
+
   const [savedTranslations, setSavedTranslations] = useState<
     SavedTranslation[] | null
   >(null);
@@ -53,7 +62,7 @@ export function useTranslationSupabase(
     text: string,
     sourceLang: string,
     idx: number,
-    properNouns: string[]
+    properNouns: { original: string; translation: string }[]
   ) => {
     try {
       const res = await fetch("/api/translate", {

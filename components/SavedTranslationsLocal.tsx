@@ -11,7 +11,7 @@ interface SavedTranslationsProps {
   groupedSentences: string[][];
   currentIndex: number;
   onCopyAll: () => void;
-  updateTranslation: (idx: number, newTranslation: string) => void;
+  updateTranslation: (idx: number, newTranslation: string) => void; // ✅ 여기!
   onSentenceSelect: (index: number) => void;
 }
 
