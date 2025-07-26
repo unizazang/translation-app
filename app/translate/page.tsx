@@ -454,7 +454,52 @@ export default function Home() {
               isStarred={starredIndexes.has(currentIndex)}
               onToggleStar={() => handleToggleStar(currentIndex)}
               onSkip={handleSkip}
-              onTranslate={() => handleTranslate(currentIndex)}
+              onTranslate={async () => {
+                if (
+                  !selectedHistory?.fileHash ||
+                  !selectedHistory?.fileName ||
+                  typeof translateText !== "function"
+                ) {
+                  console.warn(
+                    "⚠️ 번역 실행 불가: translateText 또는 selectedHistory 없음",
+                    {
+                      translateText,
+                      selectedHistory,
+                    }
+                  );
+                  return;
+                }
+
+                const textToTranslate =
+                  groupedSentences[currentIndex]?.join(" ") ?? "";
+                console.log("🟡 [inline handleTranslate] 호출됨");
+                console.log("🔹 index:", currentIndex);
+                console.log("🔹 번역할 문장:", textToTranslate);
+                console.log("🔹 selectedLanguage:", selectedLanguage);
+                console.log("🔹 properNouns:", properNouns);
+
+                setIsTranslating(true);
+
+                try {
+                  await translateText(
+                    textToTranslate,
+                    selectedLanguage,
+                    currentIndex,
+                    properNouns
+                  );
+                  console.log("✅ [inline handleTranslate] translateText 완료");
+                } catch (e) {
+                  console.error(
+                    "❌ [inline handleTranslate] translateText 실패:",
+                    e
+                  );
+                }
+
+                setIsTranslating(false);
+                console.log(
+                  "🟢 [inline handleTranslate] isTranslating → false"
+                );
+              }}
             />
           )}
         </div>
