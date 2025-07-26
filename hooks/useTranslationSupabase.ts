@@ -32,6 +32,7 @@ export function useTranslationSupabase(
   const [currentIndex, setCurrentIndex] = useState(0);
   const [autoMove, setAutoMove] = useState(false);
   const [historyId, setHistoryId] = useState<string | null>(null);
+  const [isTranslating, setIsTranslating] = useState(false); // ✅ 추가
 
   // ✅ 히스토리 로딩
   useEffect(() => {
@@ -75,14 +76,16 @@ export function useTranslationSupabase(
     idx: number,
     properNouns: { original: string; translation: string }[]
   ) => {
-    // ✅ 조건 미충족 방어 (필수 수정 사항)
-    if (!fileHash || !fileName) {
+    if (!fileHash || !fileName || !historyId) {
       console.warn("⛔️ translateText 실행 조건 미충족", {
         fileHash,
         fileName,
+        historyId,
       });
       return;
     }
+
+    setIsTranslating(true); // ✅ 시작 전 설정
 
     try {
       console.log("📤 [translateText] API 요청 시작", {
@@ -117,6 +120,8 @@ export function useTranslationSupabase(
       console.log("✅ [translateText] 저장까지 완료");
     } catch (e) {
       console.error("❌ [translateText] 오류:", e);
+    } finally {
+      setIsTranslating(false); // ✅ 항상 종료
     }
   };
 
@@ -174,5 +179,6 @@ export function useTranslationSupabase(
     setCurrentIndex,
     autoMove,
     setAutoMove,
+    isTranslating, // ✅ 반환 추가
   };
 }

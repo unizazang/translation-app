@@ -110,11 +110,8 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
               </div>
               <button
                 className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-xl font-semibold shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all duration-150 disabled:opacity-50"
-                onClick={() => {
-                  console.log("🟦 [TranslationCard] 저장 버튼 클릭됨", engine);
-                  onSave(engine);
-                }}
-                disabled={isTranslating || !translations[engine]} // ✅ 번역이 비어 있으면 저장 불가
+                onClick={() => onSave(engine)}
+                disabled={isTranslating}
               >
                 저장하기
               </button>

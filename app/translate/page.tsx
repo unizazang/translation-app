@@ -73,16 +73,42 @@ export default function Home() {
   const { properNouns } = useProperNoun();
   const { groupedSentences, processText } = useTextProcessing();
 
-  const translationProps = selectedHistory
-    ? useTranslation(selectedHistory.fileHash, selectedHistory.fileName)
-    : {
-        translations: {},
-        translateText: async () => {},
-        saveTranslation: async () => {},
-        updateTranslation: async () => {},
-        savedTranslations: [],
-        copyAllTranslations: () => {},
-      };
+  // // ✅ 1. fallback props 정의
+  // const fallbackTranslationProps = {
+  //   translations: {},
+  //   translateText: async () => {
+  //     console.warn("⚠️ fallback translateText 실행됨 - 실제 번역 없음");
+  //   },
+  //   saveTranslation: async () => {},
+  //   updateTranslation: async () => {},
+  //   savedTranslations: [],
+  //   copyAllTranslations: () => {},
+  //   autoMove: false,
+  //   setAutoMove: () => {},
+  //   groupedSentences: [],
+  //   setGroupedSentences: () => {},
+  // };
+
+  // // ✅ 2. 무조건 훅 호출 (조건 없이 최상위에서만)
+  // const selectedFileHash = selectedHistory?.fileHash ?? "";
+  // const selectedFileName = selectedHistory?.fileName ?? "";
+
+  // const isReady = !!selectedFileHash && !!selectedFileName;
+
+  // const translationProps = useTranslation(selectedFileHash, selectedFileName);
+
+  // // ✅ 3. 내부에서 조건 분기 (빠짐없이 구조분해)
+  // const {
+  //   translations: translationContext,
+  //   translateText,
+  //   saveTranslation,
+  //   updateTranslation: updateTranslationRef,
+  //   savedTranslations,
+  //   copyAllTranslations,
+  //   autoMove,
+  //   setAutoMove,
+  //   setGroupedSentences,
+  // } = isReady ? translationProps : fallbackTranslationProps;
 
   const {
     translations: translationContext,
@@ -91,10 +117,13 @@ export default function Home() {
     updateTranslation: updateTranslationRef,
     savedTranslations,
     copyAllTranslations,
+    autoMove,
+    setAutoMove,
+    setGroupedSentences,
   } = useTranslation(
     selectedHistory?.fileHash ?? "",
     selectedHistory?.fileName ?? ""
-  ); // ✅ 반드시 전달
+  );
 
   const updateTranslationRefTyped = updateTranslationRef as (
     translated: string,
