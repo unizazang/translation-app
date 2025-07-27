@@ -32,9 +32,8 @@ export function useTranslationSupabase(
   const [currentIndex, setCurrentIndex] = useState(0);
   const [autoMove, setAutoMove] = useState(false);
   const [historyId, setHistoryId] = useState<string | null>(null);
-  const [isTranslating, setIsTranslating] = useState(false); // ✅ 추가
+  const [isTranslating, setIsTranslating] = useState(false);
 
-  // ✅ 히스토리 로딩
   useEffect(() => {
     const shouldLoad =
       typeof userId === "string" &&
@@ -58,34 +57,38 @@ export function useTranslationSupabase(
       fileHash,
       fileName,
     });
+
     const load = async () => {
       const id = await getOrCreateHistory(fileHash, fileName, userId);
       if (!id) {
         console.warn("⛔️ getOrCreateHistory 실패 → historyId null");
         return;
-      } else {
-        setHistoryId(id);
       }
 
+      setHistoryId(id);
+
       const saved = await getSavedTranslations(id);
+      if (!saved) {
+        console.warn("⛔️ getSavedTranslations 실패");
+        return;
+      }
+
       setSavedTranslations(saved);
+
+      // 기존 번역을 상태로 복원
+      const mapped: Record<number, TranslationResult> = {};
+      for (const item of saved) {
+        mapped[item.idx] = {
+          google: item.translated,
+          deepL: item.translated,
+        };
+      }
+      setTranslations(mapped);
     };
 
     load();
   }, [userId, fileHash, fileName]);
 
-  useEffect(() => {
-    if (!userId || !fileHash || !fileName) return;
-
-    console.log("📌 useEffect 트리거됨 - fileHash or fileName 변경", {
-      fileHash,
-      fileName,
-      userId: userId,
-    });
-  }, [fileHash, fileName, userId]);
-
-  // ✅ 번역 및 저장
-  // ✅ 번역 및 저장
   const translateText = async (
     text: string,
     sourceLang: string,
@@ -106,7 +109,7 @@ export function useTranslationSupabase(
       return;
     }
 
-    setIsTranslating(true); // ✅ 시작 전 설정
+    setIsTranslating(true);
 
     try {
       console.log("📤 [translateText] API 요청 시작", {
@@ -120,8 +123,6 @@ export function useTranslationSupabase(
         method: "POST",
         body: JSON.stringify({ text, sourceLang, properNouns }),
       });
-
-      console.log("📨 [translateText] 응답 status:", res.status);
 
       const data = await res.json();
       console.log("📩 [translateText] 응답 data:", data);
@@ -143,7 +144,7 @@ export function useTranslationSupabase(
     } catch (e) {
       console.error("❌ [translateText] 오류:", e);
     } finally {
-      setIsTranslating(false); // ✅ 항상 종료
+      setIsTranslating(false);
     }
   };
 
@@ -158,13 +159,6 @@ export function useTranslationSupabase(
     }
 
     await upsertSavedTranslation(historyId, { original, translated, idx });
-
-    console.log("📦 저장 시작", {
-      historyId,
-      idx,
-      translated,
-      original,
-    });
 
     const updatedList = [...(savedTranslations ?? [])];
     const existingIndex = updatedList.findIndex((item) => item.idx === idx);
