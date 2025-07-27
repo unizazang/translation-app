@@ -74,6 +74,16 @@ export function useTranslationSupabase(
     load();
   }, [userId, fileHash, fileName]);
 
+  useEffect(() => {
+    if (!userId || !fileHash || !fileName) return;
+
+    console.log("📌 useEffect 트리거됨 - fileHash or fileName 변경", {
+      fileHash,
+      fileName,
+      userId: userId,
+    });
+  }, [fileHash, fileName, userId]);
+
   // ✅ 번역 및 저장
   // ✅ 번역 및 저장
   const translateText = async (
@@ -82,7 +92,11 @@ export function useTranslationSupabase(
     idx: number,
     properNouns: { original: string; translation: string }[]
   ) => {
-    console.log("🟢 translateText 함수 내부 진입 성공");
+    console.log("🔥 translateText 진입", {
+      fileHash,
+      fileName,
+      historyId,
+    });
     if (!fileHash || !fileName || !historyId) {
       console.warn("⛔️ translateText 실행 조건 미충족", {
         fileHash,

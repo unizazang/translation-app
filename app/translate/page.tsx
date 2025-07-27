@@ -116,7 +116,7 @@ export default function Home() {
     autoMove,
     setAutoMove,
     setGroupedSentences,
-  } = useTranslation();
+  } = useTranslation(fileHash, fileName);
 
   const updateTranslationRefTyped = updateTranslationRef as (
     translated: string,
@@ -232,6 +232,8 @@ export default function Home() {
       setShouldAutoTranslate(true);
     }
   };
+  console.log("📄 fileHash 상태", fileHash);
+  console.log("📄 fileName 상태", fileName);
 
   const handleTranslationSave = (engine: "google" | "deepL") => {
     const translatedText = translationContext[engine];

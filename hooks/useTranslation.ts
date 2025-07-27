@@ -42,6 +42,7 @@ export type UseTranslationResult = {
   copyAllTranslations: () => void;
   autoMove: boolean;
   setAutoMove: React.Dispatch<React.SetStateAction<boolean>>;
+  isTranslating: boolean; // ✅ Supabase 버전에서는 반드시 필요함
 };
 
 export function useTranslation(fileHash?: string, fileName?: string) {
@@ -49,26 +50,9 @@ export function useTranslation(fileHash?: string, fileName?: string) {
 
   console.log("✅ useTranslation 시작", { user, fileHash });
 
-  // const isReady = !!fileHash && !!fileName;
-  // const isClient = typeof window !== "undefined";
-
-  /* { ...useTranslationSupabase(user.id, fileHash!, fileName!) } // dlfjgrp? */
-  /* 다음에 이걸로 바꿨었는데 걍 기존으로 돌려놓음 혹시나 해서
-      
-      const supabase =
-    isReady && user
-    ? useTranslationSupabase(user.id, fileHash!, fileName!)
-  : isClient
-    ? useTranslationLocal()
-    : createEmptyTranslationMethods();
-
-
-      */
-
   const [groupedSentences, setGroupedSentences] = useState<string[][]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // ✅ 항상 훅을 호출하되 내부에서 조건 분기하도록 설계
   const local = useTranslationLocal();
   const supabase = useTranslationSupabase(
     user?.id ?? null,
