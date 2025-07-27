@@ -82,6 +82,7 @@ export function useTranslationSupabase(
     idx: number,
     properNouns: { original: string; translation: string }[]
   ) => {
+    console.log("🟢 translateText 함수 내부 진입 성공");
     if (!fileHash || !fileName || !historyId) {
       console.warn("⛔️ translateText 실행 조건 미충족", {
         fileHash,
