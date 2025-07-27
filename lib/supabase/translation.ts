@@ -9,7 +9,7 @@ export async function getOrCreateHistory(
   fileName: string,
   userId: string
 ) {
-  if (!fileHash || !fileName || !userId) {
+  if (!userId) {
     console.warn("❌ getOrCreateHistory: 필수 값 없음", {
       fileHash,
       fileName,

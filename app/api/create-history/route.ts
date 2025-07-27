@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   try {
     const { fileHash, fileName, userId } = await req.json();
 
-    if (!fileHash || !fileName || !userId) {
+    if (!userId) {
       return NextResponse.json(
         { error: "fileHash, fileName, userId는 모두 필수입니다." },
         { status: 400 }

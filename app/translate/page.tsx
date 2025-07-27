@@ -89,7 +89,7 @@ export default function Home() {
   const translationProps = useTranslation(fileHash, fileName);
 
   // ✅ 3. 유효성 판단 기준
-  const isReady = !!fileHash && !!fileName;
+  const isReady = !!user?.id;
 
   // ✅ 4. 내부에서 fallback 구조분해 처리
   const {

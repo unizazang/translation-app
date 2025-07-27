@@ -46,8 +46,6 @@ export function useTranslationSupabase(
     if (!shouldLoad) {
       console.warn("⚠️ useTranslationSupabase: 조건 불충족으로 load() 스킵", {
         userId,
-        fileHash,
-        fileName,
       });
       return;
     }
@@ -100,14 +98,6 @@ export function useTranslationSupabase(
       fileName,
       historyId,
     });
-    if (!fileHash || !fileName || !historyId) {
-      console.warn("⛔️ translateText 실행 조건 미충족", {
-        fileHash,
-        fileName,
-        historyId,
-      });
-      return;
-    }
 
     setIsTranslating(true);
 
