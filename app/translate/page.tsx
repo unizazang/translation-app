@@ -267,6 +267,13 @@ export default function Home() {
     try {
       const hash = await generateFileHash(file);
       setFileHash(hash);
+
+      // ✅ Supabase 히스토리 생성은 백그라운드에서 비동기 실행
+      (async () => {
+        if (user?.id && hash && file.name) {
+          await getOrCreateHistory(hash, file.name, user.id);
+        }
+      })();
       const historyId = await getOrCreateHistory(hash, file.name, user?.id); // ✅ 올바른 순서
       console.log("✅ 강제 생성된 히스토리 ID:", historyId);
       const pdfBuffer = await loadPdf(file);
