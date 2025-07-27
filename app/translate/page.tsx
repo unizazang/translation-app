@@ -69,43 +69,29 @@ export default function Home() {
   const { properNouns } = useProperNoun();
   const { groupedSentences, processText } = useTextProcessing();
 
-  // // ✅ 1. fallback props 정의
-  // const fallbackTranslationProps = {
-  //   translations: {},
-  //   translateText: async () => {
-  //     console.warn("⚠️ fallback translateText 실행됨 - 실제 번역 없음");
-  //   },
-  //   saveTranslation: async () => {},
-  //   updateTranslation: async () => {},
-  //   savedTranslations: [],
-  //   copyAllTranslations: () => {},
-  //   autoMove: false,
-  //   setAutoMove: () => {},
-  //   groupedSentences: [],
-  //   setGroupedSentences: () => {},
-  // };
+  // ✅ 1. fallback props 정의
+  const fallbackTranslationProps = {
+    translations: {},
+    translateText: async () => {
+      console.warn("⚠️ fallback translateText 실행됨 - 실제 번역 없음");
+    },
+    saveTranslation: async () => {},
+    updateTranslation: async () => {},
+    savedTranslations: [],
+    copyAllTranslations: () => {},
+    autoMove: false,
+    setAutoMove: () => {},
+    groupedSentences: [],
+    setGroupedSentences: () => {},
+  };
 
-  // // ✅ 2. 무조건 훅 호출 (조건 없이 최상위에서만)
-  // const selectedFileHash = selectedHistory?.fileHash ?? "";
-  // const selectedFileName = selectedHistory?.fileName ?? "";
+  // ✅ 2. Supabase 기반 번역 훅은 항상 호출 (조건 없이)
+  const translationProps = useTranslation(fileHash, fileName);
 
-  // const isReady = !!selectedFileHash && !!selectedFileName;
+  // ✅ 3. 유효성 판단 기준
+  const isReady = !!fileHash && !!fileName;
 
-  // const translationProps = useTranslation(selectedFileHash, selectedFileName);
-
-  // // ✅ 3. 내부에서 조건 분기 (빠짐없이 구조분해)
-  // const {
-  //   translations: translationContext,
-  //   translateText,
-  //   saveTranslation,
-  //   updateTranslation: updateTranslationRef,
-  //   savedTranslations,
-  //   copyAllTranslations,
-  //   autoMove,
-  //   setAutoMove,
-  //   setGroupedSentences,
-  // } = isReady ? translationProps : fallbackTranslationProps;
-
+  // ✅ 4. 내부에서 fallback 구조분해 처리
   const {
     translations: translationContext,
     translateText,
@@ -116,7 +102,7 @@ export default function Home() {
     autoMove,
     setAutoMove,
     setGroupedSentences,
-  } = useTranslation(fileHash, fileName);
+  } = isReady ? translationProps : fallbackTranslationProps;
 
   const updateTranslationRefTyped = updateTranslationRef as (
     translated: string,

@@ -2,11 +2,16 @@
 
 import { useState } from "react";
 import { loadPdf, extractTextFromPdf, PdfPageData } from "@/lib/pdfProcessor";
+import { generateFileHash } from "@/lib/fileHash"; // ✅ 추가
 import FileDropzone from "./FileDropzone";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface PdfUploaderProps {
-  onTextExtracted: (text: PdfPageData[][], fileName: string) => void;
+  onTextExtracted: (
+    text: PdfPageData[][],
+    fileName: string,
+    fileHash: string
+  ) => void;
 }
 
 export default function PdfUploader({ onTextExtracted }: PdfUploaderProps) {
@@ -17,8 +22,8 @@ export default function PdfUploader({ onTextExtracted }: PdfUploaderProps) {
    */
   const handleFileUpload = async (file: File) => {
     // PDF 확장자 체크
-    if (!file.name.toLowerCase().endsWith('.pdf')) {
-      alert('PDF파일만 업로드 가능합니다.');
+    if (!file.name.toLowerCase().endsWith(".pdf")) {
+      alert("PDF파일만 업로드 가능합니다.");
       return;
     }
     setIsLoading(true);
@@ -27,9 +32,11 @@ export default function PdfUploader({ onTextExtracted }: PdfUploaderProps) {
       const extractedText: PdfPageData[][] = await extractTextFromPdf(
         pdfBuffer
       );
-      // 확장자 제거한 파일명 전달
-      const nameWithoutExt = file.name.replace(/\.pdf$/i, '');
-      onTextExtracted(extractedText, nameWithoutExt);
+
+      const fileHash = await generateFileHash(file); // ✅ 파일 해시 생성
+      const nameWithoutExt = file.name.replace(/\.pdf$/i, "");
+
+      onTextExtracted(extractedText, nameWithoutExt, fileHash); // ✅ 해시 포함 전달
     } catch (error) {
       console.error("❌ PDF 처리 중 오류 발생:", error);
     } finally {
