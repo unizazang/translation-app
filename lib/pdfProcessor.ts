@@ -50,6 +50,25 @@ export function cleanExtractedText(text: string): string {
     .trim();
 }
 
+/* 
+일반 공백, 탭, 개행,
+
+모든 유니코드 invisible character,
+
+zero-width space, non-breaking space 등
+최대한 모든 "비가시 문자"를 날리는 쿼리입니다.
+UPDATE callteam_roles
+SET email = REGEXP_REPLACE(
+  email,
+  '[\s\u00a0\u200b\u200e\u200f\u2028\u2029\u202a\u202b\u202c\u202d\u202e\u2060\u3000]+',
+  '',
+  'g'
+)
+WHERE email LIKE 'zifnffk32123%';
+
+*/
+
+
 /**
  * ✅ PDF에서 텍스트를 추출하는 함수
  */
